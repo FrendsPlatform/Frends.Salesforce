@@ -1,0 +1,7 @@
+{
+  "Tasks": [
+    {
+      "TaskMethod": "Frends.Salesforce.ExecuteQuery.Salesforce.ExecuteQuery"
+    }
+  ]
+}
