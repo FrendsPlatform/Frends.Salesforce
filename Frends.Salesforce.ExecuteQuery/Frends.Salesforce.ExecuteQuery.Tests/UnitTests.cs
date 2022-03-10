@@ -15,6 +15,7 @@ namespace Frends.Salesforce.ExecuteQuery.Tests
 
         private readonly string _domain = @"https://hiqfinlandoy2-dev-ed.my.salesforce.com";
         private readonly string _username = "testuser@test.fi";
+        private readonly string _authurl = @"https://login.salesforce.com/services/oauth2/token";
         private readonly CancellationToken _cancellationToken = new();
 
         [Test]
@@ -29,7 +30,7 @@ namespace Frends.Salesforce.ExecuteQuery.Tests
             var options = new Options
             {
                 AuthenticationMethod = AuthenticationMethod.AccessToken,
-                AccessToken = await Salesforce.GetAccessToken(_clientID, _clientSecret, _username, _password + _securityToken, _cancellationToken)
+                AccessToken = await Salesforce.GetAccessToken(_authurl, _clientID, _clientSecret, _username, _password + _securityToken, _cancellationToken)
             };
 
             var result = await Salesforce.ExecuteQuery(input, options, _cancellationToken);
@@ -48,6 +49,7 @@ namespace Frends.Salesforce.ExecuteQuery.Tests
             var options = new Options
             {
                 AuthenticationMethod = AuthenticationMethod.OAuth2WithPassword,
+                AuthUrl = _authurl,
                 ClientID = _clientID,
                 ClientSecret = _clientSecret,
                 Username = _username,
@@ -71,6 +73,7 @@ namespace Frends.Salesforce.ExecuteQuery.Tests
             var options = new Options
             {
                 AuthenticationMethod = AuthenticationMethod.OAuth2WithPassword,
+                AuthUrl = _authurl,
                 ClientID = _clientID,
                 ClientSecret = _clientSecret,
                 Username = _username,
@@ -80,7 +83,7 @@ namespace Frends.Salesforce.ExecuteQuery.Tests
             };
 
             var result = (ResultWithToken)await Salesforce.ExecuteQuery(input, options, _cancellationToken);
-            var accessToken = await Salesforce.GetAccessToken(_clientID, _clientSecret, _username, _password + _securityToken, _cancellationToken);
+            var accessToken = await Salesforce.GetAccessToken(_authurl, _clientID, _clientSecret, _username, _password + _securityToken, _cancellationToken);
             Assert.IsTrue(result.RequestIsSuccessful);
             Assert.AreEqual(result.Token, accessToken);
         }

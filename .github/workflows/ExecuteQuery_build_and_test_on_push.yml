@@ -7,8 +7,6 @@ on:
     paths:
       - 'Frends.Salesforce.ExecuteQuery/**'
   workflow_dispatch:
-    paths:
-      - 'Frends.Salesforce.ExecuteQuery/**'
 
 jobs:
   build:
@@ -26,4 +24,3 @@ jobs:
       env_var_value_2: ${{ secrets.SALESFORCE_PASSWORD }}
       env_var_value_3: ${{ secrets.SALESFORCE_SECURITY_TOKEN }}
       env_var_value_4: ${{ secrets.SALESFORCE_CLIENTID }}
-      

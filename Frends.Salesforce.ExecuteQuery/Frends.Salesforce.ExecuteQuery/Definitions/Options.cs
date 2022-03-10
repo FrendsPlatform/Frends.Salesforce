@@ -21,6 +21,13 @@ namespace Frends.Salesforce.ExecuteQuery
         public string AccessToken { get; set; }
 
         /// <summary>
+        /// URL to fetch OAuth2 token.
+        /// </summary>
+        [UIHint(nameof(AuthenticationMethod), "", AuthenticationMethod.OAuth2WithPassword)]
+        [DefaultValue(@"https://login.salesforce.com/services/oauth2/token")]
+        public string AuthUrl { get; set; }
+
+        /// <summary>
         /// Client ID to get OAuth2 token.
         /// </summary>
         [UIHint(nameof(AuthenticationMethod), "", AuthenticationMethod.OAuth2WithPassword)]

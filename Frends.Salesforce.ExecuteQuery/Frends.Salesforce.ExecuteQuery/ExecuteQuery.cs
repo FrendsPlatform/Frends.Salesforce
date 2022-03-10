@@ -37,7 +37,7 @@ namespace Frends.Salesforce.ExecuteQuery
 
             if (options.AuthenticationMethod is AuthenticationMethod.OAuth2WithPassword)
             {
-                accessToken = await GetAccessToken(options.ClientID, options.ClientSecret, options.Username, options.Password + options.SecurityToken, cancellationToken);
+                accessToken = await GetAccessToken(options.AuthUrl, options.ClientID, options.ClientSecret, options.Username, options.Password + options.SecurityToken, cancellationToken);
                 request.AddHeader("Authorization", "Bearer " + accessToken);
             }
 
@@ -55,9 +55,9 @@ namespace Frends.Salesforce.ExecuteQuery
         /// Get OAuth2 access token.
         /// This method is public since it is used also in Unit tests.
         /// </summary>
-        public static async Task<string> GetAccessToken(string clientId, string clientSecret, string username, string passwordWithSecurityToken, CancellationToken cancellationToken)
+        public static async Task<string> GetAccessToken(string url, string clientId, string clientSecret, string username, string passwordWithSecurityToken, CancellationToken cancellationToken)
         {
-            var authClient = new RestClient(@"https://login.salesforce.com/services/oauth2/token");
+            var authClient = new RestClient(url);
             var authRequest = new RestRequest("", Method.Post);
             authRequest.AddHeader("Content-Type", "application/x-www-form-urlencoded");
             authRequest.AddParameter("grant_type", "password");
