@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 
 namespace Frends.Salesforce.CreateSObject.Definitions
 {
+    /// <summary>
+    /// Enums-class for CreateSObject-task.
+    /// </summary>
     public class Enums
     {
         /// <summary>

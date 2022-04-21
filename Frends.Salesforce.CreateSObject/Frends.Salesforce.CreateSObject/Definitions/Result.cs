@@ -3,29 +3,37 @@
 namespace Frends.Salesforce.CreateSObject
 {
     /// <summary>
-    /// Result-class for ExecuteQuery-task.
+    /// Result-class for CreateSObject-task.
     /// </summary>
     public class Result
     {
         /// <summary>
         /// Body of the response.
         /// </summary>
-        public object Body { get; set; }
+        public object Body { get; private set; }
 
         /// <summary>
         /// Was the request successful?
         /// </summary>
-        public bool RequestIsSuccessful { get; set; }
+        public bool RequestIsSuccessful { get; private set; }
 
         /// <summary>
         /// Exception that was thrown by the server.
         /// </summary>
-        public Exception ErrorException { get; set; }
+        public Exception ErrorException { get; private set; }
 
         /// <summary>
         /// Error message from the server.
         /// </summary>
-        public string ErrorMessage { get; set; }
+        public string ErrorMessage { get; private set; }
+
+        internal Result(object body, bool succesful, Exception error, string errormessage)
+        {
+            this.Body = body;
+            this.RequestIsSuccessful = succesful;
+            this.ErrorException = error;
+            this.ErrorMessage = errormessage;
+        }
     }
 
     /// <summary>
@@ -36,6 +44,11 @@ namespace Frends.Salesforce.CreateSObject
         /// <summary>
         /// OAuth2 access token.
         /// </summary>
-        public string Token { get; set; }
+        public string Token { get; private set; }
+
+        internal ResultWithToken(object body, bool succesful, Exception error, string errormessage, string token) : base(body, succesful, error, errormessage)
+        {
+            this.Token = token;
+        }
     }
 }

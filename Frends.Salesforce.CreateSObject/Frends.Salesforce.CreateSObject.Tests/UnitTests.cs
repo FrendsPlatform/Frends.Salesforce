@@ -3,6 +3,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using NUnit.Framework;
+using static Frends.Salesforce.CreateSObject.Definitions.Enums;
 
 namespace Frends.Salesforce.CreateSObject.Tests
 {

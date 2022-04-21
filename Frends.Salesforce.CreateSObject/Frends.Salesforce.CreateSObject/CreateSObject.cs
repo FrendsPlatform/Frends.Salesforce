@@ -3,8 +3,6 @@ using RestSharp;
 using System;
 using System.ComponentModel;
 using System.Net;
-using System.Net.Http;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using static Frends.Salesforce.CreateSObject.Definitions.Enums;
@@ -47,9 +45,9 @@ namespace Frends.Salesforce.CreateSObject
             Console.WriteLine(response.Content);
 
             if (options.AuthenticationMethod is AuthenticationMethod.OAuth2WithPassword && options.ReturnAccessToken)
-                return new ResultWithToken { Body = JsonConvert.DeserializeObject<dynamic>(response.Content), RequestIsSuccessful = response.IsSuccessful, ErrorException = response.ErrorException, ErrorMessage = response.ErrorMessage, Token = accessToken };
+                return new ResultWithToken ( JsonConvert.DeserializeObject<dynamic>(response.Content),  response.IsSuccessful, response.ErrorException, response.ErrorMessage, accessToken );
             else
-                return new Result { Body = JsonConvert.DeserializeObject<dynamic>(response.Content), RequestIsSuccessful = response.IsSuccessful, ErrorException = response.ErrorException, ErrorMessage = response.ErrorMessage };
+                return new Result ( JsonConvert.DeserializeObject<dynamic>(response.Content), response.IsSuccessful, response.ErrorException, response.ErrorMessage );
         }
 
         #region HelperMethods

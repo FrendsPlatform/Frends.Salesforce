@@ -5,7 +5,7 @@ using static Frends.Salesforce.CreateSObject.Definitions.Enums;
 namespace Frends.Salesforce.CreateSObject
 {
     /// <summary>
-    /// Input-class for ExecuteQuery-task.
+    /// Input-class for CreateSObject-task.
     /// </summary>
     public class Input
     {
