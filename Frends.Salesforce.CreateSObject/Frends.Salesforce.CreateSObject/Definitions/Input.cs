@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
+using static Frends.Salesforce.CreateSObject.Definitions.Enums;
 
 namespace Frends.Salesforce.CreateSObject
 {
@@ -21,5 +22,10 @@ namespace Frends.Salesforce.CreateSObject
         /// </summary>
         [DisplayFormat(DataFormatString = "Text")]
         public string SObjectAsJson { get; set; }
+
+        /// <summary>
+        /// SObject type.
+        /// </summary>
+        public SObjectType SObjectType { get; set; }
     }
 }

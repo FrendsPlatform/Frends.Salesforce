@@ -34,7 +34,7 @@ namespace Frends.Salesforce.CreateSObject.Tests
 
         [SetUp]
         public void SetUp() {
-            var temp = new JsonTest("Test");
+            var temp = new JsonTest("Test" + DateTime.Now);
             _userJson = JsonConvert.SerializeObject(temp);
         }
 

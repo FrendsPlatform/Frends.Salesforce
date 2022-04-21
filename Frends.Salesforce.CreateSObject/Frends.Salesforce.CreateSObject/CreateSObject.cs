@@ -7,6 +7,7 @@ using System.Net.Http;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using static Frends.Salesforce.CreateSObject.Definitions.Enums;
 
 namespace Frends.Salesforce.CreateSObject
 {
@@ -26,7 +27,7 @@ namespace Frends.Salesforce.CreateSObject
         )
         {
             var query = WebUtility.UrlEncode(input.SObjectAsJson);
-            var client = new RestClient(input.Domain + "/services/data/v54.0/");
+            var client = new RestClient(input.Domain + "/services/data/v54.0/" + input.SObjectType);
             var request = new RestRequest("/", Method.Get);
             string accessToken = "";
 
