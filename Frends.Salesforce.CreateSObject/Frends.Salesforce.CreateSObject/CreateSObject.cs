@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json;
 using RestSharp;
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Net;
 using System.Threading;
@@ -24,9 +25,8 @@ namespace Frends.Salesforce.CreateSObject
             CancellationToken cancellationToken
         )
         {
-            var query = WebUtility.UrlEncode(input.SObjectAsJson);
-            var client = new RestClient(input.Domain + "/services/data/v54.0/" + input.SObjectType);
-            var request = new RestRequest("/", Method.Get);
+            var client = new RestClient(input.Domain + "/services/data/v54.0/sobjects/" + input.SObjectType);
+            var request = new RestRequest("/", Method.Post);
             string accessToken = "";
 
             if (options.AuthenticationMethod is AuthenticationMethod.AccessToken)
@@ -41,6 +41,10 @@ namespace Frends.Salesforce.CreateSObject
                 request.AddHeader("Authorization", "Bearer " + accessToken);
             }
 
+
+            var json = JsonConvert.DeserializeObject<Dictionary<string, string>>(input.SObjectAsJson);
+            request.RequestFormat = DataFormat.Json;
+            request.AddJsonBody(json);
             var response = await client.ExecuteAsync(request, cancellationToken);
             Console.WriteLine(response.Content);
 

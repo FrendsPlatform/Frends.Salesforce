@@ -26,6 +26,7 @@ namespace Frends.Salesforce.CreateSObject
         /// <summary>
         /// SObject type.
         /// </summary>
+        [DefaultValue(SObjectType.Account)]
         public SObjectType SObjectType { get; set; }
     }
 }

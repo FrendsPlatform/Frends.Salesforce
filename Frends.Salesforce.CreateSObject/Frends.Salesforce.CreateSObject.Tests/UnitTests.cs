@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Newtonsoft.Json;
+using System.Text.Json;
 using NUnit.Framework;
 using static Frends.Salesforce.CreateSObject.Definitions.Enums;
+using System.Collections.Generic;
 
 namespace Frends.Salesforce.CreateSObject.Tests
 {
@@ -22,21 +23,19 @@ namespace Frends.Salesforce.CreateSObject.Tests
 
         private string _userJson;
 
+        #region helper classes
         private class JsonTest { 
-            private string Name { get; }
-            private DateTime Date { get; }
-
-            public JsonTest(string name)
-            {
-                this.Name = name;
-                this.Date = DateTime.Now;
-            }
+            public string Name { get; set; }
         }
+        #endregion
 
         [SetUp]
         public void SetUp() {
-            var temp = new JsonTest("Test" + DateTime.Now);
-            _userJson = JsonConvert.SerializeObject(temp);
+            JsonTest content = new JsonTest {
+                Name = "Test" + DateTime.Now.Year + "" + DateTime.Now.Month + "" + DateTime.Now.Day
+            };
+            var json = JsonSerializer.Serialize(content);
+            _userJson = json;
         }
 
         [Test]
@@ -45,7 +44,8 @@ namespace Frends.Salesforce.CreateSObject.Tests
             var input = new Input
             {
                 Domain = _domain,
-                SObjectAsJson = _userJson
+                SObjectAsJson = _userJson,
+                SObjectType = SObjectType.Account
             };
 
             var options = new Options
@@ -53,6 +53,8 @@ namespace Frends.Salesforce.CreateSObject.Tests
                 AuthenticationMethod = AuthenticationMethod.AccessToken,
                 AccessToken = await Salesforce.GetAccessToken(_authurl, _clientID, _clientSecret, _username, _password + _securityToken, _cancellationToken)
             };
+
+            Console.WriteLine(_userJson);
 
             var result = await Salesforce.CreateSObject(input, options, _cancellationToken);
             Assert.IsTrue(result.RequestIsSuccessful);
