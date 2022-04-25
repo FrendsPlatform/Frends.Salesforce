@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Runtime.CompilerServices;
 
+[assembly: InternalsVisibleTo("Frends.Salesforce.CreateSObject.Tests")]
 namespace Frends.Salesforce.CreateSObject
 {
     /// <summary>
@@ -27,12 +29,18 @@ namespace Frends.Salesforce.CreateSObject
         /// </summary>
         public string ErrorMessage { get; private set; }
 
-        internal Result(object body, bool succesful, Exception error, string errormessage)
+        /// <summary>
+        /// Used for testing.
+        /// </summary>
+        internal string RecordId { get; private set; }
+
+        internal Result(object body, bool succesful, Exception error, string errormessage, string id)
         {
             this.Body = body;
             this.RequestIsSuccessful = succesful;
             this.ErrorException = error;
             this.ErrorMessage = errormessage;
+            this.RecordId = id;
         }
     }
 
@@ -46,7 +54,7 @@ namespace Frends.Salesforce.CreateSObject
         /// </summary>
         public string Token { get; private set; }
 
-        internal ResultWithToken(object body, bool succesful, Exception error, string errormessage, string token) : base(body, succesful, error, errormessage)
+        internal ResultWithToken(object body, bool succesful, Exception error, string errormessage, string token, string id) : base(body, succesful, error, errormessage, id)
         {
             this.Token = token;
         }

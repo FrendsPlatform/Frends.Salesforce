@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Text.Json;
 using NUnit.Framework;
+using RestSharp;
 using static Frends.Salesforce.CreateSObject.Definitions.Enums;
-using System.Collections.Generic;
+using JsonSerializer = System.Text.Json.JsonSerializer;
 
 namespace Frends.Salesforce.CreateSObject.Tests
 {
@@ -20,26 +20,39 @@ namespace Frends.Salesforce.CreateSObject.Tests
         private readonly string _username = "testuser@test.fi";
         private readonly string _authurl = @"https://login.salesforce.com/services/oauth2/token";
         private readonly CancellationToken _cancellationToken = new();
+        private Options _options;
 
         private string _userJson;
+        private ResultObject _result;
 
         #region helper classes
         private class JsonTest { 
             public string Name { get; set; }
         }
+
+        private class ResultObject { 
+            public SObjectType Type { get; set; }
+            public string Id { get; set; }
+        }
         #endregion
 
         [SetUp]
-        public void SetUp() {
+        public async Task SetUp() {
             JsonTest content = new JsonTest {
                 Name = "Test" + DateTime.Now.Year + "" + DateTime.Now.Month + "" + DateTime.Now.Day + "" + DateTime.Now.Hour + "" + DateTime.Now.Minute + "" + DateTime.Now.Millisecond
             };
             var json = JsonSerializer.Serialize(content);
             _userJson = json;
+
+            _options = new Options
+            {
+                AuthenticationMethod = AuthenticationMethod.AccessToken,
+                AccessToken = await Salesforce.GetAccessToken(_authurl, _clientID, _clientSecret, _username, _password + _securityToken, _cancellationToken)
+            };
         }
 
         [Test]
-        public async Task CreateSObject()
+        public async Task TestCreateSObject()
         {
             var input = new Input
             {
@@ -48,17 +61,20 @@ namespace Frends.Salesforce.CreateSObject.Tests
                 SObjectType = SObjectType.Account
             };
 
-            var options = new Options
-            {
-                AuthenticationMethod = AuthenticationMethod.AccessToken,
-                AccessToken = await Salesforce.GetAccessToken(_authurl, _clientID, _clientSecret, _username, _password + _securityToken, _cancellationToken)
-            };
-
-            Console.WriteLine(_userJson);
-
-            var result = await Salesforce.CreateSObject(input, options, _cancellationToken);
+            var result = await Salesforce.CreateSObject(input, _options, _cancellationToken);
             Assert.IsTrue(result.RequestIsSuccessful);
+
+            _result = new ResultObject { Type = SObjectType.Account, Id = result.RecordId };
         }
 
+        [TearDown]
+        public async Task OneTimeTearDownAsync() {
+            Console.WriteLine(_result.Id);
+            var client = new RestClient(_domain + "/services/data/v54.0/sobjects/" + _result.Type + "/" + _result.Id);
+            var request = new RestRequest("/", Method.Delete);
+
+            request.AddHeader("Authorization", "Bearer " + _securityToken);
+            var response = await client.ExecuteAsync(request, _cancellationToken);
+        }
     }
 }

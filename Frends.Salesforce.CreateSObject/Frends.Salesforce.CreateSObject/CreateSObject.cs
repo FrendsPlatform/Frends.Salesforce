@@ -3,7 +3,6 @@ using RestSharp;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
 using static Frends.Salesforce.CreateSObject.Definitions.Enums;
@@ -16,7 +15,7 @@ namespace Frends.Salesforce.CreateSObject
     public class Salesforce
     {
         /// <summary>
-        /// Execute a query to salesforce
+        /// Execute a create call to salesforce
         /// </summary>
         /// <returns></returns>
         public static async Task<Result> CreateSObject(
@@ -25,6 +24,7 @@ namespace Frends.Salesforce.CreateSObject
             CancellationToken cancellationToken
         )
         {
+            var id = DateTimeOffset.Now.ToUnixTimeSeconds();
             var client = new RestClient(input.Domain + "/services/data/v54.0/sobjects/" + input.SObjectType);
             var request = new RestRequest("/", Method.Post);
             string accessToken = "";
@@ -41,17 +41,16 @@ namespace Frends.Salesforce.CreateSObject
                 request.AddHeader("Authorization", "Bearer " + accessToken);
             }
 
-
             var json = JsonConvert.DeserializeObject<Dictionary<string, string>>(input.SObjectAsJson);
             request.RequestFormat = DataFormat.Json;
             request.AddJsonBody(json);
             var response = await client.ExecuteAsync(request, cancellationToken);
-            Console.WriteLine(response.Content);
+            var content = JsonConvert.DeserializeObject<dynamic>(response.Content);
 
             if (options.AuthenticationMethod is AuthenticationMethod.OAuth2WithPassword && options.ReturnAccessToken)
-                return new ResultWithToken ( JsonConvert.DeserializeObject<dynamic>(response.Content),  response.IsSuccessful, response.ErrorException, response.ErrorMessage, accessToken );
+                return new ResultWithToken (content,  response.IsSuccessful, response.ErrorException, response.ErrorMessage, accessToken, id.ToString() );
             else
-                return new Result ( JsonConvert.DeserializeObject<dynamic>(response.Content), response.IsSuccessful, response.ErrorException, response.ErrorMessage );
+                return new Result (content, response.IsSuccessful, response.ErrorException, response.ErrorMessage, id.ToString() );
         }
 
         #region HelperMethods
