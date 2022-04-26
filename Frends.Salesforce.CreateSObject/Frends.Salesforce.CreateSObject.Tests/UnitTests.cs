@@ -2,6 +2,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Newtonsoft.Json;
 using RestSharp;
 using static Frends.Salesforce.CreateSObject.Definitions.Enums;
 using JsonSerializer = System.Text.Json.JsonSerializer;
@@ -25,21 +26,35 @@ namespace Frends.Salesforce.CreateSObject.Tests
         private string _userJson;
         private ResultObject _result;
 
+        private string _name = "Test" + DateTime.Now.Year + "" + DateTime.Now.Month + "" + DateTime.Now.Day + "" + DateTime.Now.Hour + "" + DateTime.Now.Minute + "" + DateTime.Now.Millisecond;
+
         #region helper classes
-        private class InputObject { 
+        private class Account
+        { 
             public string Name { get; set; }
         }
 
-        private class ResultObject { 
+        private class Case
+        {
+            public string AccountId { get; set; }
+            public string CreatorName { get; set; }
+            public string Description { get; set; }
+            public string Subject { get; set; }
+        }
+
+        private class ResultObject
+        { 
             public SObjectType Type { get; set; }
             public string Id { get; set; }
         }
         #endregion
 
         [TestInitialize]
-        public async Task TestInitialize() {
-            InputObject content = new InputObject {
-                Name = "Test" + DateTime.Now.Year + "" + DateTime.Now.Month + "" + DateTime.Now.Day + "" + DateTime.Now.Hour + "" + DateTime.Now.Minute + "" + DateTime.Now.Millisecond
+        public async Task TestInitialize()
+        {
+            Account content = new Account
+            {
+                Name = _name
             };
             var json = JsonSerializer.Serialize(content);
             _userJson = json;
@@ -50,7 +65,7 @@ namespace Frends.Salesforce.CreateSObject.Tests
                 AccessToken = await Salesforce.GetAccessToken(_authurl, _clientID, _clientSecret, _username, _password + _securityToken, _cancellationToken)
             };
         }
-
+#if false
         [TestCleanup]
         public async Task TestCleanUp()
         {
@@ -64,10 +79,18 @@ namespace Frends.Salesforce.CreateSObject.Tests
                 _result = null;
             }
         }
+        #endif
 
         [TestMethod]
-        public async Task TestCreateSObject()
+        public async Task TestCreateSObjects()
         {
+            AssertAccount();
+            AssertCase();
+        }
+
+        #region Create record types
+
+        private async Task AssertAccount() {
             var input = new Input
             {
                 Domain = _domain,
@@ -80,6 +103,30 @@ namespace Frends.Salesforce.CreateSObject.Tests
 
             _result = new ResultObject { Type = SObjectType.Account, Id = result.RecordId };
         }
+
+        private async Task AssertCase()
+        {
+            Case content = new Case
+            {
+                AccountId = _result.Id,
+                CreatorName = _name,
+                Subject = "This is a test.",
+                Description = "This is a test case for Frends.SalesForce.CreateSObject task."
+            };
+            var json = JsonSerializer.Serialize(content);
+
+            var input = new Input
+            {
+                Domain = _domain,
+                SObjectAsJson = json,
+                SObjectType = SObjectType.Case
+            };
+
+            var result = await Salesforce.CreateSObject(input, _options, _cancellationToken);
+            Assert.IsTrue(result.RequestIsSuccessful);
+        }
+
+        #endregion
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentException))]

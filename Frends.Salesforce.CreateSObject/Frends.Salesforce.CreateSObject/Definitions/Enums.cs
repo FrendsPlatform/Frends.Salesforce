@@ -38,7 +38,7 @@ namespace Frends.Salesforce.CreateSObject.Definitions
             /// <summary>
             /// Cases type for SObject.
             /// </summary>
-            Cases,
+            Case,
             /// <summary>
             /// Custom object type for SObject.
             /// </summary>

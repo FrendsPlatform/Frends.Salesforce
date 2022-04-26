@@ -56,9 +56,9 @@ namespace Frends.Salesforce.CreateSObject
                 else
                     return new Result(content, response.IsSuccessful, response.ErrorException, response.ErrorMessage, content.id.ToString());
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                throw new Exception("Creation couldn't be executed.");
+                throw new Exception(ex.Message);
             }
         }
 
