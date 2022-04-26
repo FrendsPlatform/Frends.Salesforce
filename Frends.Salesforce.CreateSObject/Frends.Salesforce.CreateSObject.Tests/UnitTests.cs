@@ -84,8 +84,8 @@ namespace Frends.Salesforce.CreateSObject.Tests
         [TestMethod]
         public async Task TestCreateSObjects()
         {
-            AssertAccount();
-            AssertCase();
+            await AssertAccount();
+            await AssertCase();
         }
 
         #region Create record types
