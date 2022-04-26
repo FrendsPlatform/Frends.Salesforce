@@ -24,33 +24,42 @@ namespace Frends.Salesforce.CreateSObject
             CancellationToken cancellationToken
         )
         {
-            var id = DateTimeOffset.Now.ToUnixTimeSeconds();
+            if (string.IsNullOrEmpty(input.Domain)) throw new ArgumentNullException("Domain cannot be empty.");
+            else if (string.IsNullOrEmpty(input.SObjectAsJson)) throw new ArgumentNullException("Json cannot be empty.");
+
             var client = new RestClient(input.Domain + "/services/data/v54.0/sobjects/" + input.SObjectType);
             var request = new RestRequest("/", Method.Post);
             string accessToken = "";
 
-            if (options.AuthenticationMethod is AuthenticationMethod.AccessToken)
-            {
-                if (string.IsNullOrWhiteSpace(options.AccessToken)) throw new ArgumentException("Access token cannot be null when using Access Token authentication method");
-                request.AddHeader("Authorization", "Bearer " + options.AccessToken);
+            switch (options.AuthenticationMethod) {
+                case AuthenticationMethod.AccessToken:
+                    if (string.IsNullOrWhiteSpace(options.AccessToken)) throw new ArgumentException("Access token cannot be null when using Access Token authentication method");
+                    request.AddHeader("Authorization", "Bearer " + options.AccessToken);
+                    break;
+                case AuthenticationMethod.OAuth2WithPassword:
+                    accessToken = await GetAccessToken(options.AuthUrl, options.ClientID, options.ClientSecret, options.Username, options.Password + options.SecurityToken, cancellationToken);
+                    request.AddHeader("Authorization", "Bearer " + accessToken);
+                    break;
             }
 
-            if (options.AuthenticationMethod is AuthenticationMethod.OAuth2WithPassword)
+            try
             {
-                accessToken = await GetAccessToken(options.AuthUrl, options.ClientID, options.ClientSecret, options.Username, options.Password + options.SecurityToken, cancellationToken);
-                request.AddHeader("Authorization", "Bearer " + accessToken);
+                var json = JsonConvert.DeserializeObject<Dictionary<string, string>>(input.SObjectAsJson);
+                request.RequestFormat = DataFormat.Json;
+                request.AddJsonBody(json);
+
+                var response = await client.ExecuteAsync(request, cancellationToken);
+                var content = JsonConvert.DeserializeObject<dynamic>(response.Content);
+
+                if (options.AuthenticationMethod is AuthenticationMethod.OAuth2WithPassword && options.ReturnAccessToken)
+                    return new ResultWithToken(content, response.IsSuccessful, response.ErrorException, response.ErrorMessage, accessToken, content.id.ToString());
+                else
+                    return new Result(content, response.IsSuccessful, response.ErrorException, response.ErrorMessage, content.id.ToString());
             }
-
-            var json = JsonConvert.DeserializeObject<Dictionary<string, string>>(input.SObjectAsJson);
-            request.RequestFormat = DataFormat.Json;
-            request.AddJsonBody(json);
-            var response = await client.ExecuteAsync(request, cancellationToken);
-            var content = JsonConvert.DeserializeObject<dynamic>(response.Content);
-
-            if (options.AuthenticationMethod is AuthenticationMethod.OAuth2WithPassword && options.ReturnAccessToken)
-                return new ResultWithToken (content,  response.IsSuccessful, response.ErrorException, response.ErrorMessage, accessToken, content.id.ToString() );
-            else
-                return new Result (content, response.IsSuccessful, response.ErrorException, response.ErrorMessage, content.id.ToString() );
+            catch (Exception)
+            {
+                throw new Exception("Creation couldn't be executed.");
+            }
         }
 
         #region HelperMethods
