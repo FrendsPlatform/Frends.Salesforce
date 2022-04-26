@@ -1,13 +1,10 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Text;
 using NUnit.Framework;
 using RestSharp;
 using static Frends.Salesforce.CreateSObject.Definitions.Enums;
 using JsonSerializer = System.Text.Json.JsonSerializer;
-using System.Web;
-using System.Net;
 
 namespace Frends.Salesforce.CreateSObject.Tests
 {
@@ -27,10 +24,9 @@ namespace Frends.Salesforce.CreateSObject.Tests
 
         private string _userJson;
         private ResultObject _result;
-        private JsonTest _jsonTest;
 
         #region helper classes
-        private class JsonTest { 
+        private class InputObject { 
             public string Name { get; set; }
         }
 
@@ -42,10 +38,10 @@ namespace Frends.Salesforce.CreateSObject.Tests
 
         [SetUp]
         public async Task SetUp() {
-            _jsonTest = new JsonTest {
+            InputObject content = new InputObject {
                 Name = "Test" + DateTime.Now.Year + "" + DateTime.Now.Month + "" + DateTime.Now.Day + "" + DateTime.Now.Hour + "" + DateTime.Now.Minute + "" + DateTime.Now.Millisecond
             };
-            var json = JsonSerializer.Serialize(_jsonTest);
+            var json = JsonSerializer.Serialize(content);
             _userJson = json;
 
             _options = new Options
@@ -78,7 +74,7 @@ namespace Frends.Salesforce.CreateSObject.Tests
 
             request.AddHeader("Authorization", "Bearer " + _options.AccessToken);
             var response = await client.ExecuteAsync(request, _cancellationToken);
-            Console.WriteLine(response.Content);
+            _result = null;
         }
     }
 }
