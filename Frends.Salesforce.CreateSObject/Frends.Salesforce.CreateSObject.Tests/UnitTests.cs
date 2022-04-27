@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -25,7 +26,7 @@ namespace Frends.Salesforce.CreateSObject.Tests
         private readonly CancellationToken _cancellationToken = new();
         private Options _options;
         private string _userJson;
-        private ResultObject _result;
+        private List<ResultObject> _result;
 
         private string _name = "Test" + DateTime.Now.Year + "" + DateTime.Now.Month + "" + DateTime.Now.Day + "" + DateTime.Now.Hour + "" + DateTime.Now.Minute + "" + DateTime.Now.Millisecond;
 
@@ -54,6 +55,8 @@ namespace Frends.Salesforce.CreateSObject.Tests
         [TestInitialize]
         public async Task TestInitialize()
         {
+            _result = new List<ResultObject>();
+
             Account content = new Account
             {
                 Name = _name
@@ -66,21 +69,23 @@ namespace Frends.Salesforce.CreateSObject.Tests
                 AccessToken = await Salesforce.GetAccessToken(_authurl, _clientID, _clientSecret, _username, _password + _securityToken, _cancellationToken)
             };
         }
-#if false
+#if true
         [TestCleanup]
         public async Task TestCleanUp()
         {
             if (_result != null)
             {
-                var client = new RestClient(_domain + "/services/data/v54.0/sobjects/" + _result.Type + "/" + _result.Id);
-                var request = new RestRequest("/", Method.Delete);
+                foreach(var res in _result){
+                    var client = new RestClient(_domain + "/services/data/v54.0/sobjects/" + res.Type + "/" + res.Id);
+                    var request = new RestRequest("/", Method.Delete);
 
-                request.AddHeader("Authorization", "Bearer " + _options.AccessToken);
-                var response = await client.ExecuteAsync(request, _cancellationToken);
+                    request.AddHeader("Authorization", "Bearer " + _options.AccessToken);
+                    var response = await client.ExecuteAsync(request, _cancellationToken);
+                }
                 _result = null;
             }
         }
-        #endif
+#endif
 
         [TestMethod]
         public async Task TestCreateSObjects()
@@ -102,14 +107,17 @@ namespace Frends.Salesforce.CreateSObject.Tests
             var result = await Salesforce.CreateSObject(input, _options, _cancellationToken);
             Assert.IsTrue(result.RequestIsSuccessful);
 
-            _result = new ResultObject { Type = SObjectType.Account, Id = result.RecordId };
+            _result.Add(new ResultObject { Type = SObjectType.Account, Id = result.RecordId });
         }
 
         private async Task AssertCase()
         {
+            var listResult = _result.Select((Value, Index) => new { Value, Index })
+                 .Single(p => p.Value.Type == SObjectType.Account);
+
             Case content = new Case
             {
-                AccountId = _result.Id,
+                AccountId = listResult.Value.Id,
                 Subject = "This is a test.",
                 Description = "This is a test case for Frends.SalesForce.CreateSObject task.",
                 Origin = "Web"
@@ -125,6 +133,8 @@ namespace Frends.Salesforce.CreateSObject.Tests
 
             var result = await Salesforce.CreateSObject(input, _options, _cancellationToken);
             Assert.IsTrue(result.RequestIsSuccessful);
+
+            _result.Add(new ResultObject { Type = SObjectType.Case, Id = result.RecordId });
         }
 
         #endregion
@@ -207,5 +217,7 @@ namespace Frends.Salesforce.CreateSObject.Tests
 
             var result = await Salesforce.CreateSObject(input, options, _cancellationToken);
         }
+
+        // Invalid Type json
     }
 }
