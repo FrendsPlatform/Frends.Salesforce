@@ -40,7 +40,6 @@ namespace Frends.Salesforce.CreateSObject.Tests
             public string AccountId { get; set; }
             public string Status { get; set; } = "New";
             public string Origin { get; set; }
-            public string CreatorName { get; set; }
             public string Description { get; set; }
             public string Subject { get; set; }
         }
@@ -87,7 +86,7 @@ namespace Frends.Salesforce.CreateSObject.Tests
         public async Task TestCreateSObjects()
         {
             await AssertAccount();
-            //await AssertCase();
+            await AssertCase();
         }
 
         #region Create record types
@@ -110,9 +109,7 @@ namespace Frends.Salesforce.CreateSObject.Tests
         {
             Case content = new Case
             {
-                //AccountId = _result.Id,
-                AccountId = "0017Q00000EouflQAB",
-                CreatorName = _name + "_2",
+                AccountId = _result.Id,
                 Subject = "This is a test.",
                 Description = "This is a test case for Frends.SalesForce.CreateSObject task.",
                 Origin = "Web"

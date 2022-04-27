@@ -54,12 +54,12 @@ namespace Frends.Salesforce.CreateSObject
             }
 
             var response = await client.ExecuteAsync(request, cancellationToken);
-                var content = JsonConvert.DeserializeObject<dynamic>(response.Content);
+            var content = JsonConvert.DeserializeObject<dynamic>(response.Content);
 
             if (options.AuthenticationMethod is AuthenticationMethod.OAuth2WithPassword && options.ReturnAccessToken)
-                return new ResultWithToken(content, response.IsSuccessful, response.ErrorException, response.ErrorMessage, accessToken, content.id.ToString() ?? null);
+                return new ResultWithToken(content, response.IsSuccessful, response.ErrorException, response.ErrorMessage, accessToken, content.id.ToString());
             else
-                return new Result(content, response.IsSuccessful, response.ErrorException, response.ErrorMessage, content.id.ToString() ?? null);
+                return new Result(content, response.IsSuccessful, response.ErrorException, response.ErrorMessage, content.id.ToString());
         }
 
         #region HelperMethods
