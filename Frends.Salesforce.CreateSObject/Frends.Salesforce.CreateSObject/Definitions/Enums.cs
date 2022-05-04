@@ -25,36 +25,5 @@ namespace Frends.Salesforce.CreateSObject.Definitions
             /// </summary>
             OAuth2WithPassword
         }
-
-        /// <summary>
-        /// SObjectType options for Salesforce.
-        /// </summary>
-        public enum SObjectType
-        {
-            /// <summary>
-            /// Account type for SObject.
-            /// </summary>
-            Account,
-            /// <summary>
-            /// Cases type for SObject.
-            /// </summary>
-            Case,
-            /// <summary>
-            /// Cases type for SObject.
-            /// </summary>
-            Contact,
-            /// <summary>
-            /// Custom object type for SObject.
-            /// </summary>
-            CustomObject,
-            /// <summary>
-            /// Custom settings type for SObject.
-            /// </summary>
-            CustomSettings,
-            /// <summary>
-            /// Custom metadata type for SObject.
-            /// </summary>
-            CustomMetadata
-        }
     }
 }

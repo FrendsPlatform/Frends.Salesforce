@@ -24,9 +24,10 @@ namespace Frends.Salesforce.CreateSObject
         public string SObjectAsJson { get; set; }
 
         /// <summary>
-        /// SObject type.
+        /// SObject type. Can be Account, Case, CustomObject, CustomSettings, CustomMetadata, etc...
         /// </summary>
-        [DefaultValue(SObjectType.Account)]
-        public SObjectType SObjectType { get; set; }
+        [DefaultValue("Account")]
+        [DisplayFormat(DataFormatString = "Text")]
+        public string SObjectType { get; set; }
     }
 }

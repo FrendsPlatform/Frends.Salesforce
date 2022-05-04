@@ -31,6 +31,15 @@ namespace Frends.Salesforce.CreateSObject.Tests
         private string _name = "Test" + DateTime.Now.Year + "" + DateTime.Now.Month + "" + DateTime.Now.Day + "" + DateTime.Now.Hour + "" + DateTime.Now.Minute + "" + DateTime.Now.Millisecond;
 
         #region helper classes
+
+        private class Custom
+        {
+            public string Id { get; set; }
+            public string Label { get; set; } = "New";
+            public string PluralLabel { get; set; }
+            public string ObjectName { get; set; }
+        }
+
         private class Account
         { 
             public string Name { get; set; }
@@ -55,7 +64,7 @@ namespace Frends.Salesforce.CreateSObject.Tests
 
         private class ResultObject
         { 
-            public SObjectType Type { get; set; }
+            public string Type { get; set; }
             public string Id { get; set; }
         }
         #endregion
@@ -83,8 +92,8 @@ namespace Frends.Salesforce.CreateSObject.Tests
         {
             if (_result != null)
             {
-                foreach(var res in _result){
-                    var client = new RestClient(_domain + "/services/data/v54.0/sobjects/" + res.Type + "/" + res.Id);
+                for (var i = (_result.Count-1); i >= 0; i--) {
+                    var client = new RestClient(_domain + "/services/data/v54.0/sobjects/" + _result[i].Type + "/" + _result[i].Id);
                     var request = new RestRequest("/", Method.Delete);
 
                     request.AddHeader("Authorization", "Bearer " + _options.AccessToken);
@@ -110,19 +119,19 @@ namespace Frends.Salesforce.CreateSObject.Tests
             {
                 Domain = _domain,
                 SObjectAsJson = _userJson,
-                SObjectType = SObjectType.Account
+                SObjectType = "Account"
             };
 
             var result = await Salesforce.CreateSObject(input, _options, _cancellationToken);
             Assert.IsTrue(result.RequestIsSuccessful);
 
-            _result.Add(new ResultObject { Type = SObjectType.Account, Id = result.RecordId });
+            _result.Add(new ResultObject { Type = "Account", Id = result.RecordId });
         }
 
         private async Task AssertCase()
         {
             var listResult = _result.Select((Value, Index) => new { Value, Index })
-                 .Single(p => p.Value.Type == SObjectType.Account);
+                 .Single(p => p.Value.Type == "Account");
 
             Case content = new Case
             {
@@ -137,20 +146,17 @@ namespace Frends.Salesforce.CreateSObject.Tests
             {
                 Domain = _domain,
                 SObjectAsJson = json,
-                SObjectType = SObjectType.Case
+                SObjectType = "Case"
             };
 
             var result = await Salesforce.CreateSObject(input, _options, _cancellationToken);
             Assert.IsTrue(result.RequestIsSuccessful);
 
-            _result.Add(new ResultObject { Type = SObjectType.Case, Id = result.RecordId });
+            _result.Add(new ResultObject { Type = "Case", Id = result.RecordId });
         }
 
         private async Task AssertContact()
         {
-            var listResult = _result.Select((Value, Index) => new { Value, Index })
-                 .Single(p => p.Value.Type == SObjectType.Account);
-
             Contact content = new Contact
             {
                 Title = Contact.Salutation.Mr,
@@ -162,13 +168,13 @@ namespace Frends.Salesforce.CreateSObject.Tests
             {
                 Domain = _domain,
                 SObjectAsJson = json,
-                SObjectType = SObjectType.Contact
+                SObjectType = "Contact"
             };
 
             var result = await Salesforce.CreateSObject(input, _options, _cancellationToken);
             Assert.IsTrue(result.RequestIsSuccessful);
 
-            _result.Add(new ResultObject { Type = SObjectType.Contact, Id = result.RecordId });
+            _result.Add(new ResultObject { Type = "Contact", Id = result.RecordId });
         }
 
         #endregion
@@ -180,7 +186,7 @@ namespace Frends.Salesforce.CreateSObject.Tests
             {
                 Domain = _domain,
                 SObjectAsJson = _userJson,
-                SObjectType = SObjectType.Account
+                SObjectType = "Contact"
             };
 
             Options options = new Options
@@ -200,7 +206,7 @@ namespace Frends.Salesforce.CreateSObject.Tests
             {
                 Domain = null,
                 SObjectAsJson = _userJson,
-                SObjectType = SObjectType.Account
+                SObjectType = "Account"
             };
 
             Options options = new Options
@@ -220,7 +226,7 @@ namespace Frends.Salesforce.CreateSObject.Tests
             {
                 Domain = _domain,
                 SObjectAsJson = null,
-                SObjectType = SObjectType.Account
+                SObjectType = "Account"
             };
 
             Options options = new Options
@@ -240,7 +246,7 @@ namespace Frends.Salesforce.CreateSObject.Tests
             {
                 Domain = @"https://mycompany.my.salesforce.com",
                 SObjectAsJson = _userJson,
-                SObjectType = SObjectType.Account
+                SObjectType = "Account"
             };
 
             Options options = new Options
