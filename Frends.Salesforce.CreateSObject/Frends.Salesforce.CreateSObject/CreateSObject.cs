@@ -47,14 +47,7 @@ namespace Frends.Salesforce.CreateSObject
                 var json = JsonConvert.DeserializeObject<Dictionary<string, string>>(input.SObjectAsJson);
                 request.RequestFormat = DataFormat.Json;
                 request.AddJsonBody(json);
-            }
-            catch (JsonException)
-            {
-                throw new JsonException("Given input couldn't be parsed to json.");
-            }
 
-            try
-            {
                 var response = await client.ExecuteAsync(request, cancellationToken);
                 var content = JsonConvert.DeserializeObject<dynamic>(response.Content);
 
@@ -62,6 +55,10 @@ namespace Frends.Salesforce.CreateSObject
                     return new ResultWithToken(content, response.IsSuccessful, response.ErrorException, response.ErrorMessage, accessToken, content.id.ToString());
                 else
                     return new Result(content, response.IsSuccessful, response.ErrorException, response.ErrorMessage, content.id.ToString());
+            }
+            catch (JsonException)
+            {
+                throw new JsonException("Given input couldn't be parsed to json.");
             }
             catch (Exception ex) {
                 throw new Exception(ex.Message);

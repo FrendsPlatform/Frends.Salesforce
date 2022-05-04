@@ -40,6 +40,10 @@ namespace Frends.Salesforce.CreateSObject.Definitions
             /// </summary>
             Case,
             /// <summary>
+            /// Cases type for SObject.
+            /// </summary>
+            Contact,
+            /// <summary>
             /// Custom object type for SObject.
             /// </summary>
             CustomObject,

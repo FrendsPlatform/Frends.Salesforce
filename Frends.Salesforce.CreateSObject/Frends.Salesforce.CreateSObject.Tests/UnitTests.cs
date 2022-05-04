@@ -45,6 +45,14 @@ namespace Frends.Salesforce.CreateSObject.Tests
             public string Subject { get; set; }
         }
 
+        private class Contact
+        {
+            public enum Salutation { Mr, Mrs, Ms, Dr, Prof }
+
+            public Salutation Title { get; set; }
+            public string LastName { get; set; }
+        }
+
         private class ResultObject
         { 
             public SObjectType Type { get; set; }
@@ -92,6 +100,7 @@ namespace Frends.Salesforce.CreateSObject.Tests
         {
             await AssertAccount();
             await AssertCase();
+            await AssertContact();
         }
 
         #region Create record types
@@ -135,6 +144,31 @@ namespace Frends.Salesforce.CreateSObject.Tests
             Assert.IsTrue(result.RequestIsSuccessful);
 
             _result.Add(new ResultObject { Type = SObjectType.Case, Id = result.RecordId });
+        }
+
+        private async Task AssertContact()
+        {
+            var listResult = _result.Select((Value, Index) => new { Value, Index })
+                 .Single(p => p.Value.Type == SObjectType.Account);
+
+            Contact content = new Contact
+            {
+                Title = Contact.Salutation.Mr,
+                LastName = _name
+            };
+            var json = JsonSerializer.Serialize(content);
+
+            var input = new Input
+            {
+                Domain = _domain,
+                SObjectAsJson = json,
+                SObjectType = SObjectType.Contact
+            };
+
+            var result = await Salesforce.CreateSObject(input, _options, _cancellationToken);
+            Assert.IsTrue(result.RequestIsSuccessful);
+
+            _result.Add(new ResultObject { Type = SObjectType.Contact, Id = result.RecordId });
         }
 
         #endregion
