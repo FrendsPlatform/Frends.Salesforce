@@ -269,7 +269,6 @@ namespace Frends.Salesforce.CreateSObject.Tests
             var result = await Salesforce.CreateSObject(input, options, _cancellationToken);
         }
 
-        // Invalid Type json
         [TestMethod]
         [ExpectedException(typeof(JsonException))]
         public async Task TestThrow_InvalidJson()
