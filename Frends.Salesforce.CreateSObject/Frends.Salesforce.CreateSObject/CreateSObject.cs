@@ -15,9 +15,12 @@ namespace Frends.Salesforce.CreateSObject
     public class Salesforce
     {
         /// <summary>
-        /// Execute a create call to salesforce
+        /// Creates a sobject to Salesforce.
+        /// [Documentation](https://tasks.frends.com/tasks#frends-tasks/Frends.Salesforce.CreateSObject)
         /// </summary>
-        /// <returns></returns>
+        /// <param name="input">Information to create the sobject.</param>
+        /// <param name="options">Information about the salesforce destination.</param>
+        /// <returns>Object { object Body, bool RequestIsSuccessful, Exception ErrorException, string ErrorMessage }</returns>
         public static async Task<Result> CreateSObject(
             [PropertyTab] Input input,
             [PropertyTab] Options options,

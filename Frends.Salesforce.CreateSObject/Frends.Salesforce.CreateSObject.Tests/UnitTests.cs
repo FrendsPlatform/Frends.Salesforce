@@ -109,7 +109,7 @@ namespace Frends.Salesforce.CreateSObject.Tests
             var input = new Input
             {
                 Domain = _domain,
-                SObjectAsJson = _userJson,
+                SObjectAsJson = @"{ ""Name"":""Test2022551640410""}",
                 SObjectType = "Account"
             };
 
