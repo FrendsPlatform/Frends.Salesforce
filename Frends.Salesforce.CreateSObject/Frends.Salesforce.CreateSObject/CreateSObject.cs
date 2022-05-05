@@ -26,6 +26,7 @@ namespace Frends.Salesforce.CreateSObject
         {
             if (string.IsNullOrEmpty(input.Domain)) throw new ArgumentNullException("Domain cannot be empty.");
             else if (string.IsNullOrEmpty(input.SObjectAsJson)) throw new ArgumentNullException("Json cannot be empty.");
+            else if (string.IsNullOrEmpty(input.SObjectType)) throw new ArgumentNullException("Type cannot be empty.");
 
             var client = new RestClient(input.Domain + "/services/data/v54.0/sobjects/" + input.SObjectType);
             var request = new RestRequest("/", Method.Post);

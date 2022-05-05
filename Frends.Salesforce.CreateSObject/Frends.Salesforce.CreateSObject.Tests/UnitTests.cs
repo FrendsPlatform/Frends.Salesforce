@@ -31,15 +31,6 @@ namespace Frends.Salesforce.CreateSObject.Tests
         private string _name = "Test" + DateTime.Now.Year + "" + DateTime.Now.Month + "" + DateTime.Now.Day + "" + DateTime.Now.Hour + "" + DateTime.Now.Minute + "" + DateTime.Now.Millisecond;
 
         #region helper classes
-
-        private class Custom
-        {
-            public string Id { get; set; }
-            public string Label { get; set; } = "New";
-            public string PluralLabel { get; set; }
-            public string ObjectName { get; set; }
-        }
-
         private class Account
         { 
             public string Name { get; set; }
@@ -227,6 +218,26 @@ namespace Frends.Salesforce.CreateSObject.Tests
                 Domain = _domain,
                 SObjectAsJson = null,
                 SObjectType = "Account"
+            };
+
+            Options options = new Options
+            {
+                AuthenticationMethod = AuthenticationMethod.AccessToken,
+                AccessToken = await Salesforce.GetAccessToken(_authurl, _clientID, _clientSecret, _username, _password + _securityToken, _cancellationToken)
+            };
+
+            var result = await Salesforce.CreateSObject(input, options, _cancellationToken);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public async Task TestThrow_EmptyType()
+        {
+            var input = new Input
+            {
+                Domain = _domain,
+                SObjectAsJson = _userJson,
+                SObjectType = ""
             };
 
             Options options = new Options
