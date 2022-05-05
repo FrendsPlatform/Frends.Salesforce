@@ -270,5 +270,24 @@ namespace Frends.Salesforce.CreateSObject.Tests
         }
 
         // Invalid Type json
+        [TestMethod]
+        [ExpectedException(typeof(JsonException))]
+        public async Task TestThrow_InvalidJson()
+        {
+            var input = new Input
+            {
+                Domain = _domain,
+                SObjectAsJson = "Not valid json format",
+                SObjectType = "Account"
+            };
+
+            Options options = new Options
+            {
+                AuthenticationMethod = AuthenticationMethod.AccessToken,
+                AccessToken = await Salesforce.GetAccessToken(_authurl, _clientID, _clientSecret, _username, _password + _securityToken, _cancellationToken)
+            };
+
+            var result = await Salesforce.CreateSObject(input, options, _cancellationToken);
+        }
     }
 }
