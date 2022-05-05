@@ -1,5 +1,5 @@
 # Changelog
 
-## [1.0.0] - 2022-03-07
+## [1.0.0] - 2022-05-05
 ### Added
-- Initial implementation of Frends.Salesforce.ExecuteQuery
+- Initial implementation of Frends.Salesforce.CreateSObject
