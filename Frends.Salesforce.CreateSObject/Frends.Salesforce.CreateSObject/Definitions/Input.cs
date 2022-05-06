@@ -28,5 +28,6 @@ public class Input
     /// </summary>
     /// <example>Account</example>
     [DefaultValue("Account")]
+    [DisplayFormat(DataFormatString = "Text")]
     public string SObjectType { get; set; }
 }

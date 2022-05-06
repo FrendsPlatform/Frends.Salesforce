@@ -27,6 +27,7 @@ public class Options
     /// <example>https://login.salesforce.com/services/oauth2/token</example>
     [UIHint(nameof(AuthenticationMethod), "", AuthenticationMethod.OAuth2WithPassword)]
     [DefaultValue(@"https://login.salesforce.com/services/oauth2/token")]
+    [DisplayFormat(DataFormatString = "Text")]
     public string AuthUrl { get; set; }
 
     /// <summary>
@@ -34,6 +35,7 @@ public class Options
     /// </summary>
     /// <example>abcdefghijkl123456789</example>
     [UIHint(nameof(AuthenticationMethod), "", AuthenticationMethod.OAuth2WithPassword)]
+    [DisplayFormat(DataFormatString = "Text")]
     public string ClientID { get; set; }
 
     /// <summary>
@@ -49,6 +51,7 @@ public class Options
     /// </summary>
     /// <example>username123</example>
     [UIHint(nameof(AuthenticationMethod), "", AuthenticationMethod.OAuth2WithPassword)]
+    [DisplayFormat(DataFormatString = "Text")]
     public string Username { get; set; }
 
     /// <summary>
