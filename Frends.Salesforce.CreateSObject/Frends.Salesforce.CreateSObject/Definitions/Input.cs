@@ -1,8 +1,7 @@
 ﻿using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
-using static Frends.Salesforce.CreateSObject.Definitions.Enums;
 
-namespace Frends.Salesforce.CreateSObject;
+namespace Frends.Salesforce.CreateSObject.Definitions;
 /// <summary>
 /// Input-class for CreateSObject-task.
 /// </summary>
@@ -14,14 +13,13 @@ public class Input
     /// </summary>
     /// <example>https://example.my.salesforce.com</example>
     [DefaultValue(@"https://example.my.salesforce.com")]
-    [DisplayFormat(DataFormatString = "Text")]
     public string Domain { get; set; }
 
     /// <summary>
     /// SObject structure as json.
     /// </summary>
     /// <example>{ "Name": "ExampleName" }</example>
-    [DisplayFormat(DataFormatString = "Text")]
+    [DisplayFormat(DataFormatString = "JSON")]
     public string SObjectAsJson { get; set; }
 
     /// <summary>
@@ -29,6 +27,5 @@ public class Input
     /// </summary>
     /// <example>Account</example>
     [DefaultValue("Account")]
-    [DisplayFormat(DataFormatString = "Text")]
     public string SObjectType { get; set; }
 }

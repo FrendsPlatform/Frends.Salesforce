@@ -2,7 +2,7 @@
 using System.ComponentModel.DataAnnotations;
 using static Frends.Salesforce.CreateSObject.Definitions.Enums;
 
-namespace Frends.Salesforce.CreateSObject;
+namespace Frends.Salesforce.CreateSObject.Definitions;
 /// <summary>
 /// Options-class for CreateSObject-task.
 /// </summary>
@@ -11,7 +11,6 @@ public class Options
     /// <summary>
     /// Authentication method.
     /// </summary>
-    /// <example>AccessToken</example>
     public AuthenticationMethod AuthenticationMethod { get; set; }
 
     /// <summary>

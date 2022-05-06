@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using Frends.Salesforce.CreateSObject.Definitions;
+using Newtonsoft.Json;
 using RestSharp;
 using System;
 using System.Collections.Generic;
@@ -75,7 +76,7 @@ public class Salesforce
     /// Get OAuth2 access token.
     /// This method is public since it is used also in Unit tests.
     /// </summary>
-    private async Task<string> GetAccessToken(string url, string clientId, string clientSecret, string username, string passwordWithSecurityToken, CancellationToken cancellationToken)
+    internal static async Task<string> GetAccessToken(string url, string clientId, string clientSecret, string username, string passwordWithSecurityToken, CancellationToken cancellationToken)
     {
         var authClient = new RestClient(url);
         var authRequest = new RestRequest("", Method.Post);
