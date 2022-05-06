@@ -19,7 +19,7 @@ public class Input
     /// SObject structure as json.
     /// </summary>
     /// <example>{ "Name": "ExampleName" }</example>
-    [DisplayFormat(DataFormatString = "JSON")]
+    [DisplayFormat(DataFormatString = "Json")]
     public string SObjectAsJson { get; set; }
 
     /// <summary>
