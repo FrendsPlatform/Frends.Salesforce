@@ -26,23 +26,14 @@ public class UnitTests
     private readonly CancellationToken _cancellationToken = new();
     private Options _options;
     private string _userJson;
-    private List<ResultObject> _result;
+    private List<Object> _result;
 
     private string _name = "Test" + DateTime.Now.Year + "" + DateTime.Now.Month + "" + DateTime.Now.Day + "" + DateTime.Now.Hour + "" + DateTime.Now.Minute + "" + DateTime.Now.Millisecond;
-
-    #region helper classes
-
-    private class ResultObject
-    { 
-        public string Type { get; set; }
-        public string Id { get; set; }
-    }
-    #endregion
 
     [TestInitialize]
     public async Task TestInitialize()
     {
-        _result = new List<ResultObject>();
+        _result = new List<Object>();
 
         _userJson = JsonSerializer.Serialize(new { Name = _name });
 
@@ -59,11 +50,14 @@ public class UnitTests
         if (_result != null)
         {
             for (var i = (_result.Count-1); i >= 0; i--) {
-                var client = new RestClient(_domain + "/services/data/v54.0/sobjects/" + _result[i].Type + "/" + _result[i].Id);
+                var temp = JsonConvert.SerializeObject(_result[i]);
+                var obj = JsonConvert.DeserializeObject<dynamic>(temp);
+
+                var client = new RestClient(_domain + "/services/data/v54.0/sobjects/" + obj.Type + "/" + obj.Id);
                 var request = new RestRequest("/", Method.Delete);
 
                 request.AddHeader("Authorization", "Bearer " + _options.AccessToken);
-                var response = await client.ExecuteAsync(request, _cancellationToken);
+                await client.ExecuteAsync(request, _cancellationToken);
             }
             _result = null;
         }
@@ -84,7 +78,7 @@ public class UnitTests
 
         var body = JsonConvert.SerializeObject(result.Body);
         var obj = JsonConvert.DeserializeObject<dynamic>(body);
-        _result.Add(new ResultObject { Type = "Account", Id = obj.id });
+        _result.Add(new { Type = "Account", Id = obj.id });
     }
 
     [TestMethod]
@@ -108,7 +102,7 @@ public class UnitTests
 
         var body = JsonConvert.SerializeObject(result.Body);
         var obj = JsonConvert.DeserializeObject<dynamic>(body);
-        _result.Add(new ResultObject { Type = "Contact", Id = obj.id });
+        _result.Add(new { Type = "Contact", Id = obj.id });
     }
 
     [TestMethod]
@@ -126,7 +120,7 @@ public class UnitTests
 
         var body = JsonConvert.SerializeObject(accountResult.Body);
         var accObj = JsonConvert.DeserializeObject<dynamic>(body);
-        _result.Add(new ResultObject { Type = "Account", Id = accObj.id });
+        _result.Add(new { Type = "Account", Id = accObj.id });
 
         // Creating a case.
         var json = JsonSerializer.Serialize(new {
@@ -146,9 +140,9 @@ public class UnitTests
         var caseResult = await Salesforce.CreateSObject(caseInput, _options, _cancellationToken);
         Assert.IsTrue(caseResult.RequestIsSuccessful);
 
-        var caseBody = JsonConvert.SerializeObject(accountResult.Body);
+        var caseBody = JsonConvert.SerializeObject(caseResult.Body);
         var caseObj = JsonConvert.DeserializeObject<dynamic>(caseBody);
-        _result.Add(new ResultObject { Type = "Case", Id = caseObj.id });
+        _result.Add(new { Type = "Case", Id = caseObj.id });
     }
 
     [TestMethod]
@@ -167,7 +161,7 @@ public class UnitTests
             AccessToken = " "
         };
 
-        var result = await Salesforce.CreateSObject(input, options, _cancellationToken);
+        await Salesforce.CreateSObject(input, options, _cancellationToken);
     }
 
     [TestMethod]
@@ -187,7 +181,7 @@ public class UnitTests
             AccessToken = await Salesforce.GetAccessToken(_authurl, _clientID, _clientSecret, _username, _password + _securityToken, _cancellationToken)
         };
 
-        var result = await Salesforce.CreateSObject(input, options, _cancellationToken);
+        await Salesforce.CreateSObject(input, options, _cancellationToken);
     }
 
     [TestMethod]
@@ -207,7 +201,7 @@ public class UnitTests
             AccessToken = await Salesforce.GetAccessToken(_authurl, _clientID, _clientSecret, _username, _password + _securityToken, _cancellationToken)
         };
 
-        var result = await Salesforce.CreateSObject(input, options, _cancellationToken);
+        await Salesforce.CreateSObject(input, options, _cancellationToken);
     }
 
     [TestMethod]
@@ -227,7 +221,7 @@ public class UnitTests
             AccessToken = await Salesforce.GetAccessToken(_authurl, _clientID, _clientSecret, _username, _password + _securityToken, _cancellationToken)
         };
 
-        var result = await Salesforce.CreateSObject(input, options, _cancellationToken);
+        await Salesforce.CreateSObject(input, options, _cancellationToken);
     }
 
     [TestMethod]
@@ -251,8 +245,7 @@ public class UnitTests
             Password = _password + _securityToken,
         };
 
-        var result = await Salesforce.CreateSObject(input, options, _cancellationToken);
-        Console.WriteLine(result.ErrorException);
+        await Salesforce.CreateSObject(input, options, _cancellationToken);
     }
 
     [TestMethod]
@@ -320,7 +313,7 @@ public class UnitTests
             AccessToken = await Salesforce.GetAccessToken(_authurl, _clientID, _clientSecret, _username, _password + _securityToken, _cancellationToken)
         };
 
-        var result = await Salesforce.CreateSObject(input, options, _cancellationToken);
+        await Salesforce.CreateSObject(input, options, _cancellationToken);
     }
 }
 
