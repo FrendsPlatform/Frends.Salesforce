@@ -7,7 +7,6 @@ using Frends.Salesforce.CreateSObject.Definitions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Newtonsoft.Json;
 using RestSharp;
-using static Frends.Salesforce.CreateSObject.Definitions.Enums;
 using JsonSerializer = System.Text.Json.JsonSerializer;
 
 namespace Frends.Salesforce.CreateSObject.Tests;

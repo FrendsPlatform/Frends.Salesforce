@@ -1,13 +1,11 @@
 ﻿using Frends.Salesforce.CreateSObject.Definitions;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using RestSharp;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Threading;
 using System.Threading.Tasks;
-using static Frends.Salesforce.CreateSObject.Definitions.Enums;
 
 namespace Frends.Salesforce.CreateSObject;
 /// <summary>
@@ -59,7 +57,7 @@ public class Salesforce
 
             Console.WriteLine(response.ErrorMessage);
 
-            if (options.AuthenticationMethod is AuthenticationMethod.OAuth2WithPassword && options.ReturnAccessToken)
+            if (options.AuthenticationMethod is Definitions.AuthenticationMethod.OAuth2WithPassword && options.ReturnAccessToken)
                 return new ResultWithToken(content, response.IsSuccessful, response.ErrorException, response.ErrorMessage, accessToken);
             else
                 return new Result(content, response.IsSuccessful, response.ErrorException, response.ErrorMessage);

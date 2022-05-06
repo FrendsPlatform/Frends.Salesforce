@@ -1,6 +1,5 @@
 ﻿using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
-using static Frends.Salesforce.CreateSObject.Definitions.Enums;
 
 namespace Frends.Salesforce.CreateSObject.Definitions;
 /// <summary>
