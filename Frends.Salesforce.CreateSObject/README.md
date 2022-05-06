@@ -1,12 +1,10 @@
-# Frends.Salesforce.ExecuteQuery
-FRENDS Task for creating sobject to Salesforce
+# Frends.Salesforce.CreateSObject
+Frends Task for creating sobject to Salesforce
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](https://opensource.org/licenses/MIT) 
 [![Build](https://github.com/FrendsPlatform/Frends.Salesforce/actions/workflows/CreateSObject_build_and_test_on_main.yml/badge.svg)](https://github.com/FrendsPlatform/Frends.Salesforce/actions)
 ![MyGet](https://img.shields.io/myget/frends-tasks/v/Frends.Salesforce.CreateSObject)
 ![Coverage](https://app-github-custom-badges.azurewebsites.net/Badge?key=FrendsPlatform/Frends.Salesforce/Frends.Salesforce.CreateSObject|main)
-
-Returns object of response.
 
 ## Installing
 

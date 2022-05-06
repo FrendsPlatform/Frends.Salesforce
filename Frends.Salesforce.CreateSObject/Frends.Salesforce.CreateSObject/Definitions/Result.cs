@@ -49,6 +49,7 @@ public class ResultWithToken : Result
     /// <summary>
     /// OAuth2 access token.
     /// </summary>
+    /// <example>abcdefghjklmn123456789</example>
     public string Token { get; private set; }
 
     internal ResultWithToken(object body, bool succesful, Exception error, string errormessage, string token) : base(body, succesful, error, errormessage)

@@ -10,7 +10,7 @@
 	<PackageTags>Frends</PackageTags>
 	<PackageLicenseExpression>MIT</PackageLicenseExpression>
 	<GenerateDocumentationFile>true</GenerateDocumentationFile>
-	<Description>FRENDS task to create SObject to Salesforce.</Description>
+	<Description>Frends task to create SObject to Salesforce.</Description>
 	<PackageProjectUrl>https://frends.com/</PackageProjectUrl>
 	<RepositoryUrl>https://github.com/FrendsPlatform/Frends.Salesforce/tree/main/Frends.Salesforce.CreateSObject</RepositoryUrl>
   </PropertyGroup>
