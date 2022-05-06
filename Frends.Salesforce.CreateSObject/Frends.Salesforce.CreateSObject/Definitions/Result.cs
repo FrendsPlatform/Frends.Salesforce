@@ -34,10 +34,10 @@ public class Result
 
     internal Result(object body, bool succesful, Exception error, string errormessage)
     {
-        this.Body = body;
-        this.RequestIsSuccessful = succesful;
-        this.ErrorException = error;
-        this.ErrorMessage = errormessage;
+        Body = body;
+        RequestIsSuccessful = succesful;
+        ErrorException = error;
+        ErrorMessage = errormessage;
     }
 }
 
@@ -54,6 +54,6 @@ public class ResultWithToken : Result
 
     internal ResultWithToken(object body, bool succesful, Exception error, string errormessage, string token) : base(body, succesful, error, errormessage)
     {
-        this.Token = token;
+        Token = token;
     }
 }
