@@ -13,6 +13,7 @@ public class Enums
     /// <summary>
     /// Authentication options to authenticate to Salesforce.
     /// </summary>
+    /// <example>AccessToken</example>
     public enum AuthenticationMethod
     {
         /// <summary>

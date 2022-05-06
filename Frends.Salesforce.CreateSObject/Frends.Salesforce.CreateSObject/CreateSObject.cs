@@ -19,6 +19,7 @@ public class Salesforce
     /// </summary>
     /// <param name="input">Information to create the sobject.</param>
     /// <param name="options">Information about the salesforce destination.</param>
+    /// <param name="cancellationToken"></param>
     /// <returns>Object { object Body, bool RequestIsSuccessful, Exception ErrorException, string ErrorMessage }</returns>
     public static async Task<Result> CreateSObject(
         [PropertyTab] Input input,
@@ -26,9 +27,9 @@ public class Salesforce
         CancellationToken cancellationToken
     )
     {
-        if (string.IsNullOrEmpty(input.Domain)) throw new ArgumentNullException("Domain cannot be empty.");
-        else if (string.IsNullOrEmpty(input.SObjectAsJson)) throw new ArgumentNullException("Json cannot be empty.");
-        else if (string.IsNullOrEmpty(input.SObjectType)) throw new ArgumentNullException("Type cannot be empty.");
+        if (string.IsNullOrWhiteSpace(input.Domain)) throw new ArgumentNullException("Domain cannot be empty.");
+        if (string.IsNullOrWhiteSpace(input.SObjectAsJson)) throw new ArgumentNullException("Json cannot be empty.");
+        if (string.IsNullOrWhiteSpace(input.SObjectType)) throw new ArgumentNullException("Type cannot be empty.");
 
         var client = new RestClient(input.Domain + "/services/data/v54.0/sobjects/" + input.SObjectType);
         var request = new RestRequest("/", Method.Post);
@@ -74,7 +75,7 @@ public class Salesforce
     /// Get OAuth2 access token.
     /// This method is public since it is used also in Unit tests.
     /// </summary>
-    public static async Task<string> GetAccessToken(string url, string clientId, string clientSecret, string username, string passwordWithSecurityToken, CancellationToken cancellationToken)
+    private async Task<string> GetAccessToken(string url, string clientId, string clientSecret, string username, string passwordWithSecurityToken, CancellationToken cancellationToken)
     {
         var authClient = new RestClient(url);
         var authRequest = new RestRequest("", Method.Post);
