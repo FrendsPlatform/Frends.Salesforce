@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Frends.Salesforce.CreateSObject.Definitions;
+﻿namespace Frends.Salesforce.CreateSObject.Definitions;
 
 /// <summary>
 /// Authentication options to authenticate to Salesforce.
