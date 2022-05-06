@@ -5,6 +5,7 @@ Frends tasks for Salesforce operations.
 # Tasks
 
 - [Frends.Salesforce.ExecuteQuery](Frends.Salesforce.ExecuteQuery/README.md)
+- [Frends.Salesforce.CreateSObject](Frends.Salesforce.CreateSObject/README.md)
 
 # Contributing
 When contributing to this repository, please first discuss the change you wish to make via issue, email, or any other method with the owners of this repository before making a change.
