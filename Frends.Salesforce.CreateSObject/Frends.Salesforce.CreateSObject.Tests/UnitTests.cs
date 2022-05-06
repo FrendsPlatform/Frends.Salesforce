@@ -30,27 +30,6 @@ public class UnitTests
     private string _name = "Test" + DateTime.Now.Year + "" + DateTime.Now.Month + "" + DateTime.Now.Day + "" + DateTime.Now.Hour + "" + DateTime.Now.Minute + "" + DateTime.Now.Millisecond;
 
     #region helper classes
-    private class Account
-    { 
-        public string Name { get; set; }
-    }
-
-    private class Case
-    {
-        public string AccountId { get; set; }
-        public string Status { get; set; } = "New";
-        public string Origin { get; set; }
-        public string Description { get; set; }
-        public string Subject { get; set; }
-    }
-
-    private class Contact
-    {
-        public enum Salutation { Mr, Mrs, Ms, Dr, Prof }
-
-        public Salutation Title { get; set; }
-        public string LastName { get; set; }
-    }
 
     private class ResultObject
     { 
@@ -64,11 +43,7 @@ public class UnitTests
     {
         _result = new List<ResultObject>();
 
-        Account content = new Account
-        {
-            Name = _name
-        };
-        _userJson = JsonSerializer.Serialize(content);
+        _userJson = JsonSerializer.Serialize(new { Name = _name });
 
         _options = new Options
         {
@@ -76,7 +51,7 @@ public class UnitTests
             AccessToken = await Salesforce.GetAccessToken(_authurl, _clientID, _clientSecret, _username, _password + _securityToken, _cancellationToken)
         };
     }
-#if true
+
     [TestCleanup]
     public async Task TestCleanUp()
     {
@@ -92,23 +67,14 @@ public class UnitTests
             _result = null;
         }
     }
-#endif
 
     [TestMethod]
-    public async Task TestCreateSObjects()
+    public async Task CreateAccountTest()
     {
-        await AssertAccount();
-        await AssertCase();
-        await AssertContact();
-    }
-
-    #region Create record types
-
-    private async Task AssertAccount() {
         var input = new Input
         {
             Domain = _domain,
-            SObjectAsJson = @"{ ""Name"":""Test2022551640410""}",
+            SObjectAsJson = _userJson,
             SObjectType = "Account"
         };
 
@@ -118,41 +84,14 @@ public class UnitTests
         _result.Add(new ResultObject { Type = "Account", Id = result.RecordId });
     }
 
-    private async Task AssertCase()
-    {
-        var listResult = _result.Select((Value, Index) => new { Value, Index })
-                .Single(p => p.Value.Type == "Account");
-
-        Case content = new Case
-        {
-            AccountId = listResult.Value.Id,
-            Subject = "This is a test.",
-            Description = "This is a test case for Frends.SalesForce.CreateSObject task.",
-            Origin = "Web"
-        };
-        var json = JsonSerializer.Serialize(content);
-
-        var input = new Input
-        {
-            Domain = _domain,
-            SObjectAsJson = json,
-            SObjectType = "Case"
-        };
-
-        var result = await Salesforce.CreateSObject(input, _options, _cancellationToken);
-        Assert.IsTrue(result.RequestIsSuccessful);
-
-        _result.Add(new ResultObject { Type = "Case", Id = result.RecordId });
-    }
-
-    private async Task AssertContact()
-    {
-        Contact content = new Contact
-        {
-            Title = Contact.Salutation.Mr,
-            LastName = _name
-        };
-        var json = JsonSerializer.Serialize(content);
+    [TestMethod]
+    public async Task CreateContactTest() {
+        var json = JsonSerializer.Serialize(
+            new
+            {
+                Title = "Mr",
+                LastName = _name
+            });
 
         var input = new Input
         {
@@ -167,11 +106,42 @@ public class UnitTests
         _result.Add(new ResultObject { Type = "Contact", Id = result.RecordId });
     }
 
-    #endregion
+    [TestMethod]
+    public async Task CreateCaseTest()
+    {
+        var accountInput = new Input
+        {
+            Domain = _domain,
+            SObjectAsJson = _userJson,
+            SObjectType = "Account"
+        };
+
+        var accountResult = await Salesforce.CreateSObject(accountInput, _options, _cancellationToken);
+        _result.Add(new ResultObject { Type = "Account", Id = accountResult.RecordId });
+
+        var json = JsonSerializer.Serialize(new {
+            AccountId = accountResult.RecordId,
+            Subject = "This is a test.",
+            Description = "This is a test case for Frends.SalesForce.CreateSObject task.",
+            Origin = "Web"
+        });
+
+        var caseInput = new Input
+        {
+            Domain = _domain,
+            SObjectAsJson = json,
+            SObjectType = "Case"
+        };
+
+        var caseResult = await Salesforce.CreateSObject(caseInput, _options, _cancellationToken);
+        Assert.IsTrue(caseResult.RequestIsSuccessful);
+
+        _result.Add(new ResultObject { Type = "Case", Id = caseResult.RecordId });
+    }
 
     [TestMethod]
     [ExpectedException(typeof(ArgumentException))]
-    public async Task TestThrow_EmptyAccessToken() {
+    public async Task EmptyAccessToken_ThrowTest() {
         var input = new Input
         {
             Domain = _domain,
@@ -190,7 +160,7 @@ public class UnitTests
 
     [TestMethod]
     [ExpectedException(typeof(ArgumentNullException))]
-    public async Task TestThrow_EmptyDomain()
+    public async Task EmptyDomain_ThrowTest()
     {
         var input = new Input
         {
@@ -210,7 +180,7 @@ public class UnitTests
 
     [TestMethod]
     [ExpectedException(typeof(ArgumentNullException))]
-    public async Task TestThrow_EmptyJson()
+    public async Task EmptyJson_ThrowTest()
     {
         var input = new Input
         {
@@ -230,7 +200,7 @@ public class UnitTests
 
     [TestMethod]
     [ExpectedException(typeof(ArgumentNullException))]
-    public async Task TestThrow_EmptyType()
+    public async Task EmptyType_ThrowTest()
     {
         var input = new Input
         {
@@ -250,7 +220,7 @@ public class UnitTests
 
     [TestMethod]
     [ExpectedException(typeof(Exception))]
-    public async Task TestThrow_InvalidDomain()
+    public async Task InvalidDomain_ThrowTest()
     {
         var input = new Input
         {
@@ -270,7 +240,7 @@ public class UnitTests
 
     [TestMethod]
     [ExpectedException(typeof(JsonException))]
-    public async Task TestThrow_InvalidJson()
+    public async Task InvalidJson_ThrowTest()
     {
         var input = new Input
         {
