@@ -25,14 +25,14 @@ public class UnitTests
     private readonly CancellationToken _cancellationToken = new();
     private Options _options;
     private string _userJson;
-    private List<Object> _result;
+    private List<object> _result;
 
     private string _name = "Test" + DateTime.Now.Year + "" + DateTime.Now.Month + "" + DateTime.Now.Day + "" + DateTime.Now.Hour + "" + DateTime.Now.Minute + "" + DateTime.Now.Millisecond;
 
     [TestInitialize]
     public async Task TestInitialize()
     {
-        _result = new List<Object>();
+        _result = new List<object>();
 
         _userJson = JsonSerializer.Serialize(new { Name = _name });
 
