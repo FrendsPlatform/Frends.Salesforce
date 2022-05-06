@@ -1,4 +1,4 @@
-name: ExecuteQuery_release
+name: CreateSObject_release
 
 on:
   workflow_dispatch:
@@ -7,6 +7,6 @@ jobs:
   build:
     uses: FrendsPlatform/FrendsTasks/.github/workflows/release.yml@main
     with:
-      workdir: Frends.Salesforce.ExecuteQuery
+      workdir: Frends.Salesforce.CreateSObject
     secrets:
       feed_api_key: ${{ secrets.TASKS_FEED_API_KEY }}

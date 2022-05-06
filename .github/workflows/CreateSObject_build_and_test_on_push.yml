@@ -1,18 +1,18 @@
-name: ExecuteQuery_push
+name: CreateSObject_push
 
 on:
   push:
     branches-ignore:
       - main
     paths:
-      - 'Frends.Salesforce.ExecuteQuery/**'
+      - 'Frends.Salesforce.CreateSObject/**'
   workflow_dispatch:
 
 jobs:
   build:
     uses: FrendsPlatform/FrendsTasks/.github/workflows/build_test.yml@main
     with:
-      workdir: Frends.Salesforce.ExecuteQuery
+      workdir: Frends.Salesforce.CreateSObject
       env_var_name_1: Salesforce_Client_Secret
       env_var_name_2: Salesforce_Password
       env_var_name_3: Salesforce_Security_Token

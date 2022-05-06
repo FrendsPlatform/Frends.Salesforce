@@ -4,26 +4,24 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Frends.Salesforce.CreateSObject.Definitions
+namespace Frends.Salesforce.CreateSObject.Definitions;
+/// <summary>
+/// Enums-class for CreateSObject-task.
+/// </summary>
+public class Enums
 {
     /// <summary>
-    /// Enums-class for CreateSObject-task.
+    /// Authentication options to authenticate to Salesforce.
     /// </summary>
-    public class Enums
+    public enum AuthenticationMethod
     {
         /// <summary>
-        /// Authentication options to authenticate to Salesforce.
+        /// Authenticate with access token.
         /// </summary>
-        public enum AuthenticationMethod
-        {
-            /// <summary>
-            /// Authenticate with access token.
-            /// </summary>
-            AccessToken,
-            /// <summary>
-            /// Authenticate by providing required informations to fetch OAuth2 access token.
-            /// </summary>
-            OAuth2WithPassword
-        }
+        AccessToken,
+        /// <summary>
+        /// Authenticate by providing required informations to fetch OAuth2 access token.
+        /// </summary>
+        OAuth2WithPassword
     }
 }
