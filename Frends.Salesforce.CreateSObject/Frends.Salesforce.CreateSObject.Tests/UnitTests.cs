@@ -155,7 +155,7 @@ public class UnitTests
             SObjectType = "Contact"
         };
 
-        Options options = new Options
+        var options = new Options
         {
             AuthenticationMethod = AuthenticationMethod.AccessToken,
             AccessToken = " "
@@ -175,7 +175,7 @@ public class UnitTests
             SObjectType = "Account"
         };
 
-        Options options = new Options
+        var options = new Options
         {
             AuthenticationMethod = AuthenticationMethod.AccessToken,
             AccessToken = await Salesforce.GetAccessToken(_authurl, _clientID, _clientSecret, _username, _password + _securityToken, _cancellationToken)
@@ -195,7 +195,7 @@ public class UnitTests
             SObjectType = "Account"
         };
 
-        Options options = new Options
+        var options = new Options
         {
             AuthenticationMethod = AuthenticationMethod.AccessToken,
             AccessToken = await Salesforce.GetAccessToken(_authurl, _clientID, _clientSecret, _username, _password + _securityToken, _cancellationToken)
@@ -215,7 +215,7 @@ public class UnitTests
             SObjectType = ""
         };
 
-        Options options = new Options
+        var options = new Options
         {
             AuthenticationMethod = AuthenticationMethod.AccessToken,
             AccessToken = await Salesforce.GetAccessToken(_authurl, _clientID, _clientSecret, _username, _password + _securityToken, _cancellationToken)
@@ -235,7 +235,7 @@ public class UnitTests
             SObjectType = "Account"
         };
 
-        Options options = new Options
+        var options = new Options
         {
             AuthenticationMethod = AuthenticationMethod.OAuth2WithPassword,
             AuthUrl = _authurl,
@@ -258,7 +258,7 @@ public class UnitTests
             SObjectType = "InvalidType"
         };
 
-        Options options = new Options
+        var options = new Options
         {
             AuthenticationMethod = AuthenticationMethod.OAuth2WithPassword,
             AuthUrl = _authurl,
@@ -282,7 +282,7 @@ public class UnitTests
             SObjectType = "Account"
         };
 
-        Options options = new Options
+        var options = new Options
         {
             AuthenticationMethod = AuthenticationMethod.OAuth2WithPassword,
             AuthUrl = _authurl,
@@ -307,7 +307,7 @@ public class UnitTests
             SObjectType = "Account"
         };
 
-        Options options = new Options
+        var options = new Options
         {
             AuthenticationMethod = AuthenticationMethod.AccessToken,
             AccessToken = await Salesforce.GetAccessToken(_authurl, _clientID, _clientSecret, _username, _password + _securityToken, _cancellationToken)
