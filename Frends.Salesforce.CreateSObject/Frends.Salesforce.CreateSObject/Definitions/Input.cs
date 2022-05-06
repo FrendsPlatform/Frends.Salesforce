@@ -13,6 +13,7 @@ public class Input
     /// </summary>
     /// <example>https://example.my.salesforce.com</example>
     [DefaultValue(@"https://example.my.salesforce.com")]
+    [DisplayFormat(DataFormatString = "Text")]
     public string Domain { get; set; }
 
     /// <summary>
