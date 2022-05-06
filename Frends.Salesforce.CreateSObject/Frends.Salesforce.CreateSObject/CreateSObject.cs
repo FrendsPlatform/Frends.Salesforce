@@ -1,5 +1,6 @@
 ﻿using Frends.Salesforce.CreateSObject.Definitions;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using RestSharp;
 using System;
 using System.Collections.Generic;
@@ -56,17 +57,20 @@ public class Salesforce
             var response = await client.ExecuteAsync(request, cancellationToken);
             var content = JsonConvert.DeserializeObject<dynamic>(response.Content);
 
+            Console.WriteLine(response.ErrorMessage);
+
             if (options.AuthenticationMethod is AuthenticationMethod.OAuth2WithPassword && options.ReturnAccessToken)
-                return new ResultWithToken(content, response.IsSuccessful, response.ErrorException, response.ErrorMessage, accessToken, content.id.ToString());
+                return new ResultWithToken(content, response.IsSuccessful, response.ErrorException, response.ErrorMessage, accessToken);
             else
-                return new Result(content, response.IsSuccessful, response.ErrorException, response.ErrorMessage, content.id.ToString());
+                return new Result(content, response.IsSuccessful, response.ErrorException, response.ErrorMessage);
         }
         catch (JsonException)
         {
             throw new JsonException("Given input couldn't be parsed to json.");
         }
-        catch (Exception ex) {
-            throw new Exception(ex.Message);
+        catch (ArgumentException)
+        {
+            throw new ArgumentException("Domain couldn't be found.");
         }
     }
 

@@ -11,35 +11,33 @@ public class Result
     /// <summary>
     /// Body of the response.
     /// </summary>
+    /// <example>{"id": "abcdefghijkl123456789",  "success": true,  "errors": []}</example>
     public object Body { get; private set; }
 
     /// <summary>
     /// Was the request successful?
     /// </summary>
+    /// <example>true</example>
     public bool RequestIsSuccessful { get; private set; }
 
     /// <summary>
     /// Exception that was thrown by the server.
     /// </summary>
+    /// <example>System.Net.Http.HttpRequestException</example>
     public Exception ErrorException { get; private set; }
 
     /// <summary>
     /// Error message from the server.
     /// </summary>
+    /// <example>System.Net.Http.HttpRequestException: Request failed with status code Unauthorized</example>
     public string ErrorMessage { get; private set; }
 
-    /// <summary>
-    /// Used for testing.
-    /// </summary>
-    internal string RecordId { get; private set; }
-
-    internal Result(object body, bool succesful, Exception error, string errormessage, string id)
+    internal Result(object body, bool succesful, Exception error, string errormessage)
     {
         this.Body = body;
         this.RequestIsSuccessful = succesful;
         this.ErrorException = error;
         this.ErrorMessage = errormessage;
-        this.RecordId = id;
     }
 }
 
@@ -53,7 +51,7 @@ public class ResultWithToken : Result
     /// </summary>
     public string Token { get; private set; }
 
-    internal ResultWithToken(object body, bool succesful, Exception error, string errormessage, string token, string id) : base(body, succesful, error, errormessage, id)
+    internal ResultWithToken(object body, bool succesful, Exception error, string errormessage, string token) : base(body, succesful, error, errormessage)
     {
         this.Token = token;
     }

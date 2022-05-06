@@ -11,6 +11,7 @@ public class Options
     /// <summary>
     /// Authentication method.
     /// </summary>
+    /// <example>AccessToken</example>
     public AuthenticationMethod AuthenticationMethod { get; set; }
 
     /// <summary>

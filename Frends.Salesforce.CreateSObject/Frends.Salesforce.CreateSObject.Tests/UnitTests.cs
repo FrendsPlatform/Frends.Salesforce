@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using Frends.Salesforce.CreateSObject.Definitions;
@@ -81,7 +82,9 @@ public class UnitTests
         var result = await Salesforce.CreateSObject(input, _options, _cancellationToken);
         Assert.IsTrue(result.RequestIsSuccessful);
 
-        _result.Add(new ResultObject { Type = "Account", Id = result.RecordId });
+        var body = JsonConvert.SerializeObject(result.Body);
+        var obj = JsonConvert.DeserializeObject<dynamic>(body);
+        _result.Add(new ResultObject { Type = "Account", Id = obj.id });
     }
 
     [TestMethod]
@@ -103,12 +106,15 @@ public class UnitTests
         var result = await Salesforce.CreateSObject(input, _options, _cancellationToken);
         Assert.IsTrue(result.RequestIsSuccessful);
 
-        _result.Add(new ResultObject { Type = "Contact", Id = result.RecordId });
+        var body = JsonConvert.SerializeObject(result.Body);
+        var obj = JsonConvert.DeserializeObject<dynamic>(body);
+        _result.Add(new ResultObject { Type = "Contact", Id = obj.id });
     }
 
     [TestMethod]
     public async Task CreateCaseTest()
     {
+        // Creating an account to which case can be linked to.
         var accountInput = new Input
         {
             Domain = _domain,
@@ -117,10 +123,14 @@ public class UnitTests
         };
 
         var accountResult = await Salesforce.CreateSObject(accountInput, _options, _cancellationToken);
-        _result.Add(new ResultObject { Type = "Account", Id = accountResult.RecordId });
 
+        var body = JsonConvert.SerializeObject(accountResult.Body);
+        var accObj = JsonConvert.DeserializeObject<dynamic>(body);
+        _result.Add(new ResultObject { Type = "Account", Id = accObj.id });
+
+        // Creating a case.
         var json = JsonSerializer.Serialize(new {
-            AccountId = accountResult.RecordId,
+            AccountId = accObj.id.ToString(),
             Subject = "This is a test.",
             Description = "This is a test case for Frends.SalesForce.CreateSObject task.",
             Origin = "Web"
@@ -136,7 +146,9 @@ public class UnitTests
         var caseResult = await Salesforce.CreateSObject(caseInput, _options, _cancellationToken);
         Assert.IsTrue(caseResult.RequestIsSuccessful);
 
-        _result.Add(new ResultObject { Type = "Case", Id = caseResult.RecordId });
+        var caseBody = JsonConvert.SerializeObject(accountResult.Body);
+        var caseObj = JsonConvert.DeserializeObject<dynamic>(caseBody);
+        _result.Add(new ResultObject { Type = "Case", Id = caseObj.id });
     }
 
     [TestMethod]
@@ -219,23 +231,76 @@ public class UnitTests
     }
 
     [TestMethod]
-    [ExpectedException(typeof(Exception))]
+    [ExpectedException(typeof(ArgumentException))]
     public async Task InvalidDomain_ThrowTest()
     {
         var input = new Input
         {
-            Domain = @"https://mycompany.my.salesforce.com",
+            Domain = "https://mycompany.my.salesforce.com",
             SObjectAsJson = _userJson,
             SObjectType = "Account"
         };
 
         Options options = new Options
         {
-            AuthenticationMethod = AuthenticationMethod.AccessToken,
-            AccessToken = await Salesforce.GetAccessToken(_authurl, _clientID, _clientSecret, _username, _password + _securityToken, _cancellationToken)
+            AuthenticationMethod = AuthenticationMethod.OAuth2WithPassword,
+            AuthUrl = _authurl,
+            ClientID = _clientID,
+            ClientSecret = _clientSecret,
+            Username = _username,
+            Password = _password + _securityToken,
         };
 
         var result = await Salesforce.CreateSObject(input, options, _cancellationToken);
+        Console.WriteLine(result.ErrorException);
+    }
+
+    [TestMethod]
+    public async Task InvalidObjectType_ThrowTest()
+    {
+        var input = new Input
+        {
+            Domain = _domain,
+            SObjectAsJson = _userJson,
+            SObjectType = "InvalidType"
+        };
+
+        Options options = new Options
+        {
+            AuthenticationMethod = AuthenticationMethod.OAuth2WithPassword,
+            AuthUrl = _authurl,
+            ClientID = _clientID,
+            ClientSecret = _clientSecret,
+            Username = _username,
+            Password = _password + _securityToken,
+        };
+
+        var result = await Salesforce.CreateSObject(input, options, _cancellationToken);
+        Assert.AreEqual(new HttpRequestException("Request failed with status code NotFound").ToString(), result.ErrorException.ToString());
+    }
+
+    [TestMethod]
+    public async Task InvalidSecretOAuth_ThrowTest()
+    {
+        var input = new Input
+        {
+            Domain = _domain,
+            SObjectAsJson = _userJson,
+            SObjectType = "Account"
+        };
+
+        Options options = new Options
+        {
+            AuthenticationMethod = AuthenticationMethod.OAuth2WithPassword,
+            AuthUrl = _authurl,
+            ClientID = _clientID,
+            ClientSecret = "abcdefghijklmn123456789",
+            Username = _username,
+            Password = _password + _securityToken,
+        };
+
+        var result = await Salesforce.CreateSObject(input, options, _cancellationToken);
+        Assert.AreEqual(new HttpRequestException("Request failed with status code Unauthorized").ToString(), result.ErrorException.ToString());
     }
 
     [TestMethod]
