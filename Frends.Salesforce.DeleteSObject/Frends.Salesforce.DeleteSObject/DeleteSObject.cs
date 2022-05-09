@@ -1,38 +1,40 @@
-﻿using Frends.Salesforce.CreateSObject.Definitions;
+﻿using Frends.Salesforce.DeleteSObject.Definitions;
 using Newtonsoft.Json;
 using RestSharp;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Frends.Salesforce.CreateSObject;
+[assembly: InternalsVisibleTo("Frends.Salesforce.DeleteSObject.Tests")]
+namespace Frends.Salesforce.DeleteSObject;
 /// <summary>
 /// Tasks class.
 /// </summary>
 public class Salesforce
 {
     /// <summary>
-    /// Creates a sobject to Salesforce.
-    /// [Documentation](https://tasks.frends.com/tasks#frends-tasks/Frends.Salesforce.CreateSObject)
+    /// Deletes a sobject from Salesforce.
+    /// [Documentation](https://tasks.frends.com/tasks#frends-tasks/Frends.Salesforce.DeleteSObject)
     /// </summary>
-    /// <param name="input">Information to create the sobject.</param>
+    /// <param name="input">Information to delete the sobject.</param>
     /// <param name="options">Information about the salesforce destination.</param>
     /// <param name="cancellationToken"></param>
     /// <returns>Object { object Body, bool RequestIsSuccessful, Exception ErrorException, string ErrorMessage }</returns>
-    public static async Task<Result> CreateSObject(
+    public static async Task<Result> DeleteSObject(
         [PropertyTab] Input input,
         [PropertyTab] Options options,
         CancellationToken cancellationToken
     )
     {
         if (string.IsNullOrWhiteSpace(input.Domain)) throw new ArgumentNullException("Domain cannot be empty.");
-        if (string.IsNullOrWhiteSpace(input.SObjectAsJson)) throw new ArgumentNullException("Json cannot be empty.");
+        if (string.IsNullOrWhiteSpace(input.SObjectId)) throw new ArgumentNullException("Id cannot be empty.");
         if (string.IsNullOrWhiteSpace(input.SObjectType)) throw new ArgumentNullException("Type cannot be empty.");
 
-        var client = new RestClient(input.Domain + "/services/data/v54.0/sobjects/" + input.SObjectType);
-        var request = new RestRequest("/", Method.Post);
+        var client = new RestClient(input.Domain + "/services/data/v54.0/sobjects/" + input.SObjectType + "/" + input.SObjectId);
+        var request = new RestRequest("/", Method.Delete);
         string accessToken = "";
 
         switch (options.AuthenticationMethod) {
@@ -48,23 +50,13 @@ public class Salesforce
 
         try
         {
-            var json = JsonConvert.DeserializeObject<Dictionary<string, string>>(input.SObjectAsJson);
-            request.RequestFormat = DataFormat.Json;
-            request.AddJsonBody(json);
-
             var response = await client.ExecuteAsync(request, cancellationToken);
             var content = JsonConvert.DeserializeObject<dynamic>(response.Content);
-
-            Console.WriteLine(response.ErrorMessage);
 
             if (options.AuthenticationMethod is Definitions.AuthenticationMethod.OAuth2WithPassword && options.ReturnAccessToken)
                 return new ResultWithToken(content, response.IsSuccessful, response.ErrorException, response.ErrorMessage, accessToken);
             else
                 return new Result(content, response.IsSuccessful, response.ErrorException, response.ErrorMessage);
-        }
-        catch (JsonException)
-        {
-            throw new JsonException("Given input couldn't be parsed to json.");
         }
         catch (ArgumentException)
         {
@@ -76,7 +68,6 @@ public class Salesforce
 
     /// <summary>
     /// Get OAuth2 access token.
-    /// This method is public since it is used also in Unit tests.
     /// </summary>
     internal static async Task<string> GetAccessToken(string url, string clientId, string clientSecret, string username, string passwordWithSecurityToken, CancellationToken cancellationToken)
     {

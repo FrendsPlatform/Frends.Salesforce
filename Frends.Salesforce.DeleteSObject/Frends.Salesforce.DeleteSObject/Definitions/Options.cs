@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 
-namespace Frends.Salesforce.CreateSObject.Definitions;
+namespace Frends.Salesforce.DeleteSObject.Definitions;
 /// <summary>
 /// Options-class for CreateSObject-task.
 /// </summary>

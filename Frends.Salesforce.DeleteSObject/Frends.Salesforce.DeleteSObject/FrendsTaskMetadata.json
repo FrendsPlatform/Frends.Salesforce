@@ -1,7 +1,7 @@
 {
   "Tasks": [
     {
-      "TaskMethod": "Frends.Salesforce.CreateSObject.Salesforce.CreateSObject"
+      "TaskMethod": "Frends.Salesforce.DeleteSObject.Salesforce.DeleteSObject"
     }
   ]
 }

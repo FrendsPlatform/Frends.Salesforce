@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 
-namespace Frends.Salesforce.CreateSObject.Definitions;
+namespace Frends.Salesforce.DeleteSObject.Definitions;
 /// <summary>
 /// Input-class for CreateSObject-task.
 /// </summary>
@@ -17,11 +17,11 @@ public class Input
     public string Domain { get; set; }
 
     /// <summary>
-    /// SObject structure as json.
+    /// SObject id.
     /// </summary>
-    /// <example>{ "Name": "ExampleName" }</example>
-    [DisplayFormat(DataFormatString = "Json")]
-    public string SObjectAsJson { get; set; }
+    /// <example>123456789</example>
+    [DisplayFormat(DataFormatString = "Text")]
+    public string SObjectId { get; set; }
 
     /// <summary>
     /// SObject type. Can be Account, Case, CustomObject, CustomSettings, CustomMetadata, etc...

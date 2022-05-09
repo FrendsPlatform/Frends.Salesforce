@@ -3,13 +3,14 @@ using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
-using Frends.Salesforce.CreateSObject.Definitions;
+using Frends.Salesforce.DeleteSObject.Definitions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Newtonsoft.Json;
 using RestSharp;
 using JsonSerializer = System.Text.Json.JsonSerializer;
 
-namespace Frends.Salesforce.CreateSObject.Tests;
+namespace Frends.Salesforce.DeleteSObject.Tests;
+
 [TestClass]
 public class UnitTests
 {
@@ -25,15 +26,12 @@ public class UnitTests
     private readonly CancellationToken _cancellationToken = new();
     private Options _options;
     private string _userJson;
-    private List<object> _result;
 
     private string _name = "Test" + DateTime.Now.Year + "" + DateTime.Now.Month + "" + DateTime.Now.Day + "" + DateTime.Now.Hour + "" + DateTime.Now.Minute + "" + DateTime.Now.Millisecond;
 
     [TestInitialize]
     public async Task TestInitialize()
     {
-        _result = new List<object>();
-
         _userJson = JsonSerializer.Serialize(new { Name = _name });
 
         _options = new Options
@@ -43,45 +41,34 @@ public class UnitTests
         };
     }
 
-    [TestCleanup]
-    public async Task TestCleanUp()
-    {
-        if (_result != null)
-        {
-            for (var i = (_result.Count-1); i >= 0; i--) {
-                var temp = JsonConvert.SerializeObject(_result[i]);
-                var obj = JsonConvert.DeserializeObject<dynamic>(temp);
+    private async Task<string> CreateSObject(string type, string input) {
+        var client = new RestClient(_domain + "/services/data/v54.0/sobjects/" + type);
+        var request = new RestRequest("/", Method.Post);
 
-                var client = new RestClient(_domain + "/services/data/v54.0/sobjects/" + obj.Type + "/" + obj.Id);
-                var request = new RestRequest("/", Method.Delete);
+        var accessToken = await Salesforce.GetAccessToken(_authurl, _clientID, _clientSecret, _username, _password + _securityToken, _cancellationToken);
+        request.AddHeader("Authorization", "Bearer " + accessToken);
 
-                request.AddHeader("Authorization", "Bearer " + _options.AccessToken);
-                await client.ExecuteAsync(request, _cancellationToken);
-            }
-            _result = null;
-        }
+        var json = JsonConvert.DeserializeObject<Dictionary<string, string>>(input);
+        request.RequestFormat = DataFormat.Json;
+        request.AddJsonBody(json);
+
+        var response = await client.ExecuteAsync(request, _cancellationToken);
+        var content = JsonConvert.DeserializeObject<dynamic>(response.Content);
+
+        return content.id.ToString();
     }
 
     [TestMethod]
-    public async Task CreateAccountTest()
+    public async Task DeleteAccountTest()
     {
-        var input = new Input
-        {
-            Domain = _domain,
-            SObjectAsJson = _userJson,
-            SObjectType = "Account"
-        };
+        var id = await CreateSObject("Account", _userJson);
+        var result = await Salesforce.DeleteSObject(new Input { Domain = _domain, SObjectId = id, SObjectType = "Account" }, _options, _cancellationToken);
 
-        var result = await Salesforce.CreateSObject(input, _options, _cancellationToken);
         Assert.IsTrue(result.RequestIsSuccessful);
-
-        var body = JsonConvert.SerializeObject(result.Body);
-        var obj = JsonConvert.DeserializeObject<dynamic>(body);
-        _result.Add(new { Type = "Account", Id = obj.id });
     }
 
     [TestMethod]
-    public async Task CreateContactTest() {
+    public async Task DeleteContactTest() {
         var json = JsonSerializer.Serialize(
             new
             {
@@ -89,59 +76,33 @@ public class UnitTests
                 LastName = _name
             });
 
-        var input = new Input
-        {
-            Domain = _domain,
-            SObjectAsJson = json,
-            SObjectType = "Contact"
-        };
+        var id = await CreateSObject("Contact", json);
+        var result = await Salesforce.DeleteSObject(new Input { Domain = _domain, SObjectId = id, SObjectType = "Contact" }, _options, _cancellationToken);
 
-        var result = await Salesforce.CreateSObject(input, _options, _cancellationToken);
         Assert.IsTrue(result.RequestIsSuccessful);
-
-        var body = JsonConvert.SerializeObject(result.Body);
-        var obj = JsonConvert.DeserializeObject<dynamic>(body);
-        _result.Add(new { Type = "Contact", Id = obj.id });
     }
 
     [TestMethod]
-    public async Task CreateCaseTest()
+    public async Task DeleteCaseTest()
     {
         // Creating an account to which case can be linked to.
-        var accountInput = new Input
-        {
-            Domain = _domain,
-            SObjectAsJson = _userJson,
-            SObjectType = "Account"
-        };
-
-        var accountResult = await Salesforce.CreateSObject(accountInput, _options, _cancellationToken);
-
-        var body = JsonConvert.SerializeObject(accountResult.Body);
-        var accObj = JsonConvert.DeserializeObject<dynamic>(body);
-        _result.Add(new { Type = "Account", Id = accObj.id });
+        var accountId = await CreateSObject("Account", _userJson);
 
         // Creating a case.
         var json = JsonSerializer.Serialize(new {
-            AccountId = accObj.id.ToString(),
+            AccountId = accountId,
             Subject = "This is a test.",
             Description = "This is a test case for Frends.SalesForce.CreateSObject task.",
             Origin = "Web"
         });
 
-        var caseInput = new Input
-        {
-            Domain = _domain,
-            SObjectAsJson = json,
-            SObjectType = "Case"
-        };
+        var caseId = await CreateSObject("Case", json);
 
-        var caseResult = await Salesforce.CreateSObject(caseInput, _options, _cancellationToken);
+        var caseResult = await Salesforce.DeleteSObject(new Input { Domain = _domain, SObjectId = caseId, SObjectType = "Case" }, _options, _cancellationToken);
         Assert.IsTrue(caseResult.RequestIsSuccessful);
 
-        var caseBody = JsonConvert.SerializeObject(caseResult.Body);
-        var caseObj = JsonConvert.DeserializeObject<dynamic>(caseBody);
-        _result.Add(new { Type = "Case", Id = caseObj.id });
+        var accountResult = await Salesforce.DeleteSObject(new Input { Domain = _domain, SObjectId = accountId, SObjectType = "Account" }, _options, _cancellationToken);
+        Assert.IsTrue(accountResult.RequestIsSuccessful);
     }
 
     [TestMethod]
@@ -150,7 +111,7 @@ public class UnitTests
         var input = new Input
         {
             Domain = _domain,
-            SObjectAsJson = _userJson,
+            SObjectId = "123456789",
             SObjectType = "Contact"
         };
 
@@ -160,7 +121,7 @@ public class UnitTests
             AccessToken = " "
         };
 
-        await Salesforce.CreateSObject(input, options, _cancellationToken);
+        await Salesforce.DeleteSObject(input, options, _cancellationToken);
     }
 
     [TestMethod]
@@ -170,7 +131,7 @@ public class UnitTests
         var input = new Input
         {
             Domain = null,
-            SObjectAsJson = _userJson,
+            SObjectId = "123456789",
             SObjectType = "Account"
         };
 
@@ -180,17 +141,17 @@ public class UnitTests
             AccessToken = await Salesforce.GetAccessToken(_authurl, _clientID, _clientSecret, _username, _password + _securityToken, _cancellationToken)
         };
 
-        await Salesforce.CreateSObject(input, options, _cancellationToken);
+        await Salesforce.DeleteSObject(input, options, _cancellationToken);
     }
 
     [TestMethod]
     [ExpectedException(typeof(ArgumentNullException))]
-    public async Task EmptyJson_ThrowTest()
+    public async Task EmptyId_ThrowTest()
     {
         var input = new Input
         {
             Domain = _domain,
-            SObjectAsJson = null,
+            SObjectId = null,
             SObjectType = "Account"
         };
 
@@ -200,7 +161,7 @@ public class UnitTests
             AccessToken = await Salesforce.GetAccessToken(_authurl, _clientID, _clientSecret, _username, _password + _securityToken, _cancellationToken)
         };
 
-        await Salesforce.CreateSObject(input, options, _cancellationToken);
+        await Salesforce.DeleteSObject(input, options, _cancellationToken);
     }
 
     [TestMethod]
@@ -210,7 +171,7 @@ public class UnitTests
         var input = new Input
         {
             Domain = _domain,
-            SObjectAsJson = _userJson,
+            SObjectId = "123456789",
             SObjectType = ""
         };
 
@@ -220,7 +181,7 @@ public class UnitTests
             AccessToken = await Salesforce.GetAccessToken(_authurl, _clientID, _clientSecret, _username, _password + _securityToken, _cancellationToken)
         };
 
-        await Salesforce.CreateSObject(input, options, _cancellationToken);
+        await Salesforce.DeleteSObject(input, options, _cancellationToken);
     }
 
     [TestMethod]
@@ -230,7 +191,7 @@ public class UnitTests
         var input = new Input
         {
             Domain = "https://mycompany.my.salesforce.com",
-            SObjectAsJson = _userJson,
+            SObjectId = "123456789",
             SObjectType = "Account"
         };
 
@@ -244,7 +205,7 @@ public class UnitTests
             Password = _password + _securityToken,
         };
 
-        await Salesforce.CreateSObject(input, options, _cancellationToken);
+        await Salesforce.DeleteSObject(input, options, _cancellationToken);
     }
 
     [TestMethod]
@@ -253,7 +214,7 @@ public class UnitTests
         var input = new Input
         {
             Domain = _domain,
-            SObjectAsJson = _userJson,
+            SObjectId = "123456789",
             SObjectType = "InvalidType"
         };
 
@@ -267,7 +228,7 @@ public class UnitTests
             Password = _password + _securityToken,
         };
 
-        var result = await Salesforce.CreateSObject(input, options, _cancellationToken);
+        var result = await Salesforce.DeleteSObject(input, options, _cancellationToken);
         Assert.AreEqual(new HttpRequestException("Request failed with status code NotFound").ToString(), result.ErrorException.ToString());
     }
 
@@ -277,7 +238,7 @@ public class UnitTests
         var input = new Input
         {
             Domain = _domain,
-            SObjectAsJson = _userJson,
+            SObjectId = "123456789",
             SObjectType = "Account"
         };
 
@@ -291,18 +252,17 @@ public class UnitTests
             Password = _password + _securityToken,
         };
 
-        var result = await Salesforce.CreateSObject(input, options, _cancellationToken);
+        var result = await Salesforce.DeleteSObject(input, options, _cancellationToken);
         Assert.AreEqual(new HttpRequestException("Request failed with status code Unauthorized").ToString(), result.ErrorException.ToString());
     }
 
     [TestMethod]
-    [ExpectedException(typeof(JsonException))]
-    public async Task InvalidJson_ThrowTest()
+    public async Task InvalidId_ThrowTest()
     {
         var input = new Input
         {
             Domain = _domain,
-            SObjectAsJson = "Not valid json format",
+            SObjectId = "Not valid id",
             SObjectType = "Account"
         };
 
@@ -312,7 +272,8 @@ public class UnitTests
             AccessToken = await Salesforce.GetAccessToken(_authurl, _clientID, _clientSecret, _username, _password + _securityToken, _cancellationToken)
         };
 
-        await Salesforce.CreateSObject(input, options, _cancellationToken);
+        var result = await Salesforce.DeleteSObject(input, options, _cancellationToken);
+        Assert.AreEqual(new HttpRequestException("Request failed with status code NotFound").ToString(), result.ErrorException.ToString());
     }
 }
 

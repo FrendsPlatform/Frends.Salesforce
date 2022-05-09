@@ -2,7 +2,7 @@
 using System.Runtime.CompilerServices;
 
 [assembly: InternalsVisibleTo("Frends.Salesforce.CreateSObject.Tests")]
-namespace Frends.Salesforce.CreateSObject.Definitions;
+namespace Frends.Salesforce.DeleteSObject.Definitions;
 /// <summary>
 /// Result-class for CreateSObject-task.
 /// </summary>
