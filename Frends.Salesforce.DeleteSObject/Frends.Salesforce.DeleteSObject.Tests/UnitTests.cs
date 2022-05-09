@@ -41,23 +41,6 @@ public class UnitTests
         };
     }
 
-    private async Task<string> CreateSObject(string type, string input) {
-        var client = new RestClient(_domain + "/services/data/v54.0/sobjects/" + type);
-        var request = new RestRequest("/", Method.Post);
-
-        var accessToken = await Salesforce.GetAccessToken(_authurl, _clientID, _clientSecret, _username, _password + _securityToken, _cancellationToken);
-        request.AddHeader("Authorization", "Bearer " + accessToken);
-
-        var json = JsonConvert.DeserializeObject<Dictionary<string, string>>(input);
-        request.RequestFormat = DataFormat.Json;
-        request.AddJsonBody(json);
-
-        var response = await client.ExecuteAsync(request, _cancellationToken);
-        var content = JsonConvert.DeserializeObject<dynamic>(response.Content);
-
-        return content.id.ToString();
-    }
-
     [TestMethod]
     public async Task DeleteAccountTest()
     {
@@ -274,6 +257,24 @@ public class UnitTests
 
         var result = await Salesforce.DeleteSObject(input, options, _cancellationToken);
         Assert.AreEqual(new HttpRequestException("Request failed with status code NotFound").ToString(), result.ErrorException.ToString());
+    }
+
+    private async Task<string> CreateSObject(string type, string input)
+    {
+        var client = new RestClient(_domain + "/services/data/v54.0/sobjects/" + type);
+        var request = new RestRequest("/", Method.Post);
+
+        var accessToken = await Salesforce.GetAccessToken(_authurl, _clientID, _clientSecret, _username, _password + _securityToken, _cancellationToken);
+        request.AddHeader("Authorization", "Bearer " + accessToken);
+
+        var json = JsonConvert.DeserializeObject<Dictionary<string, string>>(input);
+        request.RequestFormat = DataFormat.Json;
+        request.AddJsonBody(json);
+
+        var response = await client.ExecuteAsync(request, _cancellationToken);
+        var content = JsonConvert.DeserializeObject<dynamic>(response.Content);
+
+        return content.id.ToString();
     }
 }
 
