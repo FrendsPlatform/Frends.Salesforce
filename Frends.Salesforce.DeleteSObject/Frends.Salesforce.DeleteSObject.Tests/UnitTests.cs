@@ -259,6 +259,7 @@ public class UnitTests
         Assert.AreEqual(new HttpRequestException("Request failed with status code NotFound").ToString(), result.ErrorException.ToString());
     }
 
+    // Helper method to create SObjects for delete function.
     private async Task<string> CreateSObject(string type, string input)
     {
         var client = new RestClient(_domain + "/services/data/v54.0/sobjects/" + type);
