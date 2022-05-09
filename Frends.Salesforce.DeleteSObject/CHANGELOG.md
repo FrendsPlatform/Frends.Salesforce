@@ -1,5 +1,5 @@
 # Changelog
 
-## [1.0.0] - 2022-05-06
+## [1.0.0] - 2022-05-09
 ### Added
-- Initial implementation of Frends.Salesforce.CreateSObject
+- Initial implementation of Frends.Salesforce.DeleteSObject
