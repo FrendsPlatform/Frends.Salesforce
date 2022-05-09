@@ -19,7 +19,7 @@ public class Input
     /// <summary>
     /// SObject id.
     /// </summary>
-    /// <example>123456789</example>
+    /// <example>abcdefghijkl123456789</example>
     [DisplayFormat(DataFormatString = "Text")]
     public string SObjectId { get; set; }
 
