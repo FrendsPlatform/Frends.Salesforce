@@ -259,8 +259,29 @@ public class UnitTests
         Assert.AreEqual(new HttpRequestException("Request failed with status code NotFound").ToString(), result.ErrorException.ToString());
     }
 
-    // Helper method to create SObjects for delete function.
-    private async Task<string> CreateSObject(string type, string input)
+    [TestMethod]
+    [ExpectedException(typeof(HttpRequestException))]
+    public async Task NotFoundId_ThrowTest()
+    {
+        var input = new Input
+        {
+            Domain = _domain,
+            SObjectId = "123456789",
+            SObjectType = "Account"
+        };
+
+        var options = new Options
+        {
+            AuthenticationMethod = AuthenticationMethod.AccessToken,
+            AccessToken = await Salesforce.GetAccessToken(_authurl, _clientID, _clientSecret, _username, _password + _securityToken, _cancellationToken),
+            ThrowAnErrorIfNotFound = true
+        };
+
+        await Salesforce.DeleteSObject(input, options, _cancellationToken);
+    }
+
+        // Helper method to create SObjects for delete function.
+        private async Task<string> CreateSObject(string type, string input)
     {
         var client = new RestClient(_domain + "/services/data/v54.0/sobjects/" + type);
         var request = new RestRequest("/", Method.Post);

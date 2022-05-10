@@ -3,6 +3,7 @@ using Newtonsoft.Json;
 using RestSharp;
 using System;
 using System.ComponentModel;
+using System.Net.Http;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
@@ -51,6 +52,9 @@ public class Salesforce
         {
             var response = await client.ExecuteAsync(request, cancellationToken);
             var content = JsonConvert.DeserializeObject<dynamic>(response.Content);
+
+            if (options.ThrowAnErrorIfNotFound && response.ErrorException.ToString().Equals(new HttpRequestException("Request failed with status code NotFound").ToString()))
+                throw new HttpRequestException("Target couldn't be found with given id.");
 
             if (options.AuthenticationMethod is Definitions.AuthenticationMethod.OAuth2WithPassword && options.ReturnAccessToken)
                 return new ResultWithToken(content, response.IsSuccessful, response.ErrorException, response.ErrorMessage, accessToken);
