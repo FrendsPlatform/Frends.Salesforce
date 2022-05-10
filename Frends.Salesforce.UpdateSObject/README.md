@@ -1,10 +1,10 @@
 # Frends.Salesforce.DeleteSObject
-Frends Task for deleting sobject from Salesforce
+Frends Task for updating sobject in Salesforce
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](https://opensource.org/licenses/MIT) 
-[![Build](https://github.com/FrendsPlatform/Frends.Salesforce/actions/workflows/DeleteSObject_build_and_test_on_main.yml/badge.svg)](https://github.com/FrendsPlatform/Frends.Salesforce/actions)
-![MyGet](https://img.shields.io/myget/frends-tasks/v/Frends.Salesforce.DeleteSObject)
-![Coverage](https://app-github-custom-badges.azurewebsites.net/Badge?key=FrendsPlatform/Frends.Salesforce/Frends.Salesforce.DeleteSObject|main)
+[![Build](https://github.com/FrendsPlatform/Frends.Salesforce/actions/workflows/UpdateSObject_build_and_test_on_main.yml/badge.svg)](https://github.com/FrendsPlatform/Frends.Salesforce/actions)
+![MyGet](https://img.shields.io/myget/frends-tasks/v/Frends.Salesforce.UpdateSObject)
+![Coverage](https://app-github-custom-badges.azurewebsites.net/Badge?key=FrendsPlatform/Frends.Salesforce/Frends.Salesforce.UpdateSObject|main)
 
 ## Installing
 

@@ -45,7 +45,7 @@ public class UnitTests
     public async Task DeleteAccountTest()
     {
         var id = await CreateSObject("Account", _userJson);
-        var result = await Salesforce.DeleteSObject(new Input { Domain = _domain, SObjectId = id, SObjectType = "Account" }, _options, _cancellationToken);
+        var result = await Salesforce.UpdateSObject(new Input { Domain = _domain, SObjectId = id, SObjectType = "Account" }, _options, _cancellationToken);
 
         Assert.IsTrue(result.RequestIsSuccessful);
     }
@@ -60,7 +60,7 @@ public class UnitTests
             });
 
         var id = await CreateSObject("Contact", json);
-        var result = await Salesforce.DeleteSObject(new Input { Domain = _domain, SObjectId = id, SObjectType = "Contact" }, _options, _cancellationToken);
+        var result = await Salesforce.UpdateSObject(new Input { Domain = _domain, SObjectId = id, SObjectType = "Contact" }, _options, _cancellationToken);
 
         Assert.IsTrue(result.RequestIsSuccessful);
     }
@@ -81,10 +81,10 @@ public class UnitTests
 
         var caseId = await CreateSObject("Case", json);
 
-        var caseResult = await Salesforce.DeleteSObject(new Input { Domain = _domain, SObjectId = caseId, SObjectType = "Case" }, _options, _cancellationToken);
+        var caseResult = await Salesforce.UpdateSObject(new Input { Domain = _domain, SObjectId = caseId, SObjectType = "Case" }, _options, _cancellationToken);
         Assert.IsTrue(caseResult.RequestIsSuccessful);
 
-        var accountResult = await Salesforce.DeleteSObject(new Input { Domain = _domain, SObjectId = accountId, SObjectType = "Account" }, _options, _cancellationToken);
+        var accountResult = await Salesforce.UpdateSObject(new Input { Domain = _domain, SObjectId = accountId, SObjectType = "Account" }, _options, _cancellationToken);
         Assert.IsTrue(accountResult.RequestIsSuccessful);
     }
 
@@ -104,7 +104,7 @@ public class UnitTests
             AccessToken = " "
         };
 
-        await Salesforce.DeleteSObject(input, options, _cancellationToken);
+        await Salesforce.UpdateSObject(input, options, _cancellationToken);
     }
 
     [TestMethod]
@@ -124,7 +124,7 @@ public class UnitTests
             AccessToken = await Salesforce.GetAccessToken(_authurl, _clientID, _clientSecret, _username, _password + _securityToken, _cancellationToken)
         };
 
-        await Salesforce.DeleteSObject(input, options, _cancellationToken);
+        await Salesforce.UpdateSObject(input, options, _cancellationToken);
     }
 
     [TestMethod]
@@ -144,7 +144,7 @@ public class UnitTests
             AccessToken = await Salesforce.GetAccessToken(_authurl, _clientID, _clientSecret, _username, _password + _securityToken, _cancellationToken)
         };
 
-        await Salesforce.DeleteSObject(input, options, _cancellationToken);
+        await Salesforce.UpdateSObject(input, options, _cancellationToken);
     }
 
     [TestMethod]
@@ -164,7 +164,7 @@ public class UnitTests
             AccessToken = await Salesforce.GetAccessToken(_authurl, _clientID, _clientSecret, _username, _password + _securityToken, _cancellationToken)
         };
 
-        await Salesforce.DeleteSObject(input, options, _cancellationToken);
+        await Salesforce.UpdateSObject(input, options, _cancellationToken);
     }
 
     [TestMethod]
@@ -188,7 +188,7 @@ public class UnitTests
             Password = _password + _securityToken,
         };
 
-        await Salesforce.DeleteSObject(input, options, _cancellationToken);
+        await Salesforce.UpdateSObject(input, options, _cancellationToken);
     }
 
     [TestMethod]
@@ -211,7 +211,7 @@ public class UnitTests
             Password = _password + _securityToken,
         };
 
-        var result = await Salesforce.DeleteSObject(input, options, _cancellationToken);
+        var result = await Salesforce.UpdateSObject(input, options, _cancellationToken);
         Assert.AreEqual(new HttpRequestException("Request failed with status code NotFound").ToString(), result.ErrorException.ToString());
     }
 
@@ -235,7 +235,7 @@ public class UnitTests
             Password = _password + _securityToken,
         };
 
-        var result = await Salesforce.DeleteSObject(input, options, _cancellationToken);
+        var result = await Salesforce.UpdateSObject(input, options, _cancellationToken);
         Assert.AreEqual(new HttpRequestException("Request failed with status code Unauthorized").ToString(), result.ErrorException.ToString());
     }
 
@@ -255,7 +255,7 @@ public class UnitTests
             AccessToken = await Salesforce.GetAccessToken(_authurl, _clientID, _clientSecret, _username, _password + _securityToken, _cancellationToken)
         };
 
-        var result = await Salesforce.DeleteSObject(input, options, _cancellationToken);
+        var result = await Salesforce.UpdateSObject(input, options, _cancellationToken);
         Assert.AreEqual(new HttpRequestException("Request failed with status code NotFound").ToString(), result.ErrorException.ToString());
     }
 
@@ -277,7 +277,7 @@ public class UnitTests
             ThrowAnErrorIfNotFound = true
         };
 
-        await Salesforce.DeleteSObject(input, options, _cancellationToken);
+        await Salesforce.UpdateSObject(input, options, _cancellationToken);
     }
 
         // Helper method to create SObjects for delete function.
