@@ -1,4 +1,4 @@
-# Frends.Salesforce.DeleteSObject
+# Frends.Salesforce.UpdateSObject
 Frends Task for updating sobject in Salesforce
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](https://opensource.org/licenses/MIT) 
