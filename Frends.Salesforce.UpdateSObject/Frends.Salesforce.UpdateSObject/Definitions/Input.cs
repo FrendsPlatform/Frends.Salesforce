@@ -17,6 +17,13 @@ public class Input
     public string Domain { get; set; }
 
     /// <summary>
+    /// SObject structure as json.
+    /// </summary>
+    /// <example>{ "Name": "ExampleName" }</example>
+    [DisplayFormat(DataFormatString = "Json")]
+    public string SObjectAsJson { get; set; }
+
+    /// <summary>
     /// SObject id.
     /// </summary>
     /// <example>abcdefghijkl123456789</example>

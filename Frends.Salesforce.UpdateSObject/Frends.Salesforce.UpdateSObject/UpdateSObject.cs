@@ -2,6 +2,7 @@
 using Newtonsoft.Json;
 using RestSharp;
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Net.Http;
 using System.Runtime.CompilerServices;
@@ -31,10 +32,11 @@ public class Salesforce
     {
         if (string.IsNullOrWhiteSpace(input.Domain)) throw new ArgumentNullException("Domain cannot be empty.");
         if (string.IsNullOrWhiteSpace(input.SObjectId)) throw new ArgumentNullException("Id cannot be empty.");
+        if (string.IsNullOrWhiteSpace(input.SObjectAsJson)) throw new ArgumentNullException("Json cannot be empty.");
         if (string.IsNullOrWhiteSpace(input.SObjectType)) throw new ArgumentNullException("Type cannot be empty.");
 
         var client = new RestClient(input.Domain + "/services/data/v54.0/sobjects/" + input.SObjectType + "/" + input.SObjectId);
-        var request = new RestRequest("/", Method.Delete);
+        var request = new RestRequest("/", Method.Patch);
         string accessToken = "";
 
         switch (options.AuthenticationMethod) {
@@ -50,6 +52,10 @@ public class Salesforce
 
         try
         {
+            var json = JsonConvert.DeserializeObject<Dictionary<string, string>>(input.SObjectAsJson);
+            request.RequestFormat = DataFormat.Json;
+            request.AddJsonBody(json);
+
             var response = await client.ExecuteAsync(request, cancellationToken);
             var content = JsonConvert.DeserializeObject<dynamic>(response.Content);
 
@@ -60,6 +66,10 @@ public class Salesforce
                 return new ResultWithToken(content, response.IsSuccessful, response.ErrorException, response.ErrorMessage, accessToken);
             else
                 return new Result(content, response.IsSuccessful, response.ErrorException, response.ErrorMessage);
+        }
+        catch (JsonException)
+        {
+            throw new JsonException("Given input couldn't be parsed to json.");
         }
         catch (ArgumentException)
         {
