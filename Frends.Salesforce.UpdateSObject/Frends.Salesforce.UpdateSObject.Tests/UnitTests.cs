@@ -299,7 +299,6 @@ public class UnitTests
         };
 
         var result = await Salesforce.UpdateSObject(input, options, _cancellationToken);
-        Console.WriteLine(result.Body);
         Assert.AreEqual(new HttpRequestException("Request failed with status code NotFound").ToString(), result.ErrorException.ToString());
     }
 

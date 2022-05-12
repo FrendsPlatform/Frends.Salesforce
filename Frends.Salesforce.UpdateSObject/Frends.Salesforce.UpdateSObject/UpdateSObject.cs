@@ -1,7 +1,5 @@
 ﻿using Frends.Salesforce.UpdateSObject.Definitions;
-using Microsoft.CSharp.RuntimeBinder;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using RestSharp;
 using System;
 using System.Collections.Generic;
