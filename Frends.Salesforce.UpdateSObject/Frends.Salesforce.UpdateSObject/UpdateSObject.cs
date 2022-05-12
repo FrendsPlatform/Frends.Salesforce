@@ -23,7 +23,7 @@ public class Salesforce
     /// <param name="input">Information to update the sobject.</param>
     /// <param name="options">Information about the salesforce destination.</param>
     /// <param name="cancellationToken"></param>
-    /// <returns>Object { object Body, bool RequestIsSuccessful, Exception ErrorException, string ErrorMessage }</returns>
+    /// <returns>Object { JObject Body, bool RequestIsSuccessful, Exception ErrorException, string ErrorMessage }</returns>
     public static async Task<Result> UpdateSObject(
         [PropertyTab] Input input,
         [PropertyTab] Options options,
