@@ -1,5 +1,7 @@
 ﻿using Frends.Salesforce.UpdateSObject.Definitions;
+using Microsoft.CSharp.RuntimeBinder;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using RestSharp;
 using System;
 using System.Collections.Generic;
@@ -60,16 +62,16 @@ public class Salesforce
             var content = JsonConvert.DeserializeObject<dynamic>(response.Content);
 
             if (options.ThrowAnErrorIfNotFound && response.ErrorException.ToString().Equals(new HttpRequestException("Request failed with status code NotFound").ToString()))
-                throw new HttpRequestException("Target couldn't be found with given id.");
+                throw new HttpRequestException("Target couldn't be found with given id or type.");
 
             if (options.AuthenticationMethod is Definitions.AuthenticationMethod.OAuth2WithPassword && options.ReturnAccessToken)
                 return new ResultWithToken(content, response.IsSuccessful, response.ErrorException, response.ErrorMessage, accessToken);
             else
                 return new Result(content, response.IsSuccessful, response.ErrorException, response.ErrorMessage);
         }
-        catch (JsonException)
+        catch (JsonReaderException)
         {
-            throw new JsonException("Given input couldn't be parsed to json.");
+            throw new JsonReaderException("Given input couldn't be parsed to json.");
         }
         catch (ArgumentException)
         {

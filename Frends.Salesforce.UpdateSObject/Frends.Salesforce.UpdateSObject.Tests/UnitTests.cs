@@ -4,6 +4,7 @@ using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using Frends.Salesforce.UpdateSObject.Definitions;
+using Microsoft.CSharp.RuntimeBinder;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Newtonsoft.Json;
 using RestSharp;
@@ -254,6 +255,7 @@ public class UnitTests
     }
 
     [TestMethod]
+    [ExpectedException(typeof(RuntimeBinderException))]
     public async Task InvalidObjectType_ThrowTest()
     {
         var input = new Input
@@ -275,10 +277,12 @@ public class UnitTests
         };
 
         var result = await Salesforce.UpdateSObject(input, options, _cancellationToken);
+        Console.WriteLine(result.Body);
         Assert.AreEqual(new HttpRequestException("Request failed with status code NotFound").ToString(), result.ErrorException.ToString());
     }
 
     [TestMethod]
+    [ExpectedException(typeof(RuntimeBinderException))]
     public async Task InvalidSecretOAuth_ThrowTest()
     {
         var input = new Input
@@ -304,6 +308,7 @@ public class UnitTests
     }
 
     [TestMethod]
+    [ExpectedException(typeof(RuntimeBinderException))]
     public async Task InvalidId_ThrowTest()
     {
         var input = new Input
@@ -325,7 +330,7 @@ public class UnitTests
     }
 
     [TestMethod]
-    [ExpectedException(typeof(JsonException))]
+    [ExpectedException(typeof(JsonReaderException))]
     public async Task InvalidJson_ThrowTest()
     {
         var input = new Input

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json.Linq;
+using System;
 using System.Runtime.CompilerServices;
 
 [assembly: InternalsVisibleTo("Frends.Salesforce.CreateSObject.Tests")]
@@ -12,7 +13,7 @@ public class Result
     /// Body of the response.
     /// </summary>
     /// <example>{"id": "abcdefghijkl123456789",  "success": true,  "errors": []}</example>
-    public object Body { get; private set; }
+    public JObject Body { get; private set; }
 
     /// <summary>
     /// Was the request successful?
@@ -32,7 +33,7 @@ public class Result
     /// <example>System.Net.Http.HttpRequestException: Request failed with status code Unauthorized</example>
     public string ErrorMessage { get; private set; }
 
-    internal Result(object body, bool succesful, Exception error, string errormessage)
+    internal Result(JObject body, bool succesful, Exception error, string errormessage)
     {
         Body = body;
         RequestIsSuccessful = succesful;
@@ -52,7 +53,7 @@ public class ResultWithToken : Result
     /// <example>abcdefghjklmn123456789</example>
     public string Token { get; private set; }
 
-    internal ResultWithToken(object body, bool succesful, Exception error, string errormessage, string token) : base(body, succesful, error, errormessage)
+    internal ResultWithToken(JObject body, bool succesful, Exception error, string errormessage, string token) : base(body, succesful, error, errormessage)
     {
         Token = token;
     }
