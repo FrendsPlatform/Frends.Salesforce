@@ -33,28 +33,18 @@ public class Result
     /// <example>System.Net.Http.HttpRequestException: Request failed with status code Unauthorized</example>
     public string ErrorMessage { get; private set; }
 
-    internal Result(JObject body, bool succesful, Exception error, string errormessage)
-    {
-        Body = body;
-        RequestIsSuccessful = succesful;
-        ErrorException = error;
-        ErrorMessage = errormessage;
-    }
-}
-
-/// <summary>
-/// Extended Result-class with access token.
-/// </summary>
-public class ResultWithToken : Result
-{
     /// <summary>
     /// OAuth2 access token.
     /// </summary>
     /// <example>abcdefghjklmn123456789</example>
     public string Token { get; private set; }
 
-    internal ResultWithToken(JObject body, bool succesful, Exception error, string errormessage, string token) : base(body, succesful, error, errormessage)
+    internal Result(JObject body, bool succesful, Exception error, string errormessage, string token)
     {
+        Body = body;
+        RequestIsSuccessful = succesful;
+        ErrorException = error;
+        ErrorMessage = errormessage;
         Token = token;
     }
 }

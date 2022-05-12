@@ -83,6 +83,5 @@ public class Options
     /// </summary>
     /// <example>true</example>
     [DefaultValue(false)]
-    [UIHint(nameof(AuthenticationMethod), "", AuthenticationMethod.OAuth2WithPassword)]
     public bool ThrowAnErrorIfNotFound { get; set; }
 }

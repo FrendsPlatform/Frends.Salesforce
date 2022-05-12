@@ -130,6 +130,28 @@ public class UnitTests
     }
 
     [TestMethod]
+    public async Task GetReturnedAccessTokenTest()
+    {
+        var id = await CreateSObject("Account", _userJson);
+        _result.Add(new { Type = "Account", Id = id });
+
+        var newInput = new { Name = "NewName_" + _name };
+        var options = new Options
+        {
+            AuthenticationMethod = AuthenticationMethod.OAuth2WithPassword,
+            AuthUrl = _authurl,
+            ClientID = _clientID,
+            ClientSecret = _clientSecret,
+            Username = _username,
+            Password = _password + _securityToken,
+            ReturnAccessToken = true
+        };
+        var result = await Salesforce.UpdateSObject(new Input { Domain = _domain, SObjectId = id, SObjectType = "Account", SObjectAsJson = JsonSerializer.Serialize(newInput) }, options, _cancellationToken);
+
+        Assert.IsNotNull(result.Token);
+    }
+
+    [TestMethod]
     [ExpectedException(typeof(ArgumentException))]
     public async Task EmptyAccessToken_ThrowTest() {
         var input = new Input

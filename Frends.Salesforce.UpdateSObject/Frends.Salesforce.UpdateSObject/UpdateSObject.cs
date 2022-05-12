@@ -65,9 +65,9 @@ public class Salesforce
                 throw new HttpRequestException("Target couldn't be found with given id or type.");
 
             if (options.AuthenticationMethod is Definitions.AuthenticationMethod.OAuth2WithPassword && options.ReturnAccessToken)
-                return new ResultWithToken(content, response.IsSuccessful, response.ErrorException, response.ErrorMessage, accessToken);
+                return new Result(content, response.IsSuccessful, response.ErrorException, response.ErrorMessage, accessToken);
             else
-                return new Result(content, response.IsSuccessful, response.ErrorException, response.ErrorMessage);
+                return new Result(content, response.IsSuccessful, response.ErrorException, response.ErrorMessage, null);
         }
         catch (JsonReaderException)
         {
