@@ -66,7 +66,7 @@ public class Salesforce
             if (options.AuthenticationMethod is AuthenticationMethod.OAuth2WithPassword && options.ReturnAccessToken)
                 return new Result(content, response.IsSuccessful, response.ErrorException, response.ErrorMessage, accessToken);
             else
-                return new Result(content, response.IsSuccessful, response.ErrorException, response.ErrorMessage, null);
+                return new Result(content, response.IsSuccessful, response.ErrorException, response.ErrorMessage, string.Empty);
         }
         catch (JsonReaderException)
         {
