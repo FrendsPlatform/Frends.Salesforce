@@ -78,7 +78,7 @@ public class Salesforce
         }
         catch (RuntimeBinderException)
         {
-            throw new RuntimeBinderException("Given Salesforce information invalid.");
+            throw new RuntimeBinderException("Given Salesforce information is invalid.");
         }
     }
 
