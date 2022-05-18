@@ -1,4 +1,5 @@
 ﻿using Frends.Salesforce.UpdateSObject.Definitions;
+using Microsoft.CSharp.RuntimeBinder;
 using Newtonsoft.Json;
 using RestSharp;
 using System;
@@ -65,7 +66,7 @@ public class Salesforce
             if (options.AuthenticationMethod is AuthenticationMethod.OAuth2WithPassword && options.ReturnAccessToken)
                 return new Result(content, response.IsSuccessful, response.ErrorException, response.ErrorMessage, accessToken);
             else
-                return new Result(content, response.IsSuccessful, response.ErrorException, response.ErrorMessage, string.Empty);
+                return new Result(content, response.IsSuccessful, response.ErrorException, response.ErrorMessage, null);
         }
         catch (JsonReaderException)
         {
@@ -74,6 +75,10 @@ public class Salesforce
         catch (ArgumentException)
         {
             throw new ArgumentException("Domain couldn't be found.");
+        }
+        catch (RuntimeBinderException)
+        {
+            throw new RuntimeBinderException("Given Salesforce information invalid.");
         }
     }
 

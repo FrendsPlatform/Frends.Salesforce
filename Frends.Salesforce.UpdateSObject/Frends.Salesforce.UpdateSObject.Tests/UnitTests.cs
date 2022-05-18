@@ -278,6 +278,31 @@ public class UnitTests
 
     [TestMethod]
     [ExpectedException(typeof(RuntimeBinderException))]
+    public async Task ExampleDomain_ThrowTest()
+    {
+        var input = new Input
+        {
+            Domain = "https://example.my.salesforce.com",
+            SObjectId = "123456789",
+            SObjectAsJson = _userJson,
+            SObjectType = "Account"
+        };
+
+        var options = new Options
+        {
+            AuthenticationMethod = AuthenticationMethod.OAuth2WithPassword,
+            AuthUrl = _authurl,
+            ClientID = _clientID,
+            ClientSecret = _clientSecret,
+            Username = _username,
+            Password = _password + _securityToken,
+        };
+
+        await Salesforce.UpdateSObject(input, options, _cancellationToken);
+    }
+
+    [TestMethod]
+    [ExpectedException(typeof(RuntimeBinderException))]
     public async Task InvalidObjectType_ThrowTest()
     {
         var input = new Input
