@@ -11,7 +11,7 @@ namespace Frends.Salesforce.ExecuteQuery
         /// <summary>
         /// Salesforce Domain.
         /// /services/data/v52.0/query will be added automatically, so the domain is enough.
-        /// </summary>
+        /// <example>https://example.my.salesforce.com</example>
         [DefaultValue(@"https://example.my.salesforce.com")]
         [DisplayFormat(DataFormatString = "Text")]
         public string Domain { get; set; }
@@ -19,6 +19,7 @@ namespace Frends.Salesforce.ExecuteQuery
         /// <summary>
         /// Query which will be executed.
         /// </summary>
+        /// <example>SELECT Name from Customer</example>
         [DisplayFormat(DataFormatString = "Text")]
         public string Query { get; set; }
     }

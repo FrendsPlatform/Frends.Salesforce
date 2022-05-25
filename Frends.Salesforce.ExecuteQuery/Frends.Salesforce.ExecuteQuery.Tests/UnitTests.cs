@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
+using Frends.Salesforce.ExecuteQuery.Definitions;
 using NUnit.Framework;
 
 namespace Frends.Salesforce.ExecuteQuery.Tests
@@ -82,7 +83,7 @@ namespace Frends.Salesforce.ExecuteQuery.Tests
                 ReturnAccessToken = true
             };
 
-            var result = (ResultWithToken)await Salesforce.ExecuteQuery(input, options, _cancellationToken);
+            var result = await Salesforce.ExecuteQuery(input, options, _cancellationToken);
             var accessToken = await Salesforce.GetAccessToken(_authurl, _clientID, _clientSecret, _username, _password + _securityToken, _cancellationToken);
             Assert.IsTrue(result.RequestIsSuccessful);
             Assert.AreEqual(result.Token, accessToken);
