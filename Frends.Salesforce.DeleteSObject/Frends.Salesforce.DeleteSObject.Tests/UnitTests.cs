@@ -4,6 +4,7 @@ using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using Frends.Salesforce.DeleteSObject.Definitions;
+using Microsoft.CSharp.RuntimeBinder;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Newtonsoft.Json;
 using RestSharp;
@@ -86,6 +87,25 @@ public class UnitTests
 
         var accountResult = await Salesforce.DeleteSObject(new Input { Domain = _domain, SObjectId = accountId, SObjectType = "Account" }, _options, _cancellationToken);
         Assert.IsTrue(accountResult.RequestIsSuccessful);
+    }
+
+    [TestMethod]
+    public async Task GetReturnedAccessTokenTest()
+    {
+        var id = await CreateSObject("Account", _userJson);
+        var options = new Options
+        {
+            AuthenticationMethod = AuthenticationMethod.OAuth2WithPassword,
+            AuthUrl = _authurl,
+            ClientID = _clientID,
+            ClientSecret = _clientSecret,
+            Username = _username,
+            Password = _password + _securityToken,
+            ReturnAccessToken = true
+        };
+        var result = await Salesforce.DeleteSObject(new Input { Domain = _domain, SObjectId = id, SObjectType = "Account" }, options, _cancellationToken);
+
+        Assert.IsNotNull(result.Token);
     }
 
     [TestMethod]

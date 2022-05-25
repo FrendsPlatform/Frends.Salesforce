@@ -66,10 +66,6 @@ public class Salesforce
         {
             throw new ArgumentException("Domain couldn't be found.");
         }
-        catch (RuntimeBinderException)
-        {
-            throw new RuntimeBinderException("Given Salesforce information is invalid.");
-        }
     }
 
     #region HelperMethods
