@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json.Linq;
+using System;
 
 namespace Frends.Salesforce.ExecuteQuery
 {
@@ -10,32 +11,40 @@ namespace Frends.Salesforce.ExecuteQuery
         /// <summary>
         /// Body of the response.
         /// </summary>
-        public object Body { get; set; }
+        /// <example>{"id": "abcdefghijkl123456789",  "success": true,  "errors": []}</example>
+        public JObject Body { get; private set; }
 
         /// <summary>
         /// Was the request successful?
         /// </summary>
-        public bool RequestIsSuccessful { get; set; }
+        /// <example>true</example>
+        public bool RequestIsSuccessful { get; private set; }
 
         /// <summary>
         /// Exception that was thrown by the server.
         /// </summary>
-        public Exception ErrorException { get; set; }
+        /// <example>System.Net.Http.HttpRequestException</example>
+        public Exception ErrorException { get; private set; }
 
         /// <summary>
         /// Error message from the server.
         /// </summary>
-        public string ErrorMessage { get; set; }
-    }
+        /// <example>System.Net.Http.HttpRequestException: Request failed with status code Unauthorized</example>
+        public string ErrorMessage { get; private set; }
 
-    /// <summary>
-    /// Extended Result-class with access token.
-    /// </summary>
-    public class ResultWithToken : Result
-    {
         /// <summary>
         /// OAuth2 access token.
         /// </summary>
-        public string Token { get; set; }
+        /// <example>abcdefghjklmn123456789</example>
+        public string Token { get; private set; }
+
+        internal Result(JObject body, bool succesful, Exception error, string errormessage, string token)
+        {
+            Body = body;
+            RequestIsSuccessful = succesful;
+            ErrorException = error;
+            ErrorMessage = errormessage;
+            Token = token;
+        }
     }
 }

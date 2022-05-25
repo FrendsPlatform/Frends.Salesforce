@@ -1,4 +1,5 @@
-﻿using System.ComponentModel;
+﻿using Frends.Salesforce.ExecuteQuery.Definitions;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 
 namespace Frends.Salesforce.ExecuteQuery
@@ -66,20 +67,5 @@ namespace Frends.Salesforce.ExecuteQuery
         [DefaultValue(false)]
         [UIHint(nameof(AuthenticationMethod), "", AuthenticationMethod.OAuth2WithPassword)]
         public bool ReturnAccessToken { get; set; }
-    }
-
-    /// <summary>
-    /// Authentication options to authenticate to Salesforce.
-    /// </summary>
-    public enum AuthenticationMethod
-    {
-        /// <summary>
-        /// Authenticate with access token.
-        /// </summary>
-        AccessToken,
-        /// <summary>
-        /// Authenticate by providing required informations to fetch OAuth2 access token.
-        /// </summary>
-        OAuth2WithPassword
     }
 }

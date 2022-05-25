@@ -1,8 +1,10 @@
-﻿using Newtonsoft.Json;
+﻿using Frends.Salesforce.ExecuteQuery.Definitions;
+using Newtonsoft.Json;
 using RestSharp;
 using System;
 using System.ComponentModel;
 using System.Net;
+using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -14,39 +16,46 @@ namespace Frends.Salesforce.ExecuteQuery
     public class Salesforce
     {
         /// <summary>
-        /// Execute a query to salesforce
-        /// [Documentation](https://github.com/FrendsPlatform/Frends.Salesforce/tree/main/Frends.Salesforce.ExecuteQuery)
+        /// Execute a query to Salesforce.
+        /// [Documentation](https://tasks.frends.com/tasks#frends-tasks/Frends.Salesforce.ExecuteQuery)
         /// </summary>
-        /// <returns></returns>
+        /// <param name="input">Information to update the sobject.</param>
+        /// <param name="options">Information about the salesforce destination.</param>
+        /// <param name="cancellationToken"></param>
+        /// <returns>Object { JObject Body, bool RequestIsSuccessful, Exception ErrorException, string ErrorMessage, string Token }</returns>
         public static async Task<Result> ExecuteQuery(
             [PropertyTab] Input input,
             [PropertyTab] Options options,
             CancellationToken cancellationToken
         )
         {
+            if (string.IsNullOrWhiteSpace(input.Domain)) throw new ArgumentNullException("Domain cannot be empty.");
+            if (string.IsNullOrWhiteSpace(input.Query)) throw new ArgumentNullException("Query cannot be empty.");
+
             var query = WebUtility.UrlEncode(input.Query);
             var client = new RestClient(input.Domain + "/services/data/v54.0/query/?q=" + query);
             var request = new RestRequest("/", Method.Get);
             string accessToken = "";
 
-            if (options.AuthenticationMethod is AuthenticationMethod.AccessToken)
+            switch (options.AuthenticationMethod)
             {
-                if (string.IsNullOrWhiteSpace(options.AccessToken)) throw new ArgumentException("Access token cannot be null when using Access Token authentication method");
-                request.AddHeader("Authorization", "Bearer " + options.AccessToken);
-            }
-
-            if (options.AuthenticationMethod is AuthenticationMethod.OAuth2WithPassword)
-            {
-                accessToken = await GetAccessToken(options.AuthUrl, options.ClientID, options.ClientSecret, options.Username, options.Password + options.SecurityToken, cancellationToken);
-                request.AddHeader("Authorization", "Bearer " + accessToken);
+                case AuthenticationMethod.AccessToken:
+                    if (string.IsNullOrWhiteSpace(options.AccessToken)) throw new ArgumentException("Access token cannot be null when using Access Token authentication method");
+                    request.AddHeader("Authorization", "Bearer " + options.AccessToken);
+                    break;
+                case AuthenticationMethod.OAuth2WithPassword:
+                    accessToken = await GetAccessToken(options.AuthUrl, options.ClientID, options.ClientSecret, options.Username, options.Password + options.SecurityToken, cancellationToken);
+                    request.AddHeader("Authorization", "Bearer " + accessToken);
+                    break;
             }
 
             var response = await client.ExecuteAsync(request, cancellationToken);
+            var content = JsonConvert.DeserializeObject<dynamic>(response.Content);
 
             if (options.AuthenticationMethod is AuthenticationMethod.OAuth2WithPassword && options.ReturnAccessToken)
-                return new ResultWithToken { Body = JsonConvert.DeserializeObject<dynamic>(response.Content), RequestIsSuccessful = response.IsSuccessful, ErrorException = response.ErrorException, ErrorMessage = response.ErrorMessage, Token = accessToken };
+                return new Result(content, response.IsSuccessful, response.ErrorException, response.ErrorMessage, accessToken);
             else
-                return new Result { Body = JsonConvert.DeserializeObject<dynamic>(response.Content), RequestIsSuccessful = response.IsSuccessful, ErrorException = response.ErrorException, ErrorMessage = response.ErrorMessage };
+                return new Result(content, response.IsSuccessful, response.ErrorException, response.ErrorMessage, string.Empty);
         }
 
         #region HelperMethods
