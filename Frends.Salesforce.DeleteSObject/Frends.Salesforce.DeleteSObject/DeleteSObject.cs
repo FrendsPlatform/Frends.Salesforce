@@ -1,5 +1,4 @@
 ﻿using Frends.Salesforce.DeleteSObject.Definitions;
-using Microsoft.CSharp.RuntimeBinder;
 using Newtonsoft.Json;
 using RestSharp;
 using System;
