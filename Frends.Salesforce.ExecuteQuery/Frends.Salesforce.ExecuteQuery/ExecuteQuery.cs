@@ -4,10 +4,11 @@ using RestSharp;
 using System;
 using System.ComponentModel;
 using System.Net;
-using System.Net.Http;
+using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 
+[assembly: InternalsVisibleTo("Frends.Salesforce.ExecuteQuery.Tests")]
 namespace Frends.Salesforce.ExecuteQuery
 {
     /// <summary>
@@ -49,13 +50,20 @@ namespace Frends.Salesforce.ExecuteQuery
                     break;
             }
 
-            var response = await client.ExecuteAsync(request, cancellationToken);
-            var content = JsonConvert.DeserializeObject<dynamic>(response.Content);
+            try
+            {
+                var response = await client.ExecuteAsync(request, cancellationToken);
+                var content = JsonConvert.DeserializeObject<dynamic>(response.Content);
 
-            if (options.AuthenticationMethod is AuthenticationMethod.OAuth2WithPassword && options.ReturnAccessToken)
-                return new Result(content, response.IsSuccessful, response.ErrorException, response.ErrorMessage, accessToken);
-            else
-                return new Result(content, response.IsSuccessful, response.ErrorException, response.ErrorMessage, string.Empty);
+                if (options.AuthenticationMethod is AuthenticationMethod.OAuth2WithPassword && options.ReturnAccessToken)
+                    return new Result(content, response.IsSuccessful, response.ErrorException, response.ErrorMessage, accessToken);
+                else
+                    return new Result(content, response.IsSuccessful, response.ErrorException, response.ErrorMessage, string.Empty);
+            }
+            catch (ArgumentException)
+            {
+                throw new ArgumentException("Domain couldn't be found.");
+            }
         }
 
         #region HelperMethods
@@ -64,7 +72,7 @@ namespace Frends.Salesforce.ExecuteQuery
         /// Get OAuth2 access token.
         /// This method is public since it is used also in Unit tests.
         /// </summary>
-        public static async Task<string> GetAccessToken(string url, string clientId, string clientSecret, string username, string passwordWithSecurityToken, CancellationToken cancellationToken)
+        internal static async Task<string> GetAccessToken(string url, string clientId, string clientSecret, string username, string passwordWithSecurityToken, CancellationToken cancellationToken)
         {
             var authClient = new RestClient(url);
             var authRequest = new RestRequest("", Method.Post);
