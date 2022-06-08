@@ -20,7 +20,7 @@ public class Salesforce
     /// <param name="input">Information to create the sobject.</param>
     /// <param name="options">Information about the salesforce destination.</param>
     /// <param name="cancellationToken"></param>
-    /// <returns>Object { object Body, bool RequestIsSuccessful, Exception ErrorException, string ErrorMessage }</returns>
+    /// <returns>Object { object Body, bool RequestIsSuccessful, Exception ErrorException, string ErrorMessage, string Token }</returns>
     public static async Task<Result> CreateSObject(
         [PropertyTab] Input input,
         [PropertyTab] Options options,
@@ -55,12 +55,10 @@ public class Salesforce
             var response = await client.ExecuteAsync(request, cancellationToken);
             var content = JsonConvert.DeserializeObject<dynamic>(response.Content);
 
-            Console.WriteLine(response.ErrorMessage);
-
-            if (options.AuthenticationMethod is Definitions.AuthenticationMethod.OAuth2WithPassword && options.ReturnAccessToken)
-                return new ResultWithToken(content, response.IsSuccessful, response.ErrorException, response.ErrorMessage, accessToken);
+            if (options.AuthenticationMethod is AuthenticationMethod.OAuth2WithPassword && options.ReturnAccessToken)
+                return new Result(content, response.IsSuccessful, response.ErrorException, response.ErrorMessage, accessToken);
             else
-                return new Result(content, response.IsSuccessful, response.ErrorException, response.ErrorMessage);
+                return new Result(content, response.IsSuccessful, response.ErrorException, response.ErrorMessage, string.Empty);
         }
         catch (JsonException)
         {

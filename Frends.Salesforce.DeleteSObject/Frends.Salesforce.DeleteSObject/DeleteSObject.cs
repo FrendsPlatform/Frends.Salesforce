@@ -22,7 +22,7 @@ public class Salesforce
     /// <param name="input">Information to delete the sobject.</param>
     /// <param name="options">Information about the salesforce destination.</param>
     /// <param name="cancellationToken"></param>
-    /// <returns>Object { object Body, bool RequestIsSuccessful, Exception ErrorException, string ErrorMessage }</returns>
+    /// <returns>Object { object Body, bool RequestIsSuccessful, Exception ErrorException, string ErrorMessage, string Token }</returns>
     public static async Task<Result> DeleteSObject(
         [PropertyTab] Input input,
         [PropertyTab] Options options,
@@ -56,10 +56,10 @@ public class Salesforce
             if (options.ThrowAnErrorIfNotFound && response.ErrorException.ToString().Equals(new HttpRequestException("Request failed with status code NotFound").ToString()))
                 throw new HttpRequestException("Target couldn't be found with given id.");
 
-            if (options.AuthenticationMethod is Definitions.AuthenticationMethod.OAuth2WithPassword && options.ReturnAccessToken)
-                return new ResultWithToken(content, response.IsSuccessful, response.ErrorException, response.ErrorMessage, accessToken);
+            if (options.AuthenticationMethod is AuthenticationMethod.OAuth2WithPassword && options.ReturnAccessToken)
+                return new Result(content, response.IsSuccessful, response.ErrorException, response.ErrorMessage, accessToken);
             else
-                return new Result(content, response.IsSuccessful, response.ErrorException, response.ErrorMessage);
+                return new Result(content, response.IsSuccessful, response.ErrorException, response.ErrorMessage, string.Empty);
         }
         catch (ArgumentException)
         {
