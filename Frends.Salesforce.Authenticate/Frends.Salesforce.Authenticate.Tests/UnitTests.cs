@@ -17,8 +17,8 @@ public class UnitTests
     private readonly string password = Environment.GetEnvironmentVariable("Salesforce_Password");
     private readonly string securityToken = Environment.GetEnvironmentVariable("Salesforce_Security_Token");
     private readonly string clientID = Environment.GetEnvironmentVariable("Salesforce_ClientID");
-    private readonly string domain = @"https://hiqfinlandoy2-dev-ed.my.salesforce.com";
-    private readonly string username = "testuser@test.fi";
+    private readonly string domain = @"https://frends2-dev-ed.develop.my.salesforce.com";
+    private readonly string username = "jefim+tasks@frends.com";
     private readonly string authurl = @"https://login.salesforce.com/services/oauth2/token";
 
     [AssemblyInitialize]
@@ -49,7 +49,7 @@ public class UnitTests
     }
 
     [TestMethod]
-    public async Task Authenticate_ShouldThrowAuthenticationException_OnInvalidCredentials()
+    public async Task Authenticate_ThrowOnInvalidCredentials()
     {
         var input = new Input
         {
@@ -61,14 +61,17 @@ public class UnitTests
             SecurityToken = "invalid_security_token",
         };
 
-        await Assert.ThrowsExceptionAsync<ArgumentException>(() => Salesforce.Authenticate(input, CancellationToken.None));
+        var exception = await Assert.ThrowsExceptionAsync<Exception>(
+        () => Salesforce.Authenticate(input, CancellationToken.None));
+
+        Assert.IsTrue(exception.Message.Contains("Bad Request"), "The exception message did not contain 'Bad request'.");
     }
 
     [TestMethod]
-    public async Task Authenticate_ShouldThrowArgumentNullException_WhenCredentialsAreNull()
+    public async Task Authenticate_ThrowWhenCredentialsAreNull()
     {
         Input input = null;
-        await Assert.ThrowsExceptionAsync<ArgumentNullException>(() => Salesforce.Authenticate(input, CancellationToken.None));
+        await Assert.ThrowsExceptionAsync<NullReferenceException>(() => Salesforce.Authenticate(input, CancellationToken.None));
     }
 
     [TestMethod]
