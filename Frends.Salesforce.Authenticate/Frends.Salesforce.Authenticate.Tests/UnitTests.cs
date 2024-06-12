@@ -61,7 +61,7 @@ public class UnitTests
             SecurityToken = "invalid_security_token",
         };
 
-        var exception = await Assert.ThrowsExceptionAsync<Exception>(
+        var exception = await Assert.ThrowsExceptionAsync<HttpRequestException>(
         () => Salesforce.Authenticate(input, CancellationToken.None));
 
         Assert.IsTrue(exception.Message.Contains("Bad Request"), "The exception message did not contain 'Bad request'.");
@@ -71,7 +71,7 @@ public class UnitTests
     public async Task Authenticate_ThrowWhenCredentialsAreNull()
     {
         Input input = null;
-        await Assert.ThrowsExceptionAsync<NullReferenceException>(() => Salesforce.Authenticate(input, CancellationToken.None));
+        await Assert.ThrowsExceptionAsync<ArgumentNullException>(() => Salesforce.Authenticate(input, CancellationToken.None));
     }
 
     [TestMethod]

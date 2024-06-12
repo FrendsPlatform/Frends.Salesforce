@@ -36,6 +36,11 @@ public static class Salesforce
     /// <returns>Access token as a string.</returns>
     public static async Task<string> GetAccessTokenAsync(Input authParams, CancellationToken cancellationToken)
     {
+        if (authParams == null)
+        {
+            throw new ArgumentNullException(nameof(authParams), "Input cannot be null");
+        }
+
         var requestUrl = authParams.LoginUrl;
 
         var formData = new Dictionary<string, string>
@@ -61,7 +66,7 @@ public static class Salesforce
             }
             else
             {
-                throw new Exception($"Failed to authenticate with Salesforce. Status code: {response.StatusCode}, Reason: {response.ReasonPhrase}");
+                throw new HttpRequestException($"Failed to authenticate with Salesforce. Status code: {response.StatusCode}, Reason: {response.ReasonPhrase}");
             }
         }
     }
