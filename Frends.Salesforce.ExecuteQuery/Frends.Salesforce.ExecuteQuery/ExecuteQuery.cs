@@ -55,9 +55,9 @@ public class Salesforce
             var content = JsonConvert.DeserializeObject<dynamic>(response.Content);
 
             if (options.AuthenticationMethod is AuthenticationMethod.OAuth2WithPassword && options.ReturnAccessToken)
-                return new Result(content, response.IsSuccessful, response.ErrorException, response.ErrorMessage, accessToken);
+                return new Result(content, response.IsSuccessful, response.ErrorException, response.IsSuccessful ? string.Empty : content[0].message, accessToken);
             else
-                return new Result(content, response.IsSuccessful, response.ErrorException, response.ErrorMessage, string.Empty);
+                return new Result(content, response.IsSuccessful, response.ErrorException, response.IsSuccessful ? string.Empty : content[0].message, string.Empty);
         }
         catch (ArgumentException)
         {
