@@ -35,7 +35,8 @@ public class Salesforce
         var request = new RestRequest("/", Method.Post);
         string accessToken = "";
 
-        switch (options.AuthenticationMethod) {
+        switch (options.AuthenticationMethod)
+        {
             case AuthenticationMethod.AccessToken:
                 if (string.IsNullOrWhiteSpace(options.AccessToken)) throw new ArgumentException("Access token cannot be null when using Access Token authentication method");
                 request.AddHeader("Authorization", "Bearer " + options.AccessToken);

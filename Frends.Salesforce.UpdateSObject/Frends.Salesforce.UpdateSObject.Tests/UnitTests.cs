@@ -40,8 +40,7 @@ public class UnitTests
         var root = Directory.GetCurrentDirectory();
         var projDir = Directory.GetParent(root)?.Parent?.Parent?.FullName;
         DotEnv.Load(
-            options: new DotEnvOptions(
-                envFilePaths: new[] { $"{projDir}{Path.DirectorySeparatorChar}.env.local" }));
+            options: new DotEnvOptions(envFilePaths: new[] { $"{projDir}{Path.DirectorySeparatorChar}.env.local" }));
     }
 
     [TestInitialize]
