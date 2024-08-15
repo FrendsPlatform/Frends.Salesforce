@@ -64,7 +64,8 @@ public class UnitTests
     }
 
     [TestMethod]
-    public async Task DeleteContactTest() {
+    public async Task DeleteContactTest()
+    {
         var json = JsonSerializer.Serialize(
             new
             {
@@ -85,7 +86,8 @@ public class UnitTests
         var accountId = await CreateSObject("Account", _userJson);
 
         // Creating a case.
-        var json = JsonSerializer.Serialize(new {
+        var json = JsonSerializer.Serialize( new
+        {
             AccountId = accountId,
             Subject = "This is a test.",
             Description = "This is a test case for Frends.SalesForce.CreateSObject task.",
@@ -122,7 +124,8 @@ public class UnitTests
 
     [TestMethod]
     [ExpectedException(typeof(ArgumentException))]
-    public async Task EmptyAccessToken_ThrowTest() {
+    public async Task EmptyAccessToken_ThrowTest()
+    {
         var input = new Input
         {
             Domain = _domain,
@@ -312,8 +315,8 @@ public class UnitTests
         await Salesforce.DeleteSObject(input, options, _cancellationToken);
     }
 
-        // Helper method to create SObjects for delete function.
-        private async Task<string> CreateSObject(string type, string input)
+    // Helper method to create SObjects for delete function.
+    private async Task<string> CreateSObject(string type, string input)
     {
         var client = new RestClient(_domain + "/services/data/v54.0/sobjects/" + type);
         var request = new RestRequest("/", Method.Post);
