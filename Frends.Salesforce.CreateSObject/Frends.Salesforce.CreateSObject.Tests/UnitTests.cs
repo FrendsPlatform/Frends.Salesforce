@@ -190,7 +190,8 @@ public class UnitTests
 
     [TestMethod]
     [ExpectedException(typeof(ArgumentException))]
-    public async Task EmptyAccessToken_ThrowTest() {
+    public async Task EmptyAccessToken_ThrowTest()
+    {
         var input = new Input
         {
             Domain = _domain,

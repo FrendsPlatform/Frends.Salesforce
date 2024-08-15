@@ -90,7 +90,8 @@ public class UnitTests
     }
 
     [TestMethod]
-    public async Task UpdateContactTest() {
+    public async Task UpdateContactTest()
+    {
         var json = JsonSerializer.Serialize(
             new
             {
@@ -100,7 +101,12 @@ public class UnitTests
 
         var id = await CreateSObject("Contact", json);
         _result.Add(new { Type = "Contact", Id = id });
-        var result = await Salesforce.UpdateSObject(new Input { Domain = _domain, SObjectId = id, SObjectType = "Contact", SObjectAsJson = JsonSerializer.Serialize(
+        var result = await Salesforce.UpdateSObject(new Input
+        {
+            Domain = _domain,
+            SObjectId = id,
+            SObjectType = "Contact",
+            SObjectAsJson = JsonSerializer.Serialize(
                 new
                 {
                     Title = "Mr",
@@ -120,7 +126,8 @@ public class UnitTests
         _result.Add(new { Type = "Account", Id = accountId });
 
         // Creating a case.
-        var json = JsonSerializer.Serialize(new {
+        var json = JsonSerializer.Serialize(new
+        {
             AccountId = accountId,
             Subject = "This is a test.",
             Description = "This is a test case for Frends.SalesForce.UpdateSObject task.",
@@ -130,7 +137,12 @@ public class UnitTests
         var caseId = await CreateSObject("Case", json);
         _result.Add(new { Type = "Case", Id = caseId });
 
-        var caseResult = await Salesforce.UpdateSObject(new Input { Domain = _domain, SObjectId = caseId, SObjectType = "Case", SObjectAsJson = JsonSerializer.Serialize(
+        var caseResult = await Salesforce.UpdateSObject(new Input
+        {
+            Domain = _domain,
+            SObjectId = caseId,
+            SObjectType = "Case",
+            SObjectAsJson = JsonSerializer.Serialize(
                 new
                 {
                     AccountId = accountId,
@@ -138,7 +150,8 @@ public class UnitTests
                     Description = "This is updated test case for Frends.SalesForce.UpdateSObject task.",
                     Origin = "Web"
                 }
-         )}, _options, _cancellationToken);
+         )
+        }, _options, _cancellationToken);
         Assert.IsTrue(caseResult.RequestIsSuccessful);
     }
 
@@ -166,7 +179,8 @@ public class UnitTests
 
     [TestMethod]
     [ExpectedException(typeof(ArgumentException))]
-    public async Task EmptyAccessToken_ThrowTest() {
+    public async Task EmptyAccessToken_ThrowTest()
+    {
         var input = new Input
         {
             Domain = _domain,
@@ -431,8 +445,8 @@ public class UnitTests
         await Salesforce.UpdateSObject(input, options, _cancellationToken);
     }
 
-        // Helper method to create SObjects for delete function.
-        private async Task<string> CreateSObject(string type, string input)
+    // Helper method to create SObjects for delete function.
+    private async Task<string> CreateSObject(string type, string input)
     {
         var client = new RestClient(_domain + "/services/data/v54.0/sobjects/" + type);
         var request = new RestRequest("/", Method.Post);
