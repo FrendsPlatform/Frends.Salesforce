@@ -2,10 +2,10 @@ name: UpdateSObject_build_main
 
 on:
   push:
-    branches:    
+    branches:
       - main
     paths:
-      - 'Frends.Salesforce.UpdateSObject/**'
+      - "Frends.Salesforce.UpdateSObject/**"
   workflow_dispatch:
 
 jobs:
@@ -25,4 +25,3 @@ jobs:
       env_var_value_3: ${{ secrets.SALESFORCE_SECURITY_TOKEN }}
       env_var_value_4: ${{ secrets.SALESFORCE_CLIENTID }}
       env_var_value_5: ${{ secrets.SALESFORCE_USERNAME}}
-
