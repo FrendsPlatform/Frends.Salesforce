@@ -86,7 +86,7 @@ public class UnitTests
         var accountId = await CreateSObject("Account", _userJson);
 
         // Creating a case.
-        var json = JsonSerializer.Serialize( new
+        var json = JsonSerializer.Serialize(new
         {
             AccountId = accountId,
             Subject = "This is a test.",
