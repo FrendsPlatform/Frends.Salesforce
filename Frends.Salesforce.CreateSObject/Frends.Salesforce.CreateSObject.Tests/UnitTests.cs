@@ -61,7 +61,8 @@ public class UnitTests
     {
         if (_result != null)
         {
-            for (var i = (_result.Count-1); i >= 0; i--) {
+            for (var i = (_result.Count-1); i >= 0; i--)
+            {
                 var temp = JsonConvert.SerializeObject(_result[i]);
                 var obj = JsonConvert.DeserializeObject<dynamic>(temp);
 
@@ -94,7 +95,8 @@ public class UnitTests
     }
 
     [TestMethod]
-    public async Task CreateContactTest() {
+    public async Task CreateContactTest()
+    {
         var json = JsonSerializer.Serialize(
             new
             {
@@ -133,7 +135,7 @@ public class UnitTests
         var body = JsonConvert.SerializeObject(accountResult.Body);
         var accObj = JsonConvert.DeserializeObject<dynamic>(body);
         _result.Add(new { Type = "Account", Id = accObj.id });
-
+        
         // Creating a case.
         var json = JsonSerializer.Serialize(new {
             AccountId = accObj.id.ToString(),
