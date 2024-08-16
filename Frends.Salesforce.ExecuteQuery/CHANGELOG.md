@@ -1,5 +1,9 @@
 # Changelog
 
+## [1.0.2] - 2024-08-16
+### Changed
+- Adjusted the ErrorMessage property of the result to be more descriptive when the Salesforce API responds with an error.
+
 ## [1.0.1] - 2022-05-27
 ### Changed
 - Fix for issue with referencing result-object in other elements.
