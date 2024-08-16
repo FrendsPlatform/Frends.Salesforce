@@ -22,7 +22,7 @@ public class Salesforce
     /// <param name="input">Information to update the sobject.</param>
     /// <param name="options">Information about the salesforce destination.</param>
     /// <param name="cancellationToken"></param>
-    /// <returns>Object { JObject Body, bool RequestIsSuccessful, Exception ErrorException, string ErrorMessage, string Token }</returns>
+    /// <returns>Object { dynamic Body, bool RequestIsSuccessful, Exception ErrorException, string ErrorMessage, string Token }</returns>
     public static async Task<Result> ExecuteQuery(
         [PropertyTab] Input input,
         [PropertyTab] Options options,
@@ -52,12 +52,12 @@ public class Salesforce
         try
         {
             var response = await client.ExecuteAsync(request, cancellationToken);
-            var content = JsonConvert.DeserializeObject<dynamic>(response.Content);
+            dynamic content = JsonConvert.DeserializeObject(response.Content);
 
             if (options.AuthenticationMethod is AuthenticationMethod.OAuth2WithPassword && options.ReturnAccessToken)
-                return new Result(content, response.IsSuccessful, response.ErrorException, response.ErrorMessage, accessToken);
+                return new Result(content, response.IsSuccessful, response.ErrorException, response.IsSuccessful ? string.Empty : content[0].Value<string>("message"), accessToken);
             else
-                return new Result(content, response.IsSuccessful, response.ErrorException, response.ErrorMessage, string.Empty);
+                return new Result(content, response.IsSuccessful, response.ErrorException, response.IsSuccessful ? string.Empty : content[0].Value<string>("message"), string.Empty);
         }
         catch (ArgumentException)
         {

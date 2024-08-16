@@ -12,7 +12,7 @@ public class Result
     /// Body of the response.
     /// </summary>
     /// <example>{"id": "abcdefghijkl123456789",  "success": true,  "errors": []}</example>
-    public JObject Body { get; private set; }
+    public dynamic Body { get; private set; }
 
     /// <summary>
     /// Was the request successful?
@@ -38,7 +38,7 @@ public class Result
     /// <example>abcdefghjklmn123456789</example>
     public string Token { get; private set; }
 
-    internal Result(JObject body, bool succesful, Exception error, string errormessage, string token)
+    internal Result(dynamic body, bool succesful, Exception error, string errormessage, string token)
     {
         Body = body;
         RequestIsSuccessful = succesful;
