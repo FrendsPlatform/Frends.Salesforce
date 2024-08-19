@@ -10,7 +10,7 @@ public class Input
 {
     /// <summary>
     /// Salesforce Domain.
-    /// /services/data/v52.0/query will be added automatically, so the domain is enough.
+    /// /services/data/versionnumber/query will be added automatically, so the domain is enough.
     /// </summary>
     /// <example>https://example.my.salesforce.com</example>
     [DefaultValue(@"https://example.my.salesforce.com")]
@@ -19,7 +19,7 @@ public class Input
 
     /// <summary>
     /// The API version to use when making requests to Salesforce.
-    /// Default value is the latest version at this moment (v61.0).
+    /// If left empty, the default value is v61.0.
     /// </summary>
     [DefaultValue("v61.0")]
     public string ApiVersion { get; set; } = "v61.0";
