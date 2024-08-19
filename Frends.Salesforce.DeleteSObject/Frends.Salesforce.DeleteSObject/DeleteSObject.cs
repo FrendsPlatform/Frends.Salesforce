@@ -33,7 +33,7 @@ public class Salesforce
         if (string.IsNullOrWhiteSpace(input.SObjectId)) throw new ArgumentNullException("Id cannot be empty.");
         if (string.IsNullOrWhiteSpace(input.SObjectType)) throw new ArgumentNullException("Type cannot be empty.");
 
-        var client = new RestClient(input.Domain + "/services/data/v54.0/sobjects/" + input.SObjectType + "/" + input.SObjectId);
+        var client = new RestClient($"{input.Domain}/services/data/{input.ApiVersion}/sobjects/{input.SObjectType}/{input.SObjectId}");
         var request = new RestRequest("/", Method.Delete);
         string accessToken = "";
 
