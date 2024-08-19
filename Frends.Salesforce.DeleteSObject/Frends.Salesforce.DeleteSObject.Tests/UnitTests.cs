@@ -58,6 +58,15 @@ public class UnitTests
     public async Task DeleteAccountTest()
     {
         var id = await CreateSObject("Account", _userJson);
+        var result = await Salesforce.DeleteSObject(new Input { Domain = _domain, ApiVersion = "v61.0", SObjectId = id, SObjectType = "Account" }, _options, _cancellationToken);
+
+        Assert.IsTrue(result.RequestIsSuccessful);
+    }
+
+    [TestMethod]
+    public async Task DeleteAccountTest_WithoutSpecifiedApiVersion()
+    {
+        var id = await CreateSObject("Account", _userJson);
         var result = await Salesforce.DeleteSObject(new Input { Domain = _domain, SObjectId = id, SObjectType = "Account" }, _options, _cancellationToken);
 
         Assert.IsTrue(result.RequestIsSuccessful);
@@ -74,7 +83,7 @@ public class UnitTests
             });
 
         var id = await CreateSObject("Contact", json);
-        var result = await Salesforce.DeleteSObject(new Input { Domain = _domain, SObjectId = id, SObjectType = "Contact" }, _options, _cancellationToken);
+        var result = await Salesforce.DeleteSObject(new Input { Domain = _domain, ApiVersion = "v61.0", SObjectId = id, SObjectType = "Contact" }, _options, _cancellationToken);
 
         Assert.IsTrue(result.RequestIsSuccessful);
     }
@@ -96,10 +105,10 @@ public class UnitTests
 
         var caseId = await CreateSObject("Case", json);
 
-        var caseResult = await Salesforce.DeleteSObject(new Input { Domain = _domain, SObjectId = caseId, SObjectType = "Case" }, _options, _cancellationToken);
+        var caseResult = await Salesforce.DeleteSObject(new Input { Domain = _domain, ApiVersion = "v61.0", SObjectId = caseId, SObjectType = "Case" }, _options, _cancellationToken);
         Assert.IsTrue(caseResult.RequestIsSuccessful);
 
-        var accountResult = await Salesforce.DeleteSObject(new Input { Domain = _domain, SObjectId = accountId, SObjectType = "Account" }, _options, _cancellationToken);
+        var accountResult = await Salesforce.DeleteSObject(new Input { Domain = _domain, ApiVersion = "v61.0", SObjectId = accountId, SObjectType = "Account" }, _options, _cancellationToken);
         Assert.IsTrue(accountResult.RequestIsSuccessful);
     }
 
@@ -117,7 +126,7 @@ public class UnitTests
             Password = _password + _securityToken,
             ReturnAccessToken = true
         };
-        var result = await Salesforce.DeleteSObject(new Input { Domain = _domain, SObjectId = id, SObjectType = "Account" }, options, _cancellationToken);
+        var result = await Salesforce.DeleteSObject(new Input { Domain = _domain, ApiVersion = "v61.0", SObjectId = id, SObjectType = "Account" }, options, _cancellationToken);
 
         Assert.IsNotNull(result.Token);
     }
@@ -129,6 +138,7 @@ public class UnitTests
         var input = new Input
         {
             Domain = _domain,
+            ApiVersion = "v61.0",
             SObjectId = "123456789",
             SObjectType = "Contact"
         };
@@ -149,6 +159,7 @@ public class UnitTests
         var input = new Input
         {
             Domain = null,
+            ApiVersion = "v61.0",
             SObjectId = "123456789",
             SObjectType = "Account"
         };
@@ -169,6 +180,7 @@ public class UnitTests
         var input = new Input
         {
             Domain = _domain,
+            ApiVersion = "v61.0",
             SObjectId = null,
             SObjectType = "Account"
         };
@@ -189,6 +201,7 @@ public class UnitTests
         var input = new Input
         {
             Domain = _domain,
+            ApiVersion = "v61.0",
             SObjectId = "123456789",
             SObjectType = ""
         };
@@ -209,6 +222,7 @@ public class UnitTests
         var input = new Input
         {
             Domain = "https://mycompany.my.salesforce.com",
+            ApiVersion = "v61.0",
             SObjectId = "123456789",
             SObjectType = "Account"
         };
@@ -232,6 +246,7 @@ public class UnitTests
         var input = new Input
         {
             Domain = _domain,
+            ApiVersion = "v61.0",
             SObjectId = "123456789",
             SObjectType = "InvalidType"
         };
@@ -256,6 +271,7 @@ public class UnitTests
         var input = new Input
         {
             Domain = _domain,
+            ApiVersion = "v61.0",
             SObjectId = "123456789",
             SObjectType = "Account"
         };
@@ -280,6 +296,7 @@ public class UnitTests
         var input = new Input
         {
             Domain = _domain,
+            ApiVersion = "v61.0",
             SObjectId = "Not valid id",
             SObjectType = "Account"
         };
@@ -301,6 +318,7 @@ public class UnitTests
         var input = new Input
         {
             Domain = _domain,
+            ApiVersion = "v61.0",
             SObjectId = "123456789",
             SObjectType = "Account"
         };
