@@ -17,6 +17,13 @@ public class Input
     public string Domain { get; set; }
 
     /// <summary>
+    /// The API version to use when making requests to Salesforce.
+    /// If left empty, the default value is the v61.0.
+    /// </summary>
+    [DefaultValue("v61.0")]
+    public string ApiVersion { get; set; } = "v61.0";
+
+    /// <summary>
     /// SObject structure as json.
     /// </summary>
     /// <example>{ "Name": "ExampleName" }</example>
