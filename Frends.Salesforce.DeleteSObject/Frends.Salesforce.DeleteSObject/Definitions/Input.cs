@@ -9,7 +9,7 @@ public class Input
 {
     /// <summary>
     /// Salesforce Domain.
-    /// /services/data/v52.0/query will be added automatically, so the domain is enough.
+    /// /services/data/versionnumber/query will be added automatically, so the domain is enough.
     /// </summary>
     /// <example>https://example.my.salesforce.com</example>
     [DefaultValue(@"https://example.my.salesforce.com")]
