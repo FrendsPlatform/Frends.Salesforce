@@ -83,6 +83,18 @@ public class UnitTests
         _result.Add(new { Type = "Account", Id = id });
 
         var newInput = new { Name = "NewName_" + _name };
+        var result = await Salesforce.UpdateSObject(new Input { Domain = _domain, ApiVersion = "v61.0", SObjectId = id, SObjectType = "Account", SObjectAsJson = JsonSerializer.Serialize(newInput) }, _options, _cancellationToken);
+
+        Assert.IsTrue(result.RequestIsSuccessful);
+    }
+
+    [TestMethod]
+    public async Task UpdateAccountTest_WithoutSpecifiedApiVersion()
+    {
+        var id = await CreateSObject("Account", _userJson);
+        _result.Add(new { Type = "Account", Id = id });
+
+        var newInput = new { Name = "NewName_" + _name };
         var result = await Salesforce.UpdateSObject(new Input { Domain = _domain, SObjectId = id, SObjectType = "Account", SObjectAsJson = JsonSerializer.Serialize(newInput) }, _options, _cancellationToken);
 
         Assert.IsTrue(result.RequestIsSuccessful);
@@ -103,6 +115,7 @@ public class UnitTests
         var result = await Salesforce.UpdateSObject(new Input
         {
             Domain = _domain,
+            ApiVersion = "v61.0",
             SObjectId = id,
             SObjectType = "Contact",
             SObjectAsJson = JsonSerializer.Serialize(
@@ -139,6 +152,7 @@ public class UnitTests
         var caseResult = await Salesforce.UpdateSObject(new Input
         {
             Domain = _domain,
+            ApiVersion = "v61.0",
             SObjectId = caseId,
             SObjectType = "Case",
             SObjectAsJson = JsonSerializer.Serialize(
@@ -171,7 +185,7 @@ public class UnitTests
             Password = _password + _securityToken,
             ReturnAccessToken = true
         };
-        var result = await Salesforce.UpdateSObject(new Input { Domain = _domain, SObjectId = id, SObjectType = "Account", SObjectAsJson = JsonSerializer.Serialize(newInput) }, options, _cancellationToken);
+        var result = await Salesforce.UpdateSObject(new Input { Domain = _domain, ApiVersion = "v61.0", SObjectId = id, SObjectType = "Account", SObjectAsJson = JsonSerializer.Serialize(newInput) }, options, _cancellationToken);
 
         Assert.IsNotNull(result.Token);
     }
@@ -183,6 +197,7 @@ public class UnitTests
         var input = new Input
         {
             Domain = _domain,
+            ApiVersion = "v61.0",
             SObjectId = "123456789",
             SObjectAsJson = _userJson,
             SObjectType = "Contact"
@@ -204,6 +219,7 @@ public class UnitTests
         var input = new Input
         {
             Domain = null,
+            ApiVersion = "v61.0",
             SObjectId = "123456789",
             SObjectType = "Account"
         };
@@ -224,6 +240,7 @@ public class UnitTests
         var input = new Input
         {
             Domain = _domain,
+            ApiVersion = "v61.0",
             SObjectId = null,
             SObjectType = "Account"
         };
@@ -244,6 +261,7 @@ public class UnitTests
         var input = new Input
         {
             Domain = _domain,
+            ApiVersion = "v61.0",
             SObjectAsJson = null,
             SObjectType = "Account"
         };
@@ -264,6 +282,7 @@ public class UnitTests
         var input = new Input
         {
             Domain = _domain,
+            ApiVersion = "v61.0",
             SObjectId = "123456789",
             SObjectType = ""
         };
@@ -284,6 +303,7 @@ public class UnitTests
         var input = new Input
         {
             Domain = "https://mycompany.my.salesforce.com",
+            ApiVersion = "v61.0",
             SObjectId = "123456789",
             SObjectAsJson = _userJson,
             SObjectType = "Account"
@@ -309,6 +329,7 @@ public class UnitTests
         var input = new Input
         {
             Domain = "https://example.my.salesforce.com",
+            ApiVersion = "v61.0",
             SObjectId = "123456789",
             SObjectAsJson = _userJson,
             SObjectType = "Account"
@@ -334,6 +355,7 @@ public class UnitTests
         var input = new Input
         {
             Domain = _domain,
+            ApiVersion = "v61.0",
             SObjectId = "123456789",
             SObjectAsJson = _userJson,
             SObjectType = "InvalidType"
@@ -360,6 +382,7 @@ public class UnitTests
         var input = new Input
         {
             Domain = _domain,
+            ApiVersion = "v61.0",
             SObjectId = "123456789",
             SObjectAsJson = _userJson,
             SObjectType = "Account"
@@ -386,6 +409,7 @@ public class UnitTests
         var input = new Input
         {
             Domain = _domain,
+            ApiVersion = "v61.0",
             SObjectId = "Not valid id",
             SObjectAsJson = _userJson,
             SObjectType = "Account"
@@ -408,6 +432,7 @@ public class UnitTests
         var input = new Input
         {
             Domain = _domain,
+            ApiVersion = "v61.0",
             SObjectAsJson = "Not valid json format",
             SObjectId = "123456789",
             SObjectType = "Account"
@@ -429,6 +454,7 @@ public class UnitTests
         var input = new Input
         {
             Domain = _domain,
+            ApiVersion = "v61.0",
             SObjectId = "123456789",
             SObjectType = "Account",
             SObjectAsJson = _userJson
