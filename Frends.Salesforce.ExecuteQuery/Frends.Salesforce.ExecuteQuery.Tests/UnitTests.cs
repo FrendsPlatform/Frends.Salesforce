@@ -37,7 +37,8 @@ public class UnitTests
         var input = new Input
         {
             Domain = _domain,
-            Query = "SELECT Name from Customer"
+            Query = "SELECT Name from Customer",
+            ApiVersion = "v61.0"
         };
 
         var options = new Options
@@ -56,7 +57,8 @@ public class UnitTests
         var input = new Input
         {
             Domain = _domain,
-            Query = "SELECT Name from Customer"
+            Query = "SELECT Name from Customer",
+            ApiVersion = "v61.0"
         };
 
         var options = new Options
@@ -80,7 +82,8 @@ public class UnitTests
         var input = new Input
         {
             Domain = _domain,
-            Query = "SELECT Name from Customer"
+            Query = "SELECT Name from Customer",
+            ApiVersion = "v61.0"
         };
 
         var options = new Options
@@ -101,6 +104,26 @@ public class UnitTests
         Assert.AreEqual(result.Token, accessToken);
     }
 
+    public async Task ExecuteQuery_QueryWithoutSpecifiedApi()
+    {
+        var input = new Input
+        {
+            Domain = _domain,
+            Query = "SELECT Name from Customer",
+            ApiVersion = ""
+        };
+
+        var options = new Options
+        {
+            AuthenticationMethod = AuthenticationMethod.AccessToken,
+            AccessToken = await Salesforce.GetAccessToken(_authurl, _clientID, _clientSecret, _username, _password + _securityToken, _cancellationToken)
+        };
+
+        var result = await Salesforce.ExecuteQuery(input, options, _cancellationToken);
+        Assert.IsTrue(result.RequestIsSuccessful);
+    }
+
+
     [TestMethod]
     [ExpectedException(typeof(ArgumentNullException))]
     public async Task EmptyQuery_ThrowTest()
@@ -108,7 +131,8 @@ public class UnitTests
         var input = new Input
         {
             Domain = _domain,
-            Query = null
+            Query = null,
+            ApiVersion = "v61.0"
         };
 
         var options = new Options
@@ -127,7 +151,8 @@ public class UnitTests
         var input = new Input
         {
             Domain = _domain,
-            Query = "SELECT Name from Customer"
+            Query = "SELECT Name from Customer",
+            ApiVersion = "v61.0"
         };
 
         var options = new Options
@@ -146,7 +171,8 @@ public class UnitTests
         var input = new Input
         {
             Domain = null,
-            Query = "SELECT Name from Customer"
+            Query = "SELECT Name from Customer",
+            ApiVersion = "v61.0"
         };
 
         var options = new Options
@@ -165,7 +191,8 @@ public class UnitTests
         var input = new Input
         {
             Domain = "https://mycompany.my.salesforce.com",
-            Query = "SELECT Name from Customer"
+            Query = "SELECT Name from Customer",
+            ApiVersion = "v61.0"
         };
 
         var options = new Options
@@ -183,7 +210,8 @@ public class UnitTests
         var input = new Input
         {
             Domain = _domain,
-            Query = "SELECT NAME from Invalid"
+            Query = "SELECT NAME from Invalid",
+            ApiVersion = "v61.0"
         };
 
         var options = new Options

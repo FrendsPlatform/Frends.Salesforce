@@ -33,7 +33,7 @@ public class Salesforce
         if (string.IsNullOrWhiteSpace(input.Query)) throw new ArgumentNullException("Query cannot be empty.");
 
         var query = WebUtility.UrlEncode(input.Query);
-        var client = new RestClient(input.Domain + "/services/data/v54.0/query/?q=" + query);
+        var client = new RestClient($"{input.Domain}/services/data/{input.ApiVersion}/query/?q={query}");
         var request = new RestRequest("/", Method.Get);
         string accessToken = "";
 
