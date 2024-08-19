@@ -82,6 +82,25 @@ public class UnitTests
         var input = new Input
         {
             Domain = _domain,
+            ApiVersion = "v61.0",
+            SObjectAsJson = _userJson,
+            SObjectType = "Account"
+        };
+
+        var result = await Salesforce.CreateSObject(input, _options, _cancellationToken);
+        Assert.IsTrue(result.RequestIsSuccessful);
+
+        var body = JsonConvert.SerializeObject(result.Body);
+        var obj = JsonConvert.DeserializeObject<dynamic>(body);
+        _result.Add(new { Type = "Account", Id = obj.id });
+    }
+
+    [TestMethod]
+    public async Task CreateAccountTest_WithoutSpecifiedApiVersion()
+    {
+        var input = new Input
+        {
+            Domain = _domain,
             SObjectAsJson = _userJson,
             SObjectType = "Account"
         };
@@ -107,6 +126,7 @@ public class UnitTests
         var input = new Input
         {
             Domain = _domain,
+            ApiVersion = "v61.0",
             SObjectAsJson = json,
             SObjectType = "Contact"
         };
@@ -126,6 +146,7 @@ public class UnitTests
         var accountInput = new Input
         {
             Domain = _domain,
+            ApiVersion = "v61.0",
             SObjectAsJson = _userJson,
             SObjectType = "Account"
         };
@@ -148,6 +169,7 @@ public class UnitTests
         var caseInput = new Input
         {
             Domain = _domain,
+            ApiVersion = "v61.0",
             SObjectAsJson = json,
             SObjectType = "Case"
         };
@@ -166,6 +188,7 @@ public class UnitTests
         var input = new Input
         {
             Domain = _domain,
+            ApiVersion = "v61.0",
             SObjectAsJson = _userJson,
             SObjectType = "Account"
         };
@@ -195,6 +218,7 @@ public class UnitTests
         var input = new Input
         {
             Domain = _domain,
+            ApiVersion = "v61.0",
             SObjectAsJson = _userJson,
             SObjectType = "Contact"
         };
@@ -215,6 +239,7 @@ public class UnitTests
         var input = new Input
         {
             Domain = null,
+            ApiVersion = "v61.0",
             SObjectAsJson = _userJson,
             SObjectType = "Account"
         };
@@ -235,6 +260,7 @@ public class UnitTests
         var input = new Input
         {
             Domain = _domain,
+            ApiVersion = "v61.0",
             SObjectAsJson = null,
             SObjectType = "Account"
         };
@@ -255,6 +281,7 @@ public class UnitTests
         var input = new Input
         {
             Domain = _domain,
+            ApiVersion = "v61.0",
             SObjectAsJson = _userJson,
             SObjectType = ""
         };
@@ -275,6 +302,7 @@ public class UnitTests
         var input = new Input
         {
             Domain = "https://mycompany.my.salesforce.com",
+            ApiVersion = "v61.0",
             SObjectAsJson = _userJson,
             SObjectType = "Account"
         };
@@ -298,6 +326,7 @@ public class UnitTests
         var input = new Input
         {
             Domain = _domain,
+            ApiVersion = "v61.0",
             SObjectAsJson = _userJson,
             SObjectType = "InvalidType"
         };
@@ -322,6 +351,7 @@ public class UnitTests
         var input = new Input
         {
             Domain = _domain,
+            ApiVersion = "v61.0",
             SObjectAsJson = _userJson,
             SObjectType = "Account"
         };
@@ -347,6 +377,7 @@ public class UnitTests
         var input = new Input
         {
             Domain = _domain,
+            ApiVersion = "v61.0",
             SObjectAsJson = "Not valid json format",
             SObjectType = "Account"
         };
