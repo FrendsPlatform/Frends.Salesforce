@@ -17,7 +17,7 @@ public class Salesforce
 {
     /// <summary>
     /// Execute a query to Salesforce.
-    /// [Documentation](https://tasks.frends.com/tasks#frends-tasks/Frends.Salesforce.ExecuteQuery)
+    /// [Documentation](https://tasks.frends.com/tasks/frends-tasks/Frends.Salesforce.ExecuteQuery)
     /// </summary>
     /// <param name="input">Information to update the sobject.</param>
     /// <param name="options">Information about the salesforce destination.</param>
