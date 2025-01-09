@@ -19,7 +19,7 @@ public class Salesforce
 {
     /// <summary>
     /// Updates a sobject from Salesforce.
-    /// [Documentation](https://tasks.frends.com/tasks#frends-tasks/Frends.Salesforce.UpdateSObject)
+    /// [Documentation](https://tasks.frends.com/tasks/frends-tasks/Frends.Salesforce.UpdateSObject)
     /// </summary>
     /// <param name="input">Information to update the sobject.</param>
     /// <param name="options">Information about the salesforce destination.</param>
