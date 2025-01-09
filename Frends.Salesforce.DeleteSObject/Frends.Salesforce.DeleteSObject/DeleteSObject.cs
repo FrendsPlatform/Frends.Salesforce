@@ -17,7 +17,7 @@ public class Salesforce
 {
     /// <summary>
     /// Deletes a sobject from Salesforce.
-    /// [Documentation](https://tasks.frends.com/tasks#frends-tasks/Frends.Salesforce.DeleteSObject)
+    /// [Documentation](https://tasks.frends.com/tasks/frends-tasks/Frends.Salesforce.DeleteSObject)
     /// </summary>
     /// <param name="input">Information to delete the sobject.</param>
     /// <param name="options">Information about the salesforce destination.</param>
