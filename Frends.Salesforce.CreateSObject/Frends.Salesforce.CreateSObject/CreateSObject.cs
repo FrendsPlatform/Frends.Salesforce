@@ -15,7 +15,7 @@ public class Salesforce
 {
     /// <summary>
     /// Creates a sobject to Salesforce.
-    /// [Documentation](https://tasks.frends.com/tasks#frends-tasks/Frends.Salesforce.CreateSObject)
+    /// [Documentation](https://tasks.frends.com/tasks/frends-tasks/Frends.Salesforce.CreateSObject)
     /// </summary>
     /// <param name="input">Information to create the sobject.</param>
     /// <param name="options">Information about the salesforce destination.</param>
