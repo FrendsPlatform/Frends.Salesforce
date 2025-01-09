@@ -15,7 +15,7 @@ public class Salesforce
 {
     /// <summary>
     /// Creates a sobject to Salesforce.
-    /// [Documentation](https://tasks.frends.com/tasks#frends-tasks/Frends.Salesforce.CreateSObject)
+    /// [Documentation](https://tasks.frends.com/tasks/frends-tasks/Frends.Salesforce.CreateSObject)
     /// </summary>
     /// <param name="input">Information to create the sobject.</param>
     /// <param name="options">Information about the salesforce destination.</param>
@@ -31,7 +31,7 @@ public class Salesforce
         if (string.IsNullOrWhiteSpace(input.SObjectAsJson)) throw new ArgumentNullException("Json cannot be empty.");
         if (string.IsNullOrWhiteSpace(input.SObjectType)) throw new ArgumentNullException("Type cannot be empty.");
 
-        var client = new RestClient(input.Domain + "/services/data/v54.0/sobjects/" + input.SObjectType);
+        var client = new RestClient($"{input.Domain}/services/data/{input.ApiVersion}/sobjects/{input.SObjectType}");
         var request = new RestRequest("/", Method.Post);
         string accessToken = "";
 

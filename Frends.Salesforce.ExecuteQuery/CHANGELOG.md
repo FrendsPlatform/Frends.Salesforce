@@ -1,8 +1,12 @@
 # Changelog
 
-## [1.1.0] - 2024-08-16
+## [2.0.0] - 2024-08-19
+### Added
+- Salesforce API version number can now be specified in input.
+
+## [1.1.0] - 2024-08-28
 ### Changed
-- Adjusted the ErrorMessage property of the result to be more descriptive when the Salesforce API responds with an error.
+- Documentation link now links to a correct page in Frends Tasks.
 
 ## [1.0.1] - 2022-05-27
 ### Changed
