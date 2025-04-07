@@ -1,6 +1,6 @@
 # Changelog
 
-## [2.0.1] - 2025-03-18
+## [2.1.0] - 2025-03-18
 ### Changed
 - Updated packages:
   Newtonsoft.Json                    13.0.1  -> 13.0.3
