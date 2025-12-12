@@ -83,29 +83,28 @@ public class Salesforce
             return Helpers.ErrorHandler.Handle(e, options.ThrowAnErrorIfNotFound, accessToken);
         }
     }
-}
 
-#region HelperMethods
 
-/// <summary>
-/// Get OAuth2 access token.
-/// </summary>
-internal static async Task<string> GetAccessToken(string url, string clientId, string clientSecret, string username,
-    string passwordWithSecurityToken, CancellationToken cancellationToken)
-{
-    var authClient = new RestClient(url);
-    var authRequest = new RestRequest("", Method.Post);
-    authRequest.AddHeader("Content-Type", "application/x-www-form-urlencoded");
-    authRequest.AddParameter("grant_type", "password");
-    authRequest.AddParameter("client_id", clientId);
-    authRequest.AddParameter("client_secret", clientSecret);
-    authRequest.AddParameter("username", username);
-    authRequest.AddParameter("password", passwordWithSecurityToken);
-    var authResponse = await authClient.ExecuteAsync(authRequest, cancellationToken);
-    string accessToken = JsonConvert.DeserializeObject<dynamic>(authResponse.Content).access_token;
-    return accessToken;
-}
+    #region HelperMethods
 
-#endregion
+    /// <summary>
+    /// Get OAuth2 access token.
+    /// </summary>
+    internal static async Task<string> GetAccessToken(string url, string clientId, string clientSecret, string username,
+        string passwordWithSecurityToken, CancellationToken cancellationToken)
+    {
+        var authClient = new RestClient(url);
+        var authRequest = new RestRequest("", Method.Post);
+        authRequest.AddHeader("Content-Type", "application/x-www-form-urlencoded");
+        authRequest.AddParameter("grant_type", "password");
+        authRequest.AddParameter("client_id", clientId);
+        authRequest.AddParameter("client_secret", clientSecret);
+        authRequest.AddParameter("username", username);
+        authRequest.AddParameter("password", passwordWithSecurityToken);
+        var authResponse = await authClient.ExecuteAsync(authRequest, cancellationToken);
+        string accessToken = JsonConvert.DeserializeObject<dynamic>(authResponse.Content).access_token;
+        return accessToken;
+    }
 
+    #endregion
 }

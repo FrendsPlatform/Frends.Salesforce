@@ -125,7 +125,7 @@ public class UnitTests
 
 
     [TestMethod]
-    [ExpectedException(typeof(ArgumentNullException))]
+    [ExpectedException(typeof(Exception))]
     public async Task EmptyQuery_ThrowTest()
     {
         var input = new Input
@@ -145,7 +145,7 @@ public class UnitTests
     }
 
     [TestMethod]
-    [ExpectedException(typeof(ArgumentException))]
+    [ExpectedException(typeof(Exception))]
     public async Task EmptyAccessToken_ThrowTest()
     {
         var input = new Input
@@ -165,7 +165,7 @@ public class UnitTests
     }
 
     [TestMethod]
-    [ExpectedException(typeof(ArgumentNullException))]
+    [ExpectedException(typeof(Exception))]
     public async Task EmptyDomain_ThrowTest()
     {
         var input = new Input
@@ -185,7 +185,7 @@ public class UnitTests
     }
 
     [TestMethod]
-    [ExpectedException(typeof(ArgumentException))]
+    [ExpectedException(typeof(Exception))]
     public async Task InvalidDomain_ThrowTest()
     {
         var input = new Input

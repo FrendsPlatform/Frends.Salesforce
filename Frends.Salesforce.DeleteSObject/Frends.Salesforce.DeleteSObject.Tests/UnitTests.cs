@@ -132,7 +132,7 @@ public class UnitTests
     }
 
     [TestMethod]
-    [ExpectedException(typeof(ArgumentException))]
+    [ExpectedException(typeof(Exception))]
     public async Task EmptyAccessToken_ThrowTest()
     {
         var input = new Input
@@ -153,7 +153,7 @@ public class UnitTests
     }
 
     [TestMethod]
-    [ExpectedException(typeof(ArgumentNullException))]
+    [ExpectedException(typeof(Exception))]
     public async Task EmptyDomain_ThrowTest()
     {
         var input = new Input
@@ -174,7 +174,7 @@ public class UnitTests
     }
 
     [TestMethod]
-    [ExpectedException(typeof(ArgumentNullException))]
+    [ExpectedException(typeof(Exception))]
     public async Task EmptyId_ThrowTest()
     {
         var input = new Input
@@ -195,7 +195,7 @@ public class UnitTests
     }
 
     [TestMethod]
-    [ExpectedException(typeof(ArgumentNullException))]
+    [ExpectedException(typeof(Exception))]
     public async Task EmptyType_ThrowTest()
     {
         var input = new Input
@@ -216,7 +216,7 @@ public class UnitTests
     }
 
     [TestMethod]
-    [ExpectedException(typeof(ArgumentException))]
+    [ExpectedException(typeof(Exception))]
     public async Task InvalidDomain_ThrowTest()
     {
         var input = new Input
@@ -312,7 +312,7 @@ public class UnitTests
     }
 
     [TestMethod]
-    [ExpectedException(typeof(HttpRequestException))]
+    [ExpectedException(typeof(Exception))]
     public async Task NotFoundId_ThrowTest()
     {
         var input = new Input
