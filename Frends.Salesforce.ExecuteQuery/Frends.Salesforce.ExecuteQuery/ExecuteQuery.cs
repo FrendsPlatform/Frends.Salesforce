@@ -9,7 +9,9 @@ using System.Threading;
 using System.Threading.Tasks;
 
 [assembly: InternalsVisibleTo("Frends.Salesforce.ExecuteQuery.Tests")]
+
 namespace Frends.Salesforce.ExecuteQuery;
+
 /// <summary>
 /// Tasks class.
 /// </summary>
@@ -29,39 +31,45 @@ public class Salesforce
         CancellationToken cancellationToken
     )
     {
-        if (string.IsNullOrWhiteSpace(input.Domain)) throw new ArgumentNullException("Domain cannot be empty.");
-        if (string.IsNullOrWhiteSpace(input.Query)) throw new ArgumentNullException("Query cannot be empty.");
-
-        var query = WebUtility.UrlEncode(input.Query);
-        var client = new RestClient($"{input.Domain}/services/data/{input.ApiVersion}/query/?q={query}");
-        var request = new RestRequest("/", Method.Get);
-        string accessToken = "";
-
-        switch (options.AuthenticationMethod)
-        {
-            case AuthenticationMethod.AccessToken:
-                if (string.IsNullOrWhiteSpace(options.AccessToken)) throw new ArgumentException("Access token cannot be null when using Access Token authentication method");
-                request.AddHeader("Authorization", "Bearer " + options.AccessToken);
-                break;
-            case AuthenticationMethod.OAuth2WithPassword:
-                accessToken = await GetAccessToken(options.AuthUrl, options.ClientID, options.ClientSecret, options.Username, options.Password + options.SecurityToken, cancellationToken);
-                request.AddHeader("Authorization", "Bearer " + accessToken);
-                break;
-        }
+        var accessToken = "";
 
         try
         {
+            if (string.IsNullOrWhiteSpace(input.Domain)) throw new ArgumentNullException("Domain cannot be empty.");
+            if (string.IsNullOrWhiteSpace(input.Query)) throw new ArgumentNullException("Query cannot be empty.");
+
+            var query = WebUtility.UrlEncode(input.Query);
+            var client = new RestClient($"{input.Domain}/services/data/{input.ApiVersion}/query/?q={query}");
+            var request = new RestRequest("/", Method.Get);
+
+            switch (options.AuthenticationMethod)
+            {
+                case AuthenticationMethod.AccessToken:
+                    if (string.IsNullOrWhiteSpace(options.AccessToken))
+                        throw new ArgumentException(
+                            "Access token cannot be null when using Access Token authentication method");
+                    request.AddHeader("Authorization", "Bearer " + options.AccessToken);
+                    break;
+                case AuthenticationMethod.OAuth2WithPassword:
+                    accessToken = await GetAccessToken(options.AuthUrl, options.ClientID, options.ClientSecret,
+                        options.Username, options.Password + options.SecurityToken, cancellationToken);
+                    request.AddHeader("Authorization", "Bearer " + accessToken);
+                    break;
+            }
+
+
             var response = await client.ExecuteAsync(request, cancellationToken);
             dynamic content = JsonConvert.DeserializeObject(response.Content);
 
-            if (options.AuthenticationMethod is AuthenticationMethod.OAuth2WithPassword && options.ReturnAccessToken)
-                return new Result(content, response.IsSuccessful, response.ErrorException, response.IsSuccessful ? string.Empty : content[0].Value<string>("message"), accessToken);
-            else
-                return new Result(content, response.IsSuccessful, response.ErrorException, response.IsSuccessful ? string.Empty : content[0].Value<string>("message"), string.Empty);
+            if (!(options.AuthenticationMethod is AuthenticationMethod.OAuth2WithPassword && options.ReturnAccessToken))
+                accessToken = string.Empty;
+
+            return new Result(content, response.IsSuccessful, response.ErrorException,
+                response.IsSuccessful ? string.Empty : content[0].Value<string>("message"), accessToken);
         }
-        catch (ArgumentException)
+        catch (Exception e)
         {
-            throw new ArgumentException("Domain couldn't be found.");
+            return Helpers.ErrorHandler.Handle(e, options.ThrowAnErrorIfNotFound, accessToken);
         }
     }
 
@@ -71,7 +79,8 @@ public class Salesforce
     /// Get OAuth2 access token.
     /// This method is public since it is used also in Unit tests.
     /// </summary>
-    internal static async Task<string> GetAccessToken(string url, string clientId, string clientSecret, string username, string passwordWithSecurityToken, CancellationToken cancellationToken)
+    internal static async Task<string> GetAccessToken(string url, string clientId, string clientSecret, string username,
+        string passwordWithSecurityToken, CancellationToken cancellationToken)
     {
         var authClient = new RestClient(url);
         var authRequest = new RestRequest("", Method.Post);
