@@ -31,7 +31,7 @@ public class Salesforce
         CancellationToken cancellationToken
     )
     {
-        var accessToken = "";
+        var accessToken = string.Empty;
 
         try
         {
@@ -66,6 +66,11 @@ public class Salesforce
 
             return new Result(content, response.IsSuccessful, response.ErrorException,
                 response.IsSuccessful ? string.Empty : content[0].Value<string>("message"), accessToken);
+        }
+        catch (ArgumentException e)
+        {
+            const string message = "Domain couln't be found.";
+            return Helpers.ErrorHandler.Handle(e, options.ThrowAnErrorIfNotFound, accessToken, message);
         }
         catch (Exception e)
         {

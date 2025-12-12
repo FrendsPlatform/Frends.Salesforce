@@ -31,6 +31,8 @@ public class Salesforce
         CancellationToken cancellationToken
     )
     {
+        var accessToken = string.Empty;
+
         try
         {
             if (string.IsNullOrWhiteSpace(input.Domain)) throw new ArgumentNullException("Domain cannot be empty.");
@@ -41,7 +43,6 @@ public class Salesforce
                 new RestClient(
                     $"{input.Domain}/services/data/{input.ApiVersion}/sobjects/{input.SObjectType}/{input.SObjectId}");
             var request = new RestRequest("/", Method.Delete);
-            string accessToken = "";
 
             switch (options.AuthenticationMethod)
             {
@@ -72,32 +73,39 @@ public class Salesforce
             return new Result(content, response.IsSuccessful, response.ErrorException, response.ErrorMessage,
                 accessToken);
         }
+        catch (ArgumentException e)
+        {
+            var message = "Domain couldn't be found.";
+            return Helpers.ErrorHandler.Handle(e, options.ThrowAnErrorIfNotFound, accessToken, message);
+        }
         catch (Exception e)
         {
-            return Helpers.ErrorHandler.Handle(e, options.ThrowAnErrorIfNotFound, string.Empty);
+            return Helpers.ErrorHandler.Handle(e, options.ThrowAnErrorIfNotFound, accessToken);
         }
     }
+}
 
-    #region HelperMethods
+#region HelperMethods
 
-    /// <summary>
-    /// Get OAuth2 access token.
-    /// </summary>
-    internal static async Task<string> GetAccessToken(string url, string clientId, string clientSecret, string username,
-        string passwordWithSecurityToken, CancellationToken cancellationToken)
-    {
-        var authClient = new RestClient(url);
-        var authRequest = new RestRequest("", Method.Post);
-        authRequest.AddHeader("Content-Type", "application/x-www-form-urlencoded");
-        authRequest.AddParameter("grant_type", "password");
-        authRequest.AddParameter("client_id", clientId);
-        authRequest.AddParameter("client_secret", clientSecret);
-        authRequest.AddParameter("username", username);
-        authRequest.AddParameter("password", passwordWithSecurityToken);
-        var authResponse = await authClient.ExecuteAsync(authRequest, cancellationToken);
-        string accessToken = JsonConvert.DeserializeObject<dynamic>(authResponse.Content).access_token;
-        return accessToken;
-    }
+/// <summary>
+/// Get OAuth2 access token.
+/// </summary>
+internal static async Task<string> GetAccessToken(string url, string clientId, string clientSecret, string username,
+    string passwordWithSecurityToken, CancellationToken cancellationToken)
+{
+    var authClient = new RestClient(url);
+    var authRequest = new RestRequest("", Method.Post);
+    authRequest.AddHeader("Content-Type", "application/x-www-form-urlencoded");
+    authRequest.AddParameter("grant_type", "password");
+    authRequest.AddParameter("client_id", clientId);
+    authRequest.AddParameter("client_secret", clientSecret);
+    authRequest.AddParameter("username", username);
+    authRequest.AddParameter("password", passwordWithSecurityToken);
+    var authResponse = await authClient.ExecuteAsync(authRequest, cancellationToken);
+    string accessToken = JsonConvert.DeserializeObject<dynamic>(authResponse.Content).access_token;
+    return accessToken;
+}
 
-    #endregion
+#endregion
+
 }

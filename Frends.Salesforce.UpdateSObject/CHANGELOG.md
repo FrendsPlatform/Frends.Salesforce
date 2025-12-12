@@ -1,5 +1,9 @@
 # Changelog
 
+## [2.2.0] - 2025-12-12
+### Changed
+- Change throwing exception logic
+
 ## [2.1.0] - 2025-03-18
 ### Changed
 - Updated packages:
