@@ -83,21 +83,21 @@ public class Salesforce
         catch (JsonReaderException e)
         {
             const string message = "Given input couldn't be parsed to json.";
-            return Helpers.ErrorHandler.Handle(e, options.ThrowAnErrorIfNotFound, accessToken, message);
+            return Helpers.ErrorHandler.Handle(e, message);
         }
         catch (ArgumentException e)
         {
             const string message = "Domain couldn't be found.";
-            return Helpers.ErrorHandler.Handle(e, options.ThrowAnErrorIfNotFound, accessToken, message);
+            return Helpers.ErrorHandler.Handle(e, message);
         }
         catch (RuntimeBinderException e)
         {
             const string message = "Given Salesforce information is invalid.";
-            return Helpers.ErrorHandler.Handle(e, options.ThrowAnErrorIfNotFound, accessToken, message);
+            return Helpers.ErrorHandler.Handle(e, message);
         }
         catch (Exception e)
         {
-            return Helpers.ErrorHandler.Handle(e, options.ThrowAnErrorIfNotFound, accessToken);
+            return Helpers.ErrorHandler.Handle(e);
         }
     }
 

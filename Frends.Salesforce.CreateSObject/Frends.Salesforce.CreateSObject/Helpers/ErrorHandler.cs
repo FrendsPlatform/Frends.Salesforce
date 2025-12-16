@@ -1,7 +1,7 @@
-﻿using System;
-using Frends.Salesforce.UpdateSObject.Definitions;
+namespace Frends.Salesforce.CreateSObject.Helpers;
 
-namespace Frends.Salesforce.UpdateSObject.Helpers;
+using System;
+using Definitions;
 
 internal static class ErrorHandler
 {

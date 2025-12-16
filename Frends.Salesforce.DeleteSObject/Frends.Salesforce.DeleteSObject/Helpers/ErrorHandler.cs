@@ -5,20 +5,11 @@ namespace Frends.Salesforce.DeleteSObject.Helpers;
 
 internal static class ErrorHandler
 {
-    internal static Result Handle(Exception exception, bool throwOnFailure, string token, string additionalMessage = "")
+    internal static Result Handle(Exception exception, string additionalMessage = "")
     {
-        if (throwOnFailure)
-        {
-            if (string.IsNullOrEmpty(additionalMessage))
-                throw new Exception(exception.Message, exception);
+        if (string.IsNullOrEmpty(additionalMessage))
+            throw new Exception(exception.Message, exception);
 
-            throw new Exception(additionalMessage, exception);
-        }
-
-        var errorMessage = !string.IsNullOrEmpty(additionalMessage)
-            ? $"{additionalMessage}: {exception.Message}"
-            : exception.Message;
-
-        return new Result(null, false, exception, errorMessage, token);
+        throw new Exception(additionalMessage, exception);
     }
 }

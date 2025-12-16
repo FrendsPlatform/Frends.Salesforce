@@ -76,11 +76,11 @@ public class Salesforce
         catch (ArgumentException e)
         {
             var message = "Domain couldn't be found.";
-            return Helpers.ErrorHandler.Handle(e, options.ThrowAnErrorIfNotFound, accessToken, message);
+            return Helpers.ErrorHandler.Handle(e, message);
         }
         catch (Exception e)
         {
-            return Helpers.ErrorHandler.Handle(e, options.ThrowAnErrorIfNotFound, accessToken);
+            return Helpers.ErrorHandler.Handle(e);
         }
     }
 

@@ -296,7 +296,7 @@ public class UnitTests
     }
 
     [TestMethod]
-    [ExpectedException(typeof(ArgumentException))]
+    [ExpectedException(typeof(Exception))]
     public async Task InvalidDomain_ThrowTest()
     {
         var input = new Input
@@ -371,7 +371,7 @@ public class UnitTests
     }
 
     [TestMethod]
-    [ExpectedException(typeof(JsonException))]
+    [ExpectedException(typeof(Exception))]
     public async Task InvalidJson_ThrowTest()
     {
         var input = new Input
