@@ -49,28 +49,26 @@ public class Salesforce
                         throw new ArgumentException(
                             "Access token cannot be null when using Access Token authentication method");
                     request.AddHeader("Authorization", "Bearer " + options.AccessToken);
+
                     break;
                 case AuthenticationMethod.OAuth2WithPassword:
                     accessToken = await GetAccessToken(options.AuthUrl, options.ClientID, options.ClientSecret,
                         options.Username, options.Password + options.SecurityToken, cancellationToken);
                     request.AddHeader("Authorization", "Bearer " + accessToken);
+
                     break;
             }
+
+            if (!(options.AuthenticationMethod is AuthenticationMethod.OAuth2WithPassword && options.ReturnAccessToken))
+                accessToken = string.Empty;
 
 
             var response = await client.ExecuteAsync(request, cancellationToken);
             dynamic content = JsonConvert.DeserializeObject(response.Content);
 
-            if (!(options.AuthenticationMethod is AuthenticationMethod.OAuth2WithPassword && options.ReturnAccessToken))
-                accessToken = string.Empty;
 
             return new Result(content, response.IsSuccessful, response.ErrorException,
                 response.IsSuccessful ? string.Empty : content[0].Value<string>("message"), accessToken);
-        }
-        catch (ArgumentException e)
-        {
-            const string message = "Domain couln't be found.";
-            return Helpers.ErrorHandler.Handle(e, message);
         }
         catch (Exception e)
         {
@@ -97,8 +95,10 @@ public class Salesforce
         authRequest.AddParameter("password", passwordWithSecurityToken);
         var authResponse = await authClient.ExecuteAsync(authRequest, cancellationToken);
         string accessToken = JsonConvert.DeserializeObject<dynamic>(authResponse.Content).access_token;
+
         return accessToken;
     }
 
     #endregion
+
 }

@@ -55,15 +55,18 @@ public class Salesforce
                         throw new ArgumentException(
                             "Access token cannot be null when using Access Token authentication method");
                     request.AddHeader("Authorization", "Bearer " + options.AccessToken);
+
                     break;
                 case AuthenticationMethod.OAuth2WithPassword:
                     accessToken = await GetAccessToken(options.AuthUrl, options.ClientID, options.ClientSecret,
                         options.Username, options.Password + options.SecurityToken, cancellationToken);
                     request.AddHeader("Authorization", "Bearer " + accessToken);
+
                     break;
             }
 
-
+            if (!(options.AuthenticationMethod is AuthenticationMethod.OAuth2WithPassword && options.ReturnAccessToken))
+                accessToken = string.Empty;
             var json = JsonConvert.DeserializeObject<Dictionary<string, string>>(input.SObjectAsJson);
             request.RequestFormat = DataFormat.Json;
             request.AddJsonBody(json);
@@ -75,24 +78,19 @@ public class Salesforce
                     .Equals(new HttpRequestException("Request failed with status code NotFound").ToString()))
                 throw new HttpRequestException("Target couldn't be found with given id or type.");
 
-            if (!(options.AuthenticationMethod is AuthenticationMethod.OAuth2WithPassword && options.ReturnAccessToken))
-                accessToken = string.Empty;
             return new Result(content, response.IsSuccessful, response.ErrorException, response.ErrorMessage,
                 accessToken);
         }
         catch (JsonReaderException e)
         {
             const string message = "Given input couldn't be parsed to json.";
-            return Helpers.ErrorHandler.Handle(e, message);
-        }
-        catch (ArgumentException e)
-        {
-            const string message = "Domain couldn't be found.";
+
             return Helpers.ErrorHandler.Handle(e, message);
         }
         catch (RuntimeBinderException e)
         {
             const string message = "Given Salesforce information is invalid.";
+
             return Helpers.ErrorHandler.Handle(e, message);
         }
         catch (Exception e)
@@ -119,8 +117,10 @@ public class Salesforce
         authRequest.AddParameter("password", passwordWithSecurityToken);
         var authResponse = await authClient.ExecuteAsync(authRequest, cancellationToken);
         string accessToken = JsonConvert.DeserializeObject<dynamic>(authResponse.Content).access_token;
+
         return accessToken;
     }
 
     #endregion
+
 }

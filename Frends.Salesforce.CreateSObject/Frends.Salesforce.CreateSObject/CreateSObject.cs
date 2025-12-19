@@ -55,6 +55,9 @@ public class Salesforce
                 break;
         }
 
+        if (!(options.AuthenticationMethod is AuthenticationMethod.OAuth2WithPassword && options.ReturnAccessToken))
+            accessToken = string.Empty;
+
         try
         {
             var json = JsonConvert.DeserializeObject<Dictionary<string, string>>(input.SObjectAsJson);
@@ -64,8 +67,6 @@ public class Salesforce
             var response = await client.ExecuteAsync(request, cancellationToken);
             var content = JsonConvert.DeserializeObject<dynamic>(response.Content);
 
-            if (!(options.AuthenticationMethod is AuthenticationMethod.OAuth2WithPassword && options.ReturnAccessToken))
-                accessToken = string.Empty;
 
             return new Result(content, response.IsSuccessful, response.ErrorException, response.ErrorMessage,
                 accessToken);
@@ -74,9 +75,9 @@ public class Salesforce
         {
             return Helpers.ErrorHandler.Handle(e, "Given input couldn't be parsed to json.");
         }
-        catch (ArgumentException e)
+        catch (Exception e)
         {
-            return Helpers.ErrorHandler.Handle(e, "Domain couldn't be found.");
+            return Helpers.ErrorHandler.Handle(e);
         }
     }
 
