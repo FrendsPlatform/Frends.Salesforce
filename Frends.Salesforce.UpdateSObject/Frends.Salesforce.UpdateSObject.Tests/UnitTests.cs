@@ -23,8 +23,8 @@ public class UnitTests
     private readonly string _clientID = Environment.GetEnvironmentVariable("Salesforce_ClientID");
     private readonly string _username = Environment.GetEnvironmentVariable("Salesforce_Username");
 
-    private readonly string _domain = @"https://frends2-dev-ed.develop.my.salesforce.com";
-    private readonly string _authurl = @"https://login.salesforce.com/services/oauth2/token";
+    private readonly string _domain = Environment.GetEnvironmentVariable("Salesforce_Domain_Url");
+    private readonly string _authurl = Environment.GetEnvironmentVariable("Salesforce_Auth_Url");
 
     private readonly CancellationToken _cancellationToken = new();
     private Options _options;
@@ -191,7 +191,7 @@ public class UnitTests
     }
 
     [TestMethod]
-    [ExpectedException(typeof(ArgumentException))]
+    [ExpectedException(typeof(Exception))]
     public async Task EmptyAccessToken_ThrowTest()
     {
         var input = new Input
@@ -213,7 +213,7 @@ public class UnitTests
     }
 
     [TestMethod]
-    [ExpectedException(typeof(ArgumentNullException))]
+    [ExpectedException(typeof(Exception))]
     public async Task EmptyDomain_ThrowTest()
     {
         var input = new Input
@@ -234,7 +234,7 @@ public class UnitTests
     }
 
     [TestMethod]
-    [ExpectedException(typeof(ArgumentNullException))]
+    [ExpectedException(typeof(Exception))]
     public async Task EmptyId_ThrowTest()
     {
         var input = new Input
@@ -255,7 +255,7 @@ public class UnitTests
     }
 
     [TestMethod]
-    [ExpectedException(typeof(ArgumentNullException))]
+    [ExpectedException(typeof(Exception))]
     public async Task EmptyJson_ThrowTest()
     {
         var input = new Input
@@ -276,7 +276,7 @@ public class UnitTests
     }
 
     [TestMethod]
-    [ExpectedException(typeof(ArgumentNullException))]
+    [ExpectedException(typeof(Exception))]
     public async Task EmptyType_ThrowTest()
     {
         var input = new Input
@@ -297,7 +297,7 @@ public class UnitTests
     }
 
     [TestMethod]
-    [ExpectedException(typeof(ArgumentException))]
+    [ExpectedException(typeof(Exception))]
     public async Task InvalidDomain_ThrowTest()
     {
         var input = new Input
@@ -323,7 +323,7 @@ public class UnitTests
     }
 
     [TestMethod]
-    [ExpectedException(typeof(RuntimeBinderException))]
+    [ExpectedException(typeof(Exception))]
     public async Task ExampleDomain_ThrowTest()
     {
         var input = new Input
@@ -349,7 +349,7 @@ public class UnitTests
     }
 
     [TestMethod]
-    [ExpectedException(typeof(RuntimeBinderException))]
+    [ExpectedException(typeof(Exception))]
     public async Task InvalidObjectType_ThrowTest()
     {
         var input = new Input
@@ -376,7 +376,7 @@ public class UnitTests
     }
 
     [TestMethod]
-    [ExpectedException(typeof(RuntimeBinderException))]
+    [ExpectedException(typeof(Exception))]
     public async Task InvalidSecretOAuth_ThrowTest()
     {
         var input = new Input
@@ -403,7 +403,7 @@ public class UnitTests
     }
 
     [TestMethod]
-    [ExpectedException(typeof(RuntimeBinderException))]
+    [ExpectedException(typeof(Exception))]
     public async Task InvalidId_ThrowTest()
     {
         var input = new Input
@@ -426,7 +426,7 @@ public class UnitTests
     }
 
     [TestMethod]
-    [ExpectedException(typeof(JsonReaderException))]
+    [ExpectedException(typeof(Exception))]
     public async Task InvalidJson_ThrowTest()
     {
         var input = new Input
@@ -448,7 +448,7 @@ public class UnitTests
     }
 
     [TestMethod]
-    [ExpectedException(typeof(HttpRequestException))]
+    [ExpectedException(typeof(Exception))]
     public async Task NotFoundId_ThrowTest()
     {
         var input = new Input

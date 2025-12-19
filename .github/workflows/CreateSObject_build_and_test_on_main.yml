@@ -18,6 +18,8 @@ jobs:
       env_var_name_3: Salesforce_Security_Token
       env_var_name_4: Salesforce_ClientID
       env_var_name_5: Salesforce_Username
+      env_var_name_6: Salesforce_Domain_Url
+      env_var_name_7: Salesforce_Auth_Url
     secrets:
       badge_service_api_key: ${{ secrets.BADGE_SERVICE_API_KEY }}
       env_var_value_1: ${{ secrets.SALESFORCE_CLIENT_SECRET }}
@@ -25,3 +27,5 @@ jobs:
       env_var_value_3: ${{ secrets.SALESFORCE_SECURITY_TOKEN }}
       env_var_value_4: ${{ secrets.SALESFORCE_CLIENTID }}
       env_var_value_5: ${{ secrets.SALESFORCE_USERNAME }}
+      env_var_value_6: ${{ secrets.SALESFORCE_DOMAIN_URL }}
+      env_var_value_7: ${{ secrets.SALESFORCE_AUTH_URL }}
