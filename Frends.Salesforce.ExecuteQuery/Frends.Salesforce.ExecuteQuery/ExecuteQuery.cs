@@ -51,6 +51,13 @@ public class Salesforce
                     request.AddHeader("Authorization", "Bearer " + options.AccessToken);
 
                     break;
+
+                case AuthenticationMethod.OAuth2WithClientCredentials:
+                    accessToken = await GetAccessToken(options.AuthUrl, options.ClientID, options.ClientSecret,
+                    cancellationToken);
+                    request.AddHeader("Authorization", "Bearer " + accessToken);
+                    break;
+
                 case AuthenticationMethod.OAuth2WithPassword:
                     accessToken = await GetAccessToken(options.AuthUrl, options.ClientID, options.ClientSecret,
                         options.Username, options.Password + options.SecurityToken, cancellationToken);
@@ -59,7 +66,9 @@ public class Salesforce
                     break;
             }
 
-            if (!(options.AuthenticationMethod is AuthenticationMethod.OAuth2WithPassword && options.ReturnAccessToken))
+            if (!((options.AuthenticationMethod is AuthenticationMethod.OAuth2WithPassword || 
+                options.AuthenticationMethod is AuthenticationMethod.OAuth2WithClientCredentials) 
+                && options.ReturnAccessToken))
                 accessToken = string.Empty;
 
 
@@ -79,7 +88,26 @@ public class Salesforce
     #region HelperMethods
 
     /// <summary>
-    /// Get OAuth2 access token.
+    /// Get OAuth2 access token with Client Credentials.
+    /// This method is public since it is used also in Unit tests.
+    /// </summary>
+    internal static async Task<string> GetAccessToken(string url, string clientId, string clientSecret, 
+        CancellationToken cancellationToken)
+    {
+        var authClient = new RestClient(url);
+        var authRequest = new RestRequest("", Method.Post);
+        authRequest.AddHeader("Content-Type", "application/x-www-form-urlencoded");
+        authRequest.AddParameter("grant_type", "client_credentials");
+        authRequest.AddParameter("client_id", clientId);
+        authRequest.AddParameter("client_secret", clientSecret);
+        var authResponse = await authClient.ExecuteAsync(authRequest, cancellationToken);
+        string accessToken = JsonConvert.DeserializeObject<dynamic>(authResponse.Content).access_token;
+
+        return accessToken;
+    }
+
+    /// <summary>
+    /// Get OAuth2 access token with username-password.
     /// This method is public since it is used also in Unit tests.
     /// </summary>
     internal static async Task<string> GetAccessToken(string url, string clientId, string clientSecret, string username,

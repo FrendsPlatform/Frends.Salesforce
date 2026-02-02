@@ -38,7 +38,7 @@ public class UnitTests
         {
             Domain = _domain,
             Query = "SELECT Name from Customer",
-            ApiVersion = "v61.0"
+            ApiVersion = "v65.0"
         };
 
         var options = new Options
@@ -52,13 +52,60 @@ public class UnitTests
     }
 
     [TestMethod]
+    public async Task ExecuteQuery_QueryWithClientCredentials()
+    {
+        var input = new Input
+        {
+            Domain = _domain,
+            Query = "SELECT Name from Customer",
+            ApiVersion = "v65.0"
+        };
+
+        var options = new Options
+        {
+            AuthenticationMethod = AuthenticationMethod.OAuth2WithClientCredentials,
+            AuthUrl = _authurl,
+            ClientID = _clientID,
+            ClientSecret = _clientSecret
+        };
+
+        var result = await Salesforce.ExecuteQuery(input, options, _cancellationToken);
+        Assert.IsTrue(result.RequestIsSuccessful);
+    }
+
+    [TestMethod]
+    public async Task ExecuteQuery_QueryWithClientCredentials_ReturnToken()
+    {
+        var input = new Input
+        {
+            Domain = _domain,
+            Query = "SELECT Name from Customer",
+            ApiVersion = "v65.0"
+        };
+
+        var options = new Options
+        {
+            AuthenticationMethod = AuthenticationMethod.OAuth2WithClientCredentials,
+            AuthUrl = _authurl,
+            ClientID = _clientID,
+            ClientSecret = _clientSecret,
+            ReturnAccessToken = true
+        };
+
+        var result = await Salesforce.ExecuteQuery(input, options, _cancellationToken);
+        var accessToken = await Salesforce.GetAccessToken(_authurl, _clientID, _clientSecret, _username, _password + _securityToken, _cancellationToken);
+        Assert.IsTrue(result.RequestIsSuccessful);
+        Assert.AreEqual(result.Token, accessToken);
+    }
+
+    [TestMethod]
     public async Task ExecuteQuery_QueryWithPassword()
     {
         var input = new Input
         {
             Domain = _domain,
             Query = "SELECT Name from Customer",
-            ApiVersion = "v61.0"
+            ApiVersion = "v65.0"
         };
 
         var options = new Options
@@ -83,7 +130,7 @@ public class UnitTests
         {
             Domain = _domain,
             Query = "SELECT Name from Customer",
-            ApiVersion = "v61.0"
+            ApiVersion = "v65.0"
         };
 
         var options = new Options
@@ -132,7 +179,7 @@ public class UnitTests
         {
             Domain = _domain,
             Query = null,
-            ApiVersion = "v61.0"
+            ApiVersion = "v65.0"
         };
 
         var options = new Options
