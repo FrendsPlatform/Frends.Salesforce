@@ -38,7 +38,7 @@ public class UnitTests
         {
             Domain = _domain,
             Query = "SELECT Name from Customer",
-            ApiVersion = "v65.0"
+            ApiVersion = "v61.0"
         };
 
         var options = new Options
@@ -58,7 +58,7 @@ public class UnitTests
         {
             Domain = _domain,
             Query = "SELECT Name from Customer",
-            ApiVersion = "v65.0"
+            ApiVersion = "v61.0"
         };
 
         var options = new Options
@@ -80,7 +80,7 @@ public class UnitTests
         {
             Domain = _domain,
             Query = "SELECT Name from Customer",
-            ApiVersion = "v65.0"
+            ApiVersion = "v61.0"
         };
 
         var options = new Options
@@ -105,7 +105,7 @@ public class UnitTests
         {
             Domain = _domain,
             Query = "SELECT Name from Customer",
-            ApiVersion = "v65.0"
+            ApiVersion = "v61.0"
         };
 
         var options = new Options
@@ -130,7 +130,7 @@ public class UnitTests
         {
             Domain = _domain,
             Query = "SELECT Name from Customer",
-            ApiVersion = "v65.0"
+            ApiVersion = "v61.0"
         };
 
         var options = new Options
@@ -179,7 +179,7 @@ public class UnitTests
         {
             Domain = _domain,
             Query = null,
-            ApiVersion = "v65.0"
+            ApiVersion = "v61.0"
         };
 
         var options = new Options

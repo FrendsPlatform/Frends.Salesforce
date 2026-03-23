@@ -21,9 +21,9 @@ public class Input
     /// The API version to use when making requests to Salesforce.
     /// If left empty, the default value is v61.0.
     /// </summary>
-    [DefaultValue("v65.0")]
+    [DefaultValue("v61.0")]
     [DisplayFormat(DataFormatString = "Text")]
-    public string ApiVersion { get; set; } = "v65.0";
+    public string ApiVersion { get; set; } = "v61.0";
 
     /// <summary>
     /// Query which will be executed.

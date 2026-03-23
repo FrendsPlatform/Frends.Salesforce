@@ -53,7 +53,7 @@ public class Salesforce
                     break;
 
                 case AuthenticationMethod.OAuth2WithClientCredentials:
-                    accessToken = await GetAccessToken(options.AuthUrl, options.ClientID, options.ClientSecret,
+                    accessToken = await GetAccessToken(input.Domain + "/services/oauth2/token", options.ClientID, options.ClientSecret,
                     cancellationToken);
                     request.AddHeader("Authorization", "Bearer " + accessToken);
                     break;
@@ -101,7 +101,13 @@ public class Salesforce
         authRequest.AddParameter("client_id", clientId);
         authRequest.AddParameter("client_secret", clientSecret);
         var authResponse = await authClient.ExecuteAsync(authRequest, cancellationToken);
-        string accessToken = JsonConvert.DeserializeObject<dynamic>(authResponse.Content).access_token;
+
+        if (!authResponse.IsSuccessful)
+            throw new Exception($"Failed to obtain access token: {authResponse.Content}");
+
+        dynamic responseContent = JsonConvert.DeserializeObject<dynamic>(authResponse.Content);
+        string accessToken = responseContent?.access_token
+                ?? throw new Exception($"Access token not found in response: {authResponse.Content}");
 
         return accessToken;
     }
