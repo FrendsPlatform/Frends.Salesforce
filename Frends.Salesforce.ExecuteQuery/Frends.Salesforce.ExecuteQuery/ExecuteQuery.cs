@@ -89,7 +89,7 @@ public class Salesforce
     /// Get OAuth2 access token with Client Credentials.
     /// This method is public since it is used also in Unit tests.
     /// </summary>
-    internal static async Task<string> GetAccessToken(string url, string clientId, string clientSecret, CancellationToken cancellationToken)
+    private static async Task<string> GetAccessToken(string url, string clientId, string clientSecret, CancellationToken cancellationToken)
     {
         var authClient = new RestClient(url);
         var authRequest = new RestRequest("", Method.Post);
