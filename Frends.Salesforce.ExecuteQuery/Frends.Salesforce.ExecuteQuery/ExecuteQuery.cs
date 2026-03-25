@@ -53,12 +53,26 @@ public class Salesforce
                     break;
 
                 case AuthenticationMethod.OAuth2WithClientCredentials:
+                    if (string.IsNullOrWhiteSpace(options.AuthUrl) ||
+                        string.IsNullOrWhiteSpace(options.ClientID) ||
+                        string.IsNullOrWhiteSpace(options.ClientSecret))
+                        throw new ArgumentException(
+                            "AuthUrl, ClientID, and ClientSecret are required for OAuth2 client-credentials authentication.");
+
                     accessToken = await GetAccessToken(options.AuthUrl, options.ClientID, options.ClientSecret,
-                    cancellationToken);
+                        cancellationToken);
                     request.AddHeader("Authorization", "Bearer " + accessToken);
                     break;
 
                 case AuthenticationMethod.OAuth2WithPassword:
+                    if (string.IsNullOrWhiteSpace(options.AuthUrl) ||
+                        string.IsNullOrWhiteSpace(options.ClientID) ||
+                        string.IsNullOrWhiteSpace(options.ClientSecret) ||
+                        string.IsNullOrWhiteSpace(options.Username) ||
+                        string.IsNullOrWhiteSpace(options.Password))
+                        throw new ArgumentException(
+                            "AuthUrl, ClientID, ClientSecret, Username, and Password are required for OAuth2 password authentication.");
+
                     accessToken = await GetAccessToken(options.AuthUrl, options.ClientID, options.ClientSecret,
                         options.Username, options.Password + options.SecurityToken, cancellationToken);
                     request.AddHeader("Authorization", "Bearer " + accessToken);
@@ -66,7 +80,9 @@ public class Salesforce
                     break;
             }
 
-            if (!((options.AuthenticationMethod is AuthenticationMethod.OAuth2WithPassword || options.AuthenticationMethod is AuthenticationMethod.OAuth2WithClientCredentials) && options.ReturnAccessToken))
+            if (!((options.AuthenticationMethod is AuthenticationMethod.OAuth2WithPassword ||
+                   options.AuthenticationMethod is AuthenticationMethod.OAuth2WithClientCredentials) &&
+                  options.ReturnAccessToken))
                 accessToken = string.Empty;
 
 
@@ -88,7 +104,8 @@ public class Salesforce
     /// <summary>
     /// Get OAuth2 access token with Client Credentials.
     /// </summary>
-    private static async Task<string> GetAccessToken(string url, string clientId, string clientSecret, CancellationToken cancellationToken)
+    private static async Task<string> GetAccessToken(string url, string clientId, string clientSecret,
+        CancellationToken cancellationToken)
     {
         var authClient = new RestClient(url);
         var authRequest = new RestRequest("", Method.Post);
@@ -99,11 +116,12 @@ public class Salesforce
         var authResponse = await authClient.ExecuteAsync(authRequest, cancellationToken);
 
         if (!authResponse.IsSuccessful)
-            throw new Exception($"Failed to obtain access token: {authResponse.Content}");
+            throw new Exception(
+                $"Failed to obtain access token. HTTP {(int)authResponse.StatusCode} ({authResponse.StatusCode}).");
 
         dynamic responseContent = JsonConvert.DeserializeObject<dynamic>(authResponse.Content);
         string accessToken = responseContent?.access_token
-                ?? throw new Exception($"Access token not found in response: {authResponse.Content}");
+                             ?? throw new Exception("Access token not found in response");
 
         return accessToken;
     }
@@ -130,5 +148,4 @@ public class Salesforce
     }
 
     #endregion
-
 }
