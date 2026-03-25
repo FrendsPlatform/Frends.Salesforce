@@ -51,7 +51,28 @@ public class Salesforce
                     request.AddHeader("Authorization", "Bearer " + options.AccessToken);
 
                     break;
+
+                case AuthenticationMethod.OAuth2WithClientCredentials:
+                    if (string.IsNullOrWhiteSpace(options.AuthUrl) ||
+                        string.IsNullOrWhiteSpace(options.ClientID) ||
+                        string.IsNullOrWhiteSpace(options.ClientSecret))
+                        throw new ArgumentException(
+                            "AuthUrl, ClientID, and ClientSecret are required for OAuth2 client-credentials authentication.");
+
+                    accessToken = await GetAccessToken(options.AuthUrl, options.ClientID, options.ClientSecret,
+                        cancellationToken);
+                    request.AddHeader("Authorization", "Bearer " + accessToken);
+                    break;
+
                 case AuthenticationMethod.OAuth2WithPassword:
+                    if (string.IsNullOrWhiteSpace(options.AuthUrl) ||
+                        string.IsNullOrWhiteSpace(options.ClientID) ||
+                        string.IsNullOrWhiteSpace(options.ClientSecret) ||
+                        string.IsNullOrWhiteSpace(options.Username) ||
+                        string.IsNullOrWhiteSpace(options.Password))
+                        throw new ArgumentException(
+                            "AuthUrl, ClientID, ClientSecret, Username, and Password are required for OAuth2 password authentication.");
+
                     accessToken = await GetAccessToken(options.AuthUrl, options.ClientID, options.ClientSecret,
                         options.Username, options.Password + options.SecurityToken, cancellationToken);
                     request.AddHeader("Authorization", "Bearer " + accessToken);
@@ -59,7 +80,9 @@ public class Salesforce
                     break;
             }
 
-            if (!(options.AuthenticationMethod is AuthenticationMethod.OAuth2WithPassword && options.ReturnAccessToken))
+            if (!((options.AuthenticationMethod is AuthenticationMethod.OAuth2WithPassword ||
+                   options.AuthenticationMethod is AuthenticationMethod.OAuth2WithClientCredentials) &&
+                  options.ReturnAccessToken))
                 accessToken = string.Empty;
 
 
@@ -79,8 +102,33 @@ public class Salesforce
     #region HelperMethods
 
     /// <summary>
-    /// Get OAuth2 access token.
-    /// This method is public since it is used also in Unit tests.
+    /// Get OAuth2 access token with Client Credentials.
+    /// </summary>
+    private static async Task<string> GetAccessToken(string url, string clientId, string clientSecret,
+        CancellationToken cancellationToken)
+    {
+        var authClient = new RestClient(url);
+        var authRequest = new RestRequest("", Method.Post);
+        authRequest.AddHeader("Content-Type", "application/x-www-form-urlencoded");
+        authRequest.AddParameter("grant_type", "client_credentials");
+        authRequest.AddParameter("client_id", clientId);
+        authRequest.AddParameter("client_secret", clientSecret);
+        var authResponse = await authClient.ExecuteAsync(authRequest, cancellationToken);
+
+        if (!authResponse.IsSuccessful)
+            throw new Exception(
+                $"Failed to obtain access token. HTTP {(int)authResponse.StatusCode} ({authResponse.StatusCode}).");
+
+        dynamic responseContent = JsonConvert.DeserializeObject<dynamic>(authResponse.Content);
+        string accessToken = responseContent?.access_token
+                             ?? throw new Exception("Access token not found in response");
+
+        return accessToken;
+    }
+
+    /// <summary>
+    /// Get OAuth2 access token with username-password.
+    /// This method is internal since it is used also in Unit tests.
     /// </summary>
     internal static async Task<string> GetAccessToken(string url, string clientId, string clientSecret, string username,
         string passwordWithSecurityToken, CancellationToken cancellationToken)
@@ -100,5 +148,4 @@ public class Salesforce
     }
 
     #endregion
-
 }

@@ -27,7 +27,7 @@ public class Options
     /// URL to fetch OAuth2 token.
     /// </summary>
     /// <example>https://login.salesforce.com/services/oauth2/token</example>
-    [UIHint(nameof(AuthenticationMethod), "", AuthenticationMethod.OAuth2WithPassword)]
+    [UIHint(nameof(AuthenticationMethod), "", AuthenticationMethod.OAuth2WithPassword, AuthenticationMethod.OAuth2WithClientCredentials)]
     [DefaultValue(@"https://login.salesforce.com/services/oauth2/token")]
     [DisplayFormat(DataFormatString = "Text")]
     public string AuthUrl { get; set; }
@@ -36,7 +36,7 @@ public class Options
     /// Client ID to get OAuth2 token.
     /// </summary>
     /// <example>abcdefghijkl123456789</example>
-    [UIHint(nameof(AuthenticationMethod), "", AuthenticationMethod.OAuth2WithPassword)]
+    [UIHint(nameof(AuthenticationMethod), "", AuthenticationMethod.OAuth2WithPassword, AuthenticationMethod.OAuth2WithClientCredentials)]
     [DisplayFormat(DataFormatString = "Text")]
     public string ClientID { get; set; }
 
@@ -45,7 +45,8 @@ public class Options
     /// </summary>
     /// <example>abcdefghijkl123456789</example>
     [PasswordPropertyText]
-    [UIHint(nameof(AuthenticationMethod), "", AuthenticationMethod.OAuth2WithPassword)]
+    [UIHint(nameof(AuthenticationMethod), "", AuthenticationMethod.OAuth2WithPassword, AuthenticationMethod.OAuth2WithClientCredentials)]
+    [DisplayFormat(DataFormatString = "Text")]
     public string ClientSecret { get; set; }
 
     /// <summary>
@@ -77,7 +78,7 @@ public class Options
     /// </summary>
     /// <example>true</example>
     [DefaultValue(false)]
-    [UIHint(nameof(AuthenticationMethod), "", AuthenticationMethod.OAuth2WithPassword)]
+    [UIHint(nameof(AuthenticationMethod), "", AuthenticationMethod.OAuth2WithPassword, AuthenticationMethod.OAuth2WithClientCredentials)]
     public bool ReturnAccessToken { get; set; }
 
     /// <summary>

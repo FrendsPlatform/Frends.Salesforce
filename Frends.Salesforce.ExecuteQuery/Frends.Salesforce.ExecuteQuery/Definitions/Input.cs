@@ -22,6 +22,7 @@ public class Input
     /// If left empty, the default value is v61.0.
     /// </summary>
     [DefaultValue("v61.0")]
+    [DisplayFormat(DataFormatString = "Text")]
     public string ApiVersion { get; set; } = "v61.0";
 
     /// <summary>

@@ -1,13 +1,14 @@
 ﻿using System;
-using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using Frends.Salesforce.ExecuteQuery.Definitions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using dotenv.net;
-using NUnit.Framework.Internal;
+using Assert = Microsoft.VisualStudio.TestTools.UnitTesting.Assert;
+using TestContext = Microsoft.VisualStudio.TestTools.UnitTesting.TestContext;
 
 namespace Frends.Salesforce.ExecuteQuery.Tests;
+
 [TestClass]
 public class UnitTests
 {
@@ -18,17 +19,16 @@ public class UnitTests
     private readonly string _username = Environment.GetEnvironmentVariable("Salesforce_Username");
     private readonly string _domain = Environment.GetEnvironmentVariable("Salesforce_Domain_Url");
     private readonly string _authurl = Environment.GetEnvironmentVariable("Salesforce_Auth_Url");
+    private static string _authUrlForOAuth2WithCredentials;
+
     private readonly CancellationToken _cancellationToken = new();
 
     [ClassInitialize]
     public static void TestInitialize(TestContext testContext)
     {
-        // load envs
-        var root = Directory.GetCurrentDirectory();
-        var projDir = Directory.GetParent(root)?.Parent?.Parent?.FullName;
-        DotEnv.Load(
-            options: new DotEnvOptions(
-                envFilePaths: new[] { $"{projDir}{Path.DirectorySeparatorChar}.env.local" }));
+        DotEnv.Load();
+        _authUrlForOAuth2WithCredentials =
+            Environment.GetEnvironmentVariable("Salesforce_Domain_Url") + "/services/oauth2/token";
     }
 
     [TestMethod]
@@ -44,11 +44,58 @@ public class UnitTests
         var options = new Options
         {
             AuthenticationMethod = AuthenticationMethod.AccessToken,
-            AccessToken = await Salesforce.GetAccessToken(_authurl, _clientID, _clientSecret, _username, _password + _securityToken, _cancellationToken)
+            AccessToken = await Salesforce.GetAccessToken(_authurl, _clientID, _clientSecret, _username,
+                _password + _securityToken, _cancellationToken)
         };
 
         var result = await Salesforce.ExecuteQuery(input, options, _cancellationToken);
         Assert.IsTrue(result.RequestIsSuccessful);
+    }
+
+    [TestMethod]
+    public async Task ExecuteQuery_QueryWithClientCredentials()
+    {
+        var input = new Input
+        {
+            Domain = _domain,
+            Query = "SELECT Name from Customer",
+            ApiVersion = "v61.0"
+        };
+
+        var options = new Options
+        {
+            AuthenticationMethod = AuthenticationMethod.OAuth2WithClientCredentials,
+            AuthUrl = _authUrlForOAuth2WithCredentials,
+            ClientID = _clientID,
+            ClientSecret = _clientSecret
+        };
+
+        var result = await Salesforce.ExecuteQuery(input, options, _cancellationToken);
+        Assert.IsTrue(result.RequestIsSuccessful);
+    }
+
+    [TestMethod]
+    public async Task ExecuteQuery_QueryWithClientCredentials_ReturnToken()
+    {
+        var input = new Input
+        {
+            Domain = _domain,
+            Query = "SELECT Name from Customer",
+            ApiVersion = "v61.0"
+        };
+
+        var options = new Options
+        {
+            AuthenticationMethod = AuthenticationMethod.OAuth2WithClientCredentials,
+            AuthUrl = _authUrlForOAuth2WithCredentials,
+            ClientID = _clientID,
+            ClientSecret = _clientSecret,
+            ReturnAccessToken = true
+        };
+
+        var result = await Salesforce.ExecuteQuery(input, options, _cancellationToken);
+        Assert.IsTrue(result.RequestIsSuccessful);
+        Assert.IsNotEmpty(result.Token);
     }
 
     [TestMethod]
@@ -99,7 +146,8 @@ public class UnitTests
         };
 
         var result = await Salesforce.ExecuteQuery(input, options, _cancellationToken);
-        var accessToken = await Salesforce.GetAccessToken(_authurl, _clientID, _clientSecret, _username, _password + _securityToken, _cancellationToken);
+        var accessToken = await Salesforce.GetAccessToken(_authurl, _clientID, _clientSecret, _username,
+            _password + _securityToken, _cancellationToken);
         Assert.IsTrue(result.RequestIsSuccessful);
         Assert.AreEqual(result.Token, accessToken);
     }
@@ -116,7 +164,8 @@ public class UnitTests
         var options = new Options
         {
             AuthenticationMethod = AuthenticationMethod.AccessToken,
-            AccessToken = await Salesforce.GetAccessToken(_authurl, _clientID, _clientSecret, _username, _password + _securityToken, _cancellationToken)
+            AccessToken = await Salesforce.GetAccessToken(_authurl, _clientID, _clientSecret, _username,
+                _password + _securityToken, _cancellationToken)
         };
 
         var result = await Salesforce.ExecuteQuery(input, options, _cancellationToken);
@@ -138,7 +187,8 @@ public class UnitTests
         var options = new Options
         {
             AuthenticationMethod = AuthenticationMethod.AccessToken,
-            AccessToken = await Salesforce.GetAccessToken(_authurl, _clientID, _clientSecret, _username, _password + _securityToken, _cancellationToken)
+            AccessToken = await Salesforce.GetAccessToken(_authurl, _clientID, _clientSecret, _username,
+                _password + _securityToken, _cancellationToken)
         };
 
         await Salesforce.ExecuteQuery(input, options, _cancellationToken);
@@ -178,7 +228,8 @@ public class UnitTests
         var options = new Options
         {
             AuthenticationMethod = AuthenticationMethod.AccessToken,
-            AccessToken = await Salesforce.GetAccessToken(_authurl, _clientID, _clientSecret, _username, _password + _securityToken, _cancellationToken)
+            AccessToken = await Salesforce.GetAccessToken(_authurl, _clientID, _clientSecret, _username,
+                _password + _securityToken, _cancellationToken)
         };
 
         await Salesforce.ExecuteQuery(input, options, _cancellationToken);
@@ -198,7 +249,8 @@ public class UnitTests
         var options = new Options
         {
             AuthenticationMethod = AuthenticationMethod.AccessToken,
-            AccessToken = await Salesforce.GetAccessToken(_authurl, _clientID, _clientSecret, _username, _password + _securityToken, _cancellationToken)
+            AccessToken = await Salesforce.GetAccessToken(_authurl, _clientID, _clientSecret, _username,
+                _password + _securityToken, _cancellationToken)
         };
 
         await Salesforce.ExecuteQuery(input, options, _cancellationToken);
@@ -217,7 +269,8 @@ public class UnitTests
         var options = new Options
         {
             AuthenticationMethod = AuthenticationMethod.AccessToken,
-            AccessToken = await Salesforce.GetAccessToken(_authurl, _clientID, _clientSecret, _username, _password + _securityToken, _cancellationToken)
+            AccessToken = await Salesforce.GetAccessToken(_authurl, _clientID, _clientSecret, _username,
+                _password + _securityToken, _cancellationToken)
         };
 
         var result = await Salesforce.ExecuteQuery(input, options, _cancellationToken);

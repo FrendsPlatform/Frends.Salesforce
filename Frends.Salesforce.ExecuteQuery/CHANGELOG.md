@@ -1,5 +1,9 @@
 # Changelog
 
+## [2.3.0] - 2026-01-31
+### Added
+- Added new authentication method for authentication by OAuth2 with client credentials
+
 ## [2.2.0] - 2025-12-12
 ### Changed
 - Change throwing exception logic
