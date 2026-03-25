@@ -19,12 +19,16 @@ public class UnitTests
     private readonly string _username = Environment.GetEnvironmentVariable("Salesforce_Username");
     private readonly string _domain = Environment.GetEnvironmentVariable("Salesforce_Domain_Url");
     private readonly string _authurl = Environment.GetEnvironmentVariable("Salesforce_Auth_Url");
+    private static string _authUrlForOAuth2WithCredentials;
+
     private readonly CancellationToken _cancellationToken = new();
 
     [ClassInitialize]
     public static void TestInitialize(TestContext testContext)
     {
         DotEnv.Load();
+        _authUrlForOAuth2WithCredentials =
+            Environment.GetEnvironmentVariable("Salesforce_Domain_Url") + "/services/oauth2/token";
     }
 
     [TestMethod]
@@ -61,7 +65,7 @@ public class UnitTests
         var options = new Options
         {
             AuthenticationMethod = AuthenticationMethod.OAuth2WithClientCredentials,
-            AuthUrl = _authurl,
+            AuthUrl = _authUrlForOAuth2WithCredentials,
             ClientID = _clientID,
             ClientSecret = _clientSecret
         };
@@ -83,7 +87,7 @@ public class UnitTests
         var options = new Options
         {
             AuthenticationMethod = AuthenticationMethod.OAuth2WithClientCredentials,
-            AuthUrl = _authurl,
+            AuthUrl = _authUrlForOAuth2WithCredentials,
             ClientID = _clientID,
             ClientSecret = _clientSecret,
             ReturnAccessToken = true

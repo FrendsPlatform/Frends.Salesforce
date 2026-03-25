@@ -53,7 +53,7 @@ public class Salesforce
                     break;
 
                 case AuthenticationMethod.OAuth2WithClientCredentials:
-                    accessToken = await GetAccessToken(input.Domain + "/services/oauth2/token", options.ClientID, options.ClientSecret,
+                    accessToken = await GetAccessToken(options.AuthUrl, options.ClientID, options.ClientSecret,
                     cancellationToken);
                     request.AddHeader("Authorization", "Bearer " + accessToken);
                     break;
@@ -87,7 +87,6 @@ public class Salesforce
 
     /// <summary>
     /// Get OAuth2 access token with Client Credentials.
-    /// This method is public since it is used also in Unit tests.
     /// </summary>
     private static async Task<string> GetAccessToken(string url, string clientId, string clientSecret, CancellationToken cancellationToken)
     {
@@ -111,7 +110,7 @@ public class Salesforce
 
     /// <summary>
     /// Get OAuth2 access token with username-password.
-    /// This method is public since it is used also in Unit tests.
+    /// This method is internal since it is used also in Unit tests.
     /// </summary>
     internal static async Task<string> GetAccessToken(string url, string clientId, string clientSecret, string username,
         string passwordWithSecurityToken, CancellationToken cancellationToken)
