@@ -1,0 +1,7 @@
+﻿{
+  "Tasks": [
+    {
+      "TaskMethod": "Frends.Salesforce.PubSubConsume.Salesforce.PubSubConsume"
+    }
+  ]
+}
