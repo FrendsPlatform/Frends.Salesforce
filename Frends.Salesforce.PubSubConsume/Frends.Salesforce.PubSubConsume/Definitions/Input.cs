@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
+using Frends.Common.Toolkit.Attributes;
 
 namespace Frends.Salesforce.PubSubConsume.Definitions;
 
@@ -12,8 +13,8 @@ public class Input
     /// Salesforce topic name to subscribe to e.g., /event/My_Event__e or /data/AccountChangeEvent.
     /// </summary>
     /// <example>/event/My_Event__e</example>
-    [DisplayFormat(DataFormatString = "Text")]
-    [DefaultValue("/event/My_Event__e")]
+    [DefaultValue("")]
+    [NotEmptyString]
     public string TopicName { get; set; } = string.Empty;
 
     /// <summary>
@@ -21,7 +22,7 @@ public class Input
     /// </summary>
     /// <example>10</example>
     [DefaultValue(1)]
-    [Range(1, int.MaxValue)]
+    [Range(1, int.MaxValue, ErrorMessage = "Number of events must be greater than 0")]
     public int NumberOfEvents { get; set; } = 1;
 
     /// <summary>
@@ -35,8 +36,8 @@ public class Input
     /// Base64 encoded replay ID to continue from when ReplayPreset is Custom.
     /// </summary>
     /// <example>AAABBBCCC==</example>
-    [DisplayFormat(DataFormatString = "Text")]
-    [DefaultValue("")]
+    [RequiredIf(nameof(ReplayPreset), ReplayPresetOption.Custom)]
+
     public string ReplayIdBase64 { get; set; } = string.Empty;
 
     /// <summary>
@@ -44,5 +45,6 @@ public class Input
     /// </summary>
     /// <example>30</example>
     [DefaultValue(30)]
+    [Range(0, int.MaxValue, ErrorMessage = "Wait timeout can't be negative")]
     public int WaitTimeoutSeconds { get; set; } = 30;
 }

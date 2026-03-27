@@ -1,50 +1,54 @@
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
+using System.Diagnostics.CodeAnalysis;
+using Frends.Common.Toolkit.Attributes;
+using Frends.Salesforce.Toolkit.Definitions;
 
 namespace Frends.Salesforce.PubSubConsume.Definitions;
 
 /// <summary>
 /// Connection parameters.
 /// </summary>
-public class Connection
+public class Connection : IPubSubConnection
 {
     /// <summary>
     /// Authentication method used to get a Salesforce access token.
     /// </summary>
     /// <example>UsernamePasswordOAuth</example>
-    [DefaultValue(AuthenticationMethod.UsernamePasswordOAuth)]
-    public AuthenticationMethod AuthenticationMethod { get; set; } = AuthenticationMethod.UsernamePasswordOAuth;
+    [DefaultValue(AuthenticationMethod.OAuth2WithPassword)]
+#pragma warning disable FT0017 // Third-party type from internal Frends toolkit
+    public AuthenticationMethod AuthenticationMethod { get; set; } = AuthenticationMethod.OAuth2WithPassword;
+#pragma warning restore FT0017 // Third-party type from internal Frends toolkit
 
     /// <summary>
-    /// Salesforce OAuth login URL. Used only with the UsernamePasswordOAuth authentication method.
+    /// Salesforce OAuth login URL.
     /// </summary>
     /// <example>https://login.salesforce.com</example>
-    [DisplayFormat(DataFormatString = "Text")]
-    [DefaultValue("https://login.salesforce.com")]
-    public string LoginUrl { get; set; } = "https://login.salesforce.com";
+    [RequiredIf(
+        nameof(AuthenticationMethod),
+        AuthenticationMethod.OAuth2WithPassword,
+        AuthenticationMethod.OAuth2WithClientCredentials)]
+    public string AuthUrl { get; set; } = string.Empty;
 
     /// <summary>
     /// Salesforce Pub/Sub API endpoint.
     /// </summary>
     /// <example>https://api.pubsub.salesforce.com:7443</example>
-    [DisplayFormat(DataFormatString = "Text")]
-    [DefaultValue("https://api.pubsub.salesforce.com:7443")]
-    public string PubSubApiUrl { get; set; } = "https://api.pubsub.salesforce.com:7443";
+    [NotEmptyString]
+    public string PubSubApiUrl { get; set; } = string.Empty;
 
     /// <summary>
     /// Salesforce instance URL. Required when using the AccessToken authentication method.
     /// </summary>
     /// <example>https://mydomain.my.salesforce.com</example>
-    [DisplayFormat(DataFormatString = "Text")]
-    [DefaultValue("")]
+    [NotEmptyString]
     public string InstanceUrl { get; set; } = string.Empty;
 
     /// <summary>
     /// Salesforce tenant or org ID. Sent as the tenantId gRPC header.
     /// </summary>
     /// <example>00Dxx0000000001</example>
-    [DisplayFormat(DataFormatString = "Text")]
-    [DefaultValue("")]
+    [NotEmptyString]
     public string TenantId { get; set; } = string.Empty;
 
     /// <summary>
@@ -53,38 +57,43 @@ public class Connection
     /// <example>00Dxx0000000001!AQ8AQExampleToken</example>
     [PasswordPropertyText]
     [DefaultValue("")]
+    [RequiredIf(nameof(AuthenticationMethod), AuthenticationMethod.AccessToken)]
     public string AccessToken { get; set; } = string.Empty;
 
     /// <summary>
-    /// OAuth connected app client ID. Required when using the UsernamePasswordOAuth authentication method.
+    /// OAuth connected app client ID.
     /// </summary>
     /// <example>3MVG9d8..ExampleClientId</example>
-    [DisplayFormat(DataFormatString = "Text")]
-    [DefaultValue("")]
+    [RequiredIf(
+        nameof(AuthenticationMethod),
+        AuthenticationMethod.OAuth2WithPassword,
+        AuthenticationMethod.OAuth2WithClientCredentials)]
     public string ClientId { get; set; } = string.Empty;
 
     /// <summary>
-    /// OAuth connected app client secret. Required when using the UsernamePasswordOAuth authentication method.
+    /// OAuth connected app client secret.
     /// </summary>
     /// <example>ExampleClientSecret</example>
     [PasswordPropertyText]
-    [DefaultValue("")]
+    [RequiredIf(
+        nameof(AuthenticationMethod),
+        AuthenticationMethod.OAuth2WithPassword,
+        AuthenticationMethod.OAuth2WithClientCredentials)]
     public string ClientSecret { get; set; } = string.Empty;
 
     /// <summary>
-    /// Salesforce username. Required when using the UsernamePasswordOAuth authentication method.
+    /// Salesforce username.
     /// </summary>
     /// <example>integration.user@example.com</example>
-    [DisplayFormat(DataFormatString = "Text")]
-    [DefaultValue("")]
+    [RequiredIf(nameof(AuthenticationMethod), AuthenticationMethod.OAuth2WithPassword)]
     public string Username { get; set; } = string.Empty;
 
     /// <summary>
-    /// Salesforce password. Required when using the UsernamePasswordOAuth authentication method.
+    /// Salesforce password.
     /// </summary>
     /// <example>ExamplePassword</example>
     [PasswordPropertyText]
-    [DefaultValue("")]
+    [RequiredIf(nameof(AuthenticationMethod), AuthenticationMethod.OAuth2WithPassword)]
     public string Password { get; set; } = string.Empty;
 
     /// <summary>
@@ -92,6 +101,13 @@ public class Connection
     /// </summary>
     /// <example>ExampleSecurityToken</example>
     [PasswordPropertyText]
-    [DefaultValue("")]
     public string SecurityToken { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Allows keeping a channel for connection open.
+    /// Speed up multiple calls, but needs to be closed at last usage.
+    /// </summary>
+    /// <example>true</example>
+    [DefaultValue(true)]
+    public bool ShutdownChannel { get; set; } = true;
 }

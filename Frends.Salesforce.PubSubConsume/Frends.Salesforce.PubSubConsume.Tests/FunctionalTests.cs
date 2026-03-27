@@ -1,10 +1,12 @@
 using System;
 using System.IO;
 using System.Threading;
+using System.Threading.Tasks;
 using Avro;
 using Avro.Generic;
 using Avro.IO;
 using Frends.Salesforce.PubSubConsume.Definitions;
+using Frends.Salesforce.Toolkit.Definitions;
 using NUnit.Framework;
 
 namespace Frends.Salesforce.PubSubConsume.Tests;
@@ -13,7 +15,7 @@ namespace Frends.Salesforce.PubSubConsume.Tests;
 public class FunctionalTests : TestBase
 {
     [Test]
-    public void ConsumeSuccessful()
+    public async Task ConsumeSuccessful()
     {
         var input = new Input
         {
@@ -25,8 +27,8 @@ public class FunctionalTests : TestBase
 
         var connection = new Connection
         {
-            AuthenticationMethod = AuthenticationMethod.UsernamePasswordOAuth,
-            LoginUrl = LoginUrl,
+            AuthenticationMethod = AuthenticationMethod.OAuth2WithPassword,
+            AuthUrl = LoginUrl,
             PubSubApiUrl = PubSubApiUrl,
             InstanceUrl = InstanceUrl,
             TenantId = TenantId,
@@ -44,7 +46,7 @@ public class FunctionalTests : TestBase
             ErrorMessageOnFailure = null,
         };
 
-        var result = Salesforce.PubSubConsume(input, connection, options, CancellationToken.None);
+        var result = await Salesforce.PubSubConsume(input, connection, options, CancellationToken.None);
 
         var bytes = Convert.FromBase64String(result.Events[0].PayloadBase64);
         using var stream = new MemoryStream(bytes);
