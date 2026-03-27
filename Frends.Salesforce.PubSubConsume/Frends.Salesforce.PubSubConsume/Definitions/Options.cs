@@ -1,5 +1,4 @@
 ﻿using System.ComponentModel;
-using System.ComponentModel.DataAnnotations;
 
 namespace Frends.Salesforce.PubSubConsume.Definitions;
 
@@ -9,12 +8,11 @@ namespace Frends.Salesforce.PubSubConsume.Definitions;
 public class Options
 {
     /// <summary>
-    /// Delimiter to use between the repeated strings.
+    /// Fetch Avro schema JSON for each distinct schema ID encountered in the response.
     /// </summary>
-    /// <example>,</example>
-    [DisplayFormat(DataFormatString = "Text")]
-    [DefaultValue(" ")]
-    public string Delimiter { get; set; }
+    /// <example>true</example>
+    [DefaultValue(true)]
+    public bool ResolveSchemas { get; set; } = true;
 
     /// <summary>
     /// Whether to throw an error on failure.
@@ -27,7 +25,6 @@ public class Options
     /// Overrides the error message on failure.
     /// </summary>
     /// <example>Custom error message</example>
-    [DisplayFormat(DataFormatString = "Text")]
     [DefaultValue("")]
     public string ErrorMessageOnFailure { get; set; } = string.Empty;
 }

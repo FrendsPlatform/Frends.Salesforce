@@ -1,4 +1,6 @@
-﻿namespace Frends.Salesforce.PubSubConsume.Definitions;
+﻿using System.Collections.Generic;
+
+namespace Frends.Salesforce.PubSubConsume.Definitions;
 
 /// <summary>
 /// Result of the task.
@@ -12,10 +14,40 @@ public class Result
     public bool Success { get; set; }
 
     /// <summary>
-    /// Input string repeated the specified number of times.
+    /// Topic that was consumed.
     /// </summary>
-    /// <example>foobar,foobar</example>
-    public string Output { get; set; }
+    /// <example>/event/My_Event__e</example>
+    public string TopicName { get; set; }
+
+    /// <summary>
+    /// Number of events returned in the Events collection.
+    /// </summary>
+    /// <example>3</example>
+    public int EventCount { get; set; }
+
+    /// <summary>
+    /// Indicates whether the local wait timeout elapsed before the requested event count was reached.
+    /// </summary>
+    /// <example>false</example>
+    public bool TimedOut { get; set; }
+
+    /// <summary>
+    /// Latest replay ID reported by Salesforce, encoded as Base64.
+    /// </summary>
+    /// <example>AAABBBCCC==</example>
+    public string LatestReplayIdBase64 { get; set; }
+
+    /// <summary>
+    /// Number of events the server still considered pending in the latest response.
+    /// </summary>
+    /// <example>0</example>
+    public int PendingNumRequested { get; set; }
+
+    /// <summary>
+    /// Events returned by the subscription.
+    /// </summary>
+    /// <example>object[] { object { string EventId, string SchemaId, string ReplayIdBase64, string PayloadBase64 } }</example>
+    public List<ConsumedEvent> Events { get; set; } = new();
 
     /// <summary>
     /// Error that occurred during task execution.

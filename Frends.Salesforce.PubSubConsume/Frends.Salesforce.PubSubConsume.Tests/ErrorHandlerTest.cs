@@ -5,7 +5,6 @@ using NUnit.Framework;
 
 namespace Frends.Salesforce.PubSubConsume.Tests;
 
-// TODO: Adjust the test to use a real invalid Input scenario (e.g., missing or malformed data)
 [TestFixture]
 public class ErrorHandlerTest
 {
@@ -41,10 +40,14 @@ public class ErrorHandlerTest
 
     private static Input DefaultInput() => new()
     {
-        Repeat = -1, // Invalid value to cause an exception
+        TopicName = "/event/My_Event__e",
+        NumberOfEvents = 0,
     };
 
-    private static Connection DefaultConnection() => new();
+    private static Connection DefaultConnection() => new()
+    {
+        TenantId = "00Dxx0000000001",
+    };
 
     private static Options DefaultOptions() => new()
     {
