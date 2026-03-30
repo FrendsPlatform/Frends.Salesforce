@@ -20,13 +20,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-<!--        <PackageReference Include="Google.Protobuf" Version="3.33.1" />-->
-<!--        <PackageReference Include="Grpc.Core.Api" Version="2.76.0" />-->
-<!--        <PackageReference Include="Grpc.Net.Client" Version="2.76.0" />-->
-<!--        <PackageReference Include="Grpc.Tools" Version="2.76.0">-->
-<!--            <PrivateAssets>all</PrivateAssets>-->
-<!--            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>-->
-<!--        </PackageReference>-->
+        <PackageReference Include="Frends.Salesforce.Toolkit" Version="1.0.0" />
         <PackageReference Include="StyleCop.Analyzers" Version="1.2.0-beta.556">
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -45,9 +39,5 @@
 				 PackagePath="/"
 				 CopyToOutputDirectory="PreserveNewest" />
 		<AdditionalFiles Include="FrendsTaskMetadata.json" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <ProjectReference Include="..\..\Frends.Salesforce.Toolkit\Frends.Salesforce.Toolkit\Frends.Salesforce.Toolkit.csproj" />
     </ItemGroup>
 </Project>

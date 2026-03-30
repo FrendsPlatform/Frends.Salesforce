@@ -12,7 +12,6 @@ namespace Frends.Salesforce.PubSubConsume.Helpers;
 
 internal static class GrpcHandler
 {
-
     internal static ReplayPreset MapReplayPreset(ReplayPresetOption replayPreset)
     {
         return replayPreset switch
@@ -95,5 +94,4 @@ internal static class GrpcHandler
 
         result.LatestReplayIdBase64 = Convert.ToBase64String(replayIdBytes);
     }
-
 }

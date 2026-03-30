@@ -63,7 +63,6 @@ public static class Salesforce
                         $"Salesforce topic '{input.TopicName}' is not subscribable for the current credentials.");
                 }
 
-
                 var initialRequest = new FetchRequest
                 {
                     TopicName = input.TopicName,
