@@ -6,6 +6,7 @@
 
 - [Breaking Change] Move parameters related to Connection to new Connection parameter.
 - Remove the empty Options parameter.
+- Improve validation of input parameters.
 
 ### Added
 - Added a new authentication method for authentication by OAuth2 with client credentials

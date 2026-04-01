@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Runtime.CompilerServices;
 
-[assembly: InternalsVisibleTo("Frends.Salesforce.CreateSObject.Tests")]
+[assembly: InternalsVisibleTo("Frends.Salesforce.DeleteSObject.Tests")]
 namespace Frends.Salesforce.DeleteSObject.Definitions;
 /// <summary>
-/// Result-class for CreateSObject-task.
+/// Result-class for DeleteSObject-task.
 /// </summary>
 public class Result
 {

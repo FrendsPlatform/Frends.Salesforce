@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Net.Http;
-using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using Frends.Salesforce.DeleteSObject.Definitions;
@@ -16,49 +15,53 @@ namespace Frends.Salesforce.DeleteSObject.Tests;
 [TestClass]
 public class UnitTests
 {
-    private readonly string _clientSecret = Environment.GetEnvironmentVariable("Salesforce_Client_Secret");
-    private readonly string _password = Environment.GetEnvironmentVariable("Salesforce_Password");
-    private readonly string _securityToken = Environment.GetEnvironmentVariable("Salesforce_Security_Token");
-    private readonly string _clientID = Environment.GetEnvironmentVariable("Salesforce_ClientID");
-    private readonly string _username = Environment.GetEnvironmentVariable("Salesforce_Username");
+    private static string clientSecret;
+    private static string password;
+    private static string securityToken;
+    private static string clientId;
+    private static string username;
+    private static string domain;
+    private static string token;
 
-    private readonly string _domain = Environment.GetEnvironmentVariable("Salesforce_Domain_Url");
-    private readonly string _authurl = Environment.GetEnvironmentVariable("Salesforce_Auth_Url");
+    private readonly CancellationToken cancellationToken = CancellationToken.None;
+    private Connection connection;
+    private string userJson;
 
-    private readonly CancellationToken _cancellationToken = new();
-    private Options _options;
-    private string _userJson;
-
-    readonly string _name = "Test" + DateTime.Now.Year + "" + DateTime.Now.Month + "" + DateTime.Now.Day + "" + DateTime.Now.Hour + "" + DateTime.Now.Minute + "" + DateTime.Now.Millisecond;
+    private readonly string name = "Test" + DateTime.Now.Year + "" + DateTime.Now.Month + "" + DateTime.Now.Day + "" + DateTime.Now.Hour + "" + DateTime.Now.Minute + "" + DateTime.Now.Millisecond;
 
     [ClassInitialize]
-    public static void ClassInitialize(TestContext testContext)
+    public static async Task ClassInitialize(TestContext testContext)
     {
-        // load envs
-        var root = Directory.GetCurrentDirectory();
-        var projDir = Directory.GetParent(root)?.Parent?.Parent?.FullName;
-        DotEnv.Load(
-            options: new DotEnvOptions(
-                envFilePaths: new[] { $"{projDir}{Path.DirectorySeparatorChar}.env.local" }));
+        DotEnv.Load();
+        clientSecret = Environment.GetEnvironmentVariable("SALESFORCE_CLIENT_SECRET");
+        password = Environment.GetEnvironmentVariable("SALESFORCE_PASSWORD");
+        securityToken = Environment.GetEnvironmentVariable("SALESFORCE_SECURITY_TOKEN");
+        clientId = Environment.GetEnvironmentVariable("SALESFORCE_ClientId");
+        username = Environment.GetEnvironmentVariable("SALESFORCE_USERNAME");
+        domain = Environment.GetEnvironmentVariable("SALESFORCE_DOMAIN_URL");
+
+        token = await TestHelper.GetAccessToken(domain, clientId, clientSecret);
     }
 
     [TestInitialize]
-    public async Task TestInitialize()
+    public void TestInitialize()
     {
-        _userJson = JsonSerializer.Serialize(new { Name = _name });
+        userJson = JsonSerializer.Serialize(new { Name = name });
 
-        _options = new Options
+        connection = new Connection
         {
+            InstanceUrl = domain,
+            ApiVersion = "v61.0",
             AuthenticationMethod = AuthenticationMethod.AccessToken,
-            AccessToken = await Salesforce.GetAccessToken(_authurl, _clientID, _clientSecret, _username, _password + _securityToken, _cancellationToken)
+            AccessToken = token,
         };
     }
 
     [TestMethod]
     public async Task DeleteAccountTest()
     {
-        var id = await CreateSObject("Account", _userJson);
-        var result = await Salesforce.DeleteSObject(new Input { Domain = _domain, ApiVersion = "v61.0", SObjectId = id, SObjectType = "Account" }, _options, _cancellationToken);
+        var id = await CreateSObject("Account", userJson);
+        var result = await Salesforce.DeleteSObject(new Input { SObjectId = id, SObjectType = "Account" }, connection, cancellationToken);
 
         Assert.IsTrue(result.RequestIsSuccessful);
     }
@@ -66,8 +69,14 @@ public class UnitTests
     [TestMethod]
     public async Task DeleteAccountTest_WithoutSpecifiedApiVersion()
     {
-        var id = await CreateSObject("Account", _userJson);
-        var result = await Salesforce.DeleteSObject(new Input { Domain = _domain, SObjectId = id, SObjectType = "Account" }, _options, _cancellationToken);
+        var id = await CreateSObject("Account", userJson);
+        var con = new Connection
+        {
+            InstanceUrl = domain,
+            AuthenticationMethod = AuthenticationMethod.AccessToken,
+            AccessToken = token,
+        };
+        var result = await Salesforce.DeleteSObject(new Input { SObjectId = id, SObjectType = "Account" }, con, cancellationToken);
 
         Assert.IsTrue(result.RequestIsSuccessful);
     }
@@ -79,11 +88,11 @@ public class UnitTests
             new
             {
                 Title = "Mr",
-                LastName = _name
+                LastName = name,
             });
 
         var id = await CreateSObject("Contact", json);
-        var result = await Salesforce.DeleteSObject(new Input { Domain = _domain, ApiVersion = "v61.0", SObjectId = id, SObjectType = "Contact" }, _options, _cancellationToken);
+        var result = await Salesforce.DeleteSObject(new Input { SObjectId = id, SObjectType = "Contact" }, connection, cancellationToken);
 
         Assert.IsTrue(result.RequestIsSuccessful);
     }
@@ -92,41 +101,43 @@ public class UnitTests
     public async Task DeleteCaseTest()
     {
         // Creating an account to which case can be linked to.
-        var accountId = await CreateSObject("Account", _userJson);
+        var accountId = await CreateSObject("Account", userJson);
 
         // Creating a case.
         var json = JsonSerializer.Serialize(new
         {
             AccountId = accountId,
             Subject = "This is a test.",
-            Description = "This is a test case for Frends.SalesForce.CreateSObject task.",
-            Origin = "Web"
+            Description = "This is a test case for Frends.SalesForce.DeleteSObject task.",
+            Origin = "Web",
         });
 
         var caseId = await CreateSObject("Case", json);
 
-        var caseResult = await Salesforce.DeleteSObject(new Input { Domain = _domain, ApiVersion = "v61.0", SObjectId = caseId, SObjectType = "Case" }, _options, _cancellationToken);
+        var caseResult = await Salesforce.DeleteSObject(new Input { SObjectId = caseId, SObjectType = "Case" }, connection, cancellationToken);
         Assert.IsTrue(caseResult.RequestIsSuccessful);
 
-        var accountResult = await Salesforce.DeleteSObject(new Input { Domain = _domain, ApiVersion = "v61.0", SObjectId = accountId, SObjectType = "Account" }, _options, _cancellationToken);
+        var accountResult = await Salesforce.DeleteSObject(new Input { SObjectId = accountId, SObjectType = "Account" }, connection, cancellationToken);
         Assert.IsTrue(accountResult.RequestIsSuccessful);
     }
 
     [TestMethod]
     public async Task GetReturnedAccessTokenTest()
     {
-        var id = await CreateSObject("Account", _userJson);
-        var options = new Options
+        var id = await CreateSObject("Account", userJson);
+        var con = new Connection
         {
             AuthenticationMethod = AuthenticationMethod.OAuth2WithPassword,
-            AuthUrl = _authurl,
-            ClientID = _clientID,
-            ClientSecret = _clientSecret,
-            Username = _username,
-            Password = _password + _securityToken,
-            ReturnAccessToken = true
+            InstanceUrl = domain,
+            SecurityToken = securityToken,
+
+            ClientId = clientId,
+            ClientSecret = clientSecret,
+            Username = username,
+            Password = password,
+            ReturnAccessToken = true,
         };
-        var result = await Salesforce.DeleteSObject(new Input { Domain = _domain, ApiVersion = "v61.0", SObjectId = id, SObjectType = "Account" }, options, _cancellationToken);
+        var result = await Salesforce.DeleteSObject(new Input { SObjectId = id, SObjectType = "Account" }, con, cancellationToken);
 
         Assert.IsNotNull(result.Token);
     }
@@ -137,19 +148,17 @@ public class UnitTests
     {
         var input = new Input
         {
-            Domain = _domain,
-            ApiVersion = "v61.0",
             SObjectId = "123456789",
-            SObjectType = "Contact"
+            SObjectType = "Contact",
         };
 
-        var options = new Options
+        var con = new Connection
         {
             AuthenticationMethod = AuthenticationMethod.AccessToken,
-            AccessToken = " "
+            AccessToken = " ",
         };
 
-        await Salesforce.DeleteSObject(input, options, _cancellationToken);
+        await Salesforce.DeleteSObject(input, con, cancellationToken);
     }
 
     [TestMethod]
@@ -158,19 +167,17 @@ public class UnitTests
     {
         var input = new Input
         {
-            Domain = null,
-            ApiVersion = "v61.0",
             SObjectId = "123456789",
-            SObjectType = "Account"
+            SObjectType = "Account",
         };
 
-        var options = new Options
+        var con = new Connection
         {
             AuthenticationMethod = AuthenticationMethod.AccessToken,
-            AccessToken = await Salesforce.GetAccessToken(_authurl, _clientID, _clientSecret, _username, _password + _securityToken, _cancellationToken)
+            AccessToken = token,
         };
 
-        await Salesforce.DeleteSObject(input, options, _cancellationToken);
+        await Salesforce.DeleteSObject(input, con, cancellationToken);
     }
 
     [TestMethod]
@@ -179,19 +186,17 @@ public class UnitTests
     {
         var input = new Input
         {
-            Domain = _domain,
-            ApiVersion = "v61.0",
             SObjectId = null,
-            SObjectType = "Account"
+            SObjectType = "Account",
         };
 
-        var options = new Options
+        var con = new Connection
         {
             AuthenticationMethod = AuthenticationMethod.AccessToken,
-            AccessToken = await Salesforce.GetAccessToken(_authurl, _clientID, _clientSecret, _username, _password + _securityToken, _cancellationToken)
+            AccessToken = token,
         };
 
-        await Salesforce.DeleteSObject(input, options, _cancellationToken);
+        await Salesforce.DeleteSObject(input, con, cancellationToken);
     }
 
     [TestMethod]
@@ -200,19 +205,18 @@ public class UnitTests
     {
         var input = new Input
         {
-            Domain = _domain,
-            ApiVersion = "v61.0",
+
             SObjectId = "123456789",
-            SObjectType = ""
+            SObjectType = "",
         };
 
-        var options = new Options
+        var con = new Connection
         {
             AuthenticationMethod = AuthenticationMethod.AccessToken,
-            AccessToken = await Salesforce.GetAccessToken(_authurl, _clientID, _clientSecret, _username, _password + _securityToken, _cancellationToken)
+            AccessToken = token,
         };
 
-        await Salesforce.DeleteSObject(input, options, _cancellationToken);
+        await Salesforce.DeleteSObject(input, con, cancellationToken);
     }
 
     [TestMethod]
@@ -221,23 +225,22 @@ public class UnitTests
     {
         var input = new Input
         {
-            Domain = "https://mycompany.my.salesforce.com",
-            ApiVersion = "v61.0",
             SObjectId = "123456789",
-            SObjectType = "Account"
+            SObjectType = "Account",
         };
 
-        var options = new Options
+        var con = new Connection
         {
             AuthenticationMethod = AuthenticationMethod.OAuth2WithPassword,
-            AuthUrl = _authurl,
-            ClientID = _clientID,
-            ClientSecret = _clientSecret,
-            Username = _username,
-            Password = _password + _securityToken,
+            InstanceUrl = "https://invaliddomain.my.salesforce.com",
+
+            ClientId = clientId,
+            ClientSecret = clientSecret,
+            Username = username,
+            Password = password + securityToken,
         };
 
-        await Salesforce.DeleteSObject(input, options, _cancellationToken);
+        await Salesforce.DeleteSObject(input, con, cancellationToken);
     }
 
     [TestMethod]
@@ -245,23 +248,23 @@ public class UnitTests
     {
         var input = new Input
         {
-            Domain = _domain,
-            ApiVersion = "v61.0",
+
             SObjectId = "123456789",
-            SObjectType = "InvalidType"
+            SObjectType = "InvalidType",
         };
 
-        var options = new Options
+        var con = new Connection
         {
             AuthenticationMethod = AuthenticationMethod.OAuth2WithPassword,
-            AuthUrl = _authurl,
-            ClientID = _clientID,
-            ClientSecret = _clientSecret,
-            Username = _username,
-            Password = _password + _securityToken,
+            InstanceUrl = domain,
+            SecurityToken = securityToken,
+            ClientId = clientId,
+            ClientSecret = clientSecret,
+            Username = username,
+            Password = password,
         };
 
-        var result = await Salesforce.DeleteSObject(input, options, _cancellationToken);
+        var result = await Salesforce.DeleteSObject(input, con, cancellationToken);
         Assert.AreEqual(new HttpRequestException("Request failed with status code NotFound").ToString(), result.ErrorException.ToString());
     }
 
@@ -270,24 +273,26 @@ public class UnitTests
     {
         var input = new Input
         {
-            Domain = _domain,
-            ApiVersion = "v61.0",
+
             SObjectId = "123456789",
-            SObjectType = "Account"
+            SObjectType = "Account",
         };
 
-        var options = new Options
+        var con = new Connection
         {
             AuthenticationMethod = AuthenticationMethod.OAuth2WithPassword,
-            AuthUrl = _authurl,
-            ClientID = _clientID,
+            InstanceUrl = domain,
+            SecurityToken = securityToken,
+            ClientId = clientId,
             ClientSecret = "abcdefghijklmn123456789",
-            Username = _username,
-            Password = _password + _securityToken,
+            Username = username,
+            Password = password,
         };
 
-        var result = await Salesforce.DeleteSObject(input, options, _cancellationToken);
-        Assert.AreEqual(new HttpRequestException("Request failed with status code Unauthorized").ToString(), result.ErrorException.ToString());
+        var ex = await Assert.ThrowsExactlyAsync<Exception>(async () =>
+            await Salesforce.DeleteSObject(input, con, cancellationToken));
+
+        Assert.IsTrue(ex.Message.Contains("Failed to obtain access token"));
     }
 
     [TestMethod]
@@ -295,19 +300,19 @@ public class UnitTests
     {
         var input = new Input
         {
-            Domain = _domain,
-            ApiVersion = "v61.0",
+
             SObjectId = "Not valid id",
-            SObjectType = "Account"
+            SObjectType = "Account",
         };
 
-        var options = new Options
+        var con = new Connection
         {
+            InstanceUrl = domain,
             AuthenticationMethod = AuthenticationMethod.AccessToken,
-            AccessToken = await Salesforce.GetAccessToken(_authurl, _clientID, _clientSecret, _username, _password + _securityToken, _cancellationToken)
+            AccessToken = token,
         };
 
-        var result = await Salesforce.DeleteSObject(input, options, _cancellationToken);
+        var result = await Salesforce.DeleteSObject(input, con, cancellationToken);
         Assert.AreEqual(new HttpRequestException("Request failed with status code NotFound").ToString(), result.ErrorException.ToString());
     }
 
@@ -317,36 +322,69 @@ public class UnitTests
     {
         var input = new Input
         {
-            Domain = _domain,
-            ApiVersion = "v61.0",
+
             SObjectId = "123456789",
-            SObjectType = "Account"
+            SObjectType = "Account",
         };
 
-        var options = new Options
+        var con = new Connection
         {
             AuthenticationMethod = AuthenticationMethod.AccessToken,
-            AccessToken = await Salesforce.GetAccessToken(_authurl, _clientID, _clientSecret, _username, _password + _securityToken, _cancellationToken),
-            ThrowAnErrorIfNotFound = true
+            AccessToken = token,
+            ThrowAnErrorIfNotFound = true,
         };
 
-        await Salesforce.DeleteSObject(input, options, _cancellationToken);
+        await Salesforce.DeleteSObject(input, con, cancellationToken);
+    }
+
+    [TestMethod]
+    public async Task DeleteSObject_WithClientCredentials()
+    {
+        var id = await CreateSObject("Account", userJson);
+        var con = new Connection
+        {
+            InstanceUrl = domain,
+            ApiVersion = "v61.0",
+            AuthenticationMethod = AuthenticationMethod.OAuth2WithClientCredentials,
+            ClientId = clientId,
+            ClientSecret = clientSecret,
+        };
+        var result = await Salesforce.DeleteSObject(new Input { SObjectId = id, SObjectType = "Account" }, con, cancellationToken);
+        Assert.IsTrue(result.RequestIsSuccessful);
+    }
+
+    [TestMethod]
+    public async Task DeleteSObject_WithClientCredentials_ReturnToken()
+    {
+        var id = await CreateSObject("Account", userJson);
+        var con = new Connection
+        {
+            InstanceUrl = domain,
+            ApiVersion = "v61.0",
+            AuthenticationMethod = AuthenticationMethod.OAuth2WithClientCredentials,
+            ClientId = clientId,
+            ClientSecret = clientSecret,
+            ReturnAccessToken = true,
+        };
+        var result = await Salesforce.DeleteSObject(new Input { SObjectId = id, SObjectType = "Account" }, con, cancellationToken);
+        Assert.IsTrue(result.RequestIsSuccessful);
+        Assert.IsNotEmpty(result.Token);
     }
 
     // Helper method to create SObjects for delete function.
     private async Task<string> CreateSObject(string type, string input)
     {
-        var client = new RestClient(_domain + "/services/data/v54.0/sobjects/" + type);
+        var client = new RestClient(domain + "/services/data/v54.0/sobjects/" + type);
         var request = new RestRequest("/", Method.Post);
 
-        var accessToken = await Salesforce.GetAccessToken(_authurl, _clientID, _clientSecret, _username, _password + _securityToken, _cancellationToken);
+        var accessToken = token;
         request.AddHeader("Authorization", "Bearer " + accessToken);
 
         var json = JsonConvert.DeserializeObject<Dictionary<string, string>>(input);
         request.RequestFormat = DataFormat.Json;
         request.AddJsonBody(json);
 
-        var response = await client.ExecuteAsync(request, _cancellationToken);
+        var response = await client.ExecuteAsync(request, cancellationToken);
         var content = JsonConvert.DeserializeObject<dynamic>(response.Content);
 
         return content.id.ToString();
