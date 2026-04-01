@@ -1,34 +1,19 @@
 using System.ComponentModel;
-using System.ComponentModel.DataAnnotations;
-using System.Diagnostics.CodeAnalysis;
-using Frends.Common.Toolkit.Attributes;
-using Frends.Salesforce.Toolkit.Definitions;
+using Frends.Salesforce.PubSubConsume.Attributes;
 
 namespace Frends.Salesforce.PubSubConsume.Definitions;
 
 /// <summary>
 /// Connection parameters.
 /// </summary>
-public class Connection : IPubSubConnection
+public class Connection
 {
     /// <summary>
     /// Authentication method used to get a Salesforce access token.
     /// </summary>
     /// <example>UsernamePasswordOAuth</example>
     [DefaultValue(AuthenticationMethod.OAuth2WithPassword)]
-#pragma warning disable FT0017 // Third-party type from internal Frends toolkit
     public AuthenticationMethod AuthenticationMethod { get; set; } = AuthenticationMethod.OAuth2WithPassword;
-#pragma warning restore FT0017 // Third-party type from internal Frends toolkit
-
-    /// <summary>
-    /// Salesforce OAuth login URL.
-    /// </summary>
-    /// <example>https://login.salesforce.com</example>
-    [RequiredIf(
-        nameof(AuthenticationMethod),
-        AuthenticationMethod.OAuth2WithPassword,
-        AuthenticationMethod.OAuth2WithClientCredentials)]
-    public string AuthUrl { get; set; } = string.Empty;
 
     /// <summary>
     /// Salesforce Pub/Sub API endpoint.

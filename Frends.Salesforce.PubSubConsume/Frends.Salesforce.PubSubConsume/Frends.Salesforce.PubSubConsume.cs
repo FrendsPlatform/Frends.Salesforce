@@ -4,11 +4,10 @@ using System.ComponentModel;
 using System.Threading;
 using System.Threading.Tasks;
 using Eventbus.V1;
-using Frends.Common.Toolkit.Handlers;
 using Frends.Salesforce.PubSubConsume.Definitions;
 using Frends.Salesforce.PubSubConsume.Helpers;
-using Frends.Salesforce.Toolkit.Handlers;
 using Google.Protobuf;
+using ValidationHandler = Frends.Salesforce.PubSubConsume.Helpers.ValidationHandler;
 
 namespace Frends.Salesforce.PubSubConsume;
 

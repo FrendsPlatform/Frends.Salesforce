@@ -1,13 +1,13 @@
 using System.Text.Json.Serialization;
 
-namespace Frends.Salesforce.Toolkit.Definitions;
+namespace Frends.Salesforce.PubSubConsume.Definitions;
 
-public sealed class OAuthTokenResponse
+internal class OAuthTokenResponse
 {
     /// <summary>
     /// OAuth access token.
     /// </summary>
     /// <example>00Dxx0000000001!AQ8AQExampleToken</example>
     [JsonPropertyName("access_token")]
-    public required string AccessToken { get; set; }
+    internal required string AccessToken { get; set; }
 }

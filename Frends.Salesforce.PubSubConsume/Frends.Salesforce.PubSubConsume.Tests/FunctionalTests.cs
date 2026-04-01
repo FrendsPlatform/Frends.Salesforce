@@ -6,7 +6,6 @@ using Avro;
 using Avro.Generic;
 using Avro.IO;
 using Frends.Salesforce.PubSubConsume.Definitions;
-using Frends.Salesforce.Toolkit.Definitions;
 using NUnit.Framework;
 
 namespace Frends.Salesforce.PubSubConsume.Tests;
@@ -20,15 +19,14 @@ public class FunctionalTests : TestBase
         var input = new Input
         {
             TopicName = "/event/Test_Event__e",
-            NumberOfEvents = 3,
+            NumberOfEvents = 1,
             ReplayPreset = ReplayPresetOption.Earliest,
-            WaitTimeoutSeconds = 0,
+            WaitTimeoutSeconds = 2,
         };
 
         var connection = new Connection
         {
             AuthenticationMethod = AuthenticationMethod.OAuth2WithPassword,
-            AuthUrl = LoginUrl,
             PubSubApiUrl = PubSubApiUrl,
             InstanceUrl = InstanceUrl,
             TenantId = TenantId,

@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
-namespace Frends.Salesforce.CreateSObject.Tests.AttributesTests;
+namespace Frends.Salesforce.PubSubConsume.Tests.AttributesTests;
 
 public abstract class AttributeTestBase
 {

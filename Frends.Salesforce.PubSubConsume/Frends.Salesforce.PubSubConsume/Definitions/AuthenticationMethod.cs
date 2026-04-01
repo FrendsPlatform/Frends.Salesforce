@@ -1,4 +1,4 @@
-namespace Frends.Salesforce.Toolkit.Definitions;
+namespace Frends.Salesforce.PubSubConsume.Definitions;
 
 /// <summary>
 /// Authentication options to authenticate to Salesforce.
@@ -9,12 +9,14 @@ public enum AuthenticationMethod
     /// Authenticate with an access token.
     /// </summary>
     AccessToken = 0,
+
     /// <summary>
     /// Authenticate by providing required information to fetch OAuth2 access token.
     /// </summary>
     OAuth2WithPassword = 1,
+
     /// <summary>
     /// Authenticate by providing required information to fetch OAuth2 access token client_credentials.
     /// </summary>
-    OAuth2WithClientCredentials = 2
+    OAuth2WithClientCredentials = 2,
 }

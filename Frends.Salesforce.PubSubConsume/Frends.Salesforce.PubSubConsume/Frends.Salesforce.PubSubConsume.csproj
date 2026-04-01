@@ -20,7 +20,15 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Frends.Salesforce.Toolkit" Version="1.0.0" />
+        <PackageReference Include="Google.Protobuf" Version="3.34.1"/>
+        <PackageReference Include="Grpc.Core.Api" Version="2.76.0"/>
+        <PackageReference Include="Grpc.Net.Client" Version="2.76.0"/>
+        <PackageReference Include="Grpc.Tools" Version="2.76.0">
+            <PrivateAssets>all</PrivateAssets>
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
+        <PackageReference Include="Newtonsoft.Json" Version="13.0.3"/>
+        <PackageReference Include="RestSharp" Version="112.1.0"/>
         <PackageReference Include="StyleCop.Analyzers" Version="1.2.0-beta.556">
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -34,10 +42,20 @@
     <ItemGroup>
         <Content Include="migration.json" PackagePath="/" Pack="true"/>
         <Content Include="../CHANGELOG.md" PackagePath="/" Pack="true"/>
-		<Content Include="FrendsTaskMetadata.json"
-				 Pack="true"
-				 PackagePath="/"
-				 CopyToOutputDirectory="PreserveNewest" />
-		<AdditionalFiles Include="FrendsTaskMetadata.json" />
+        <Content Include="FrendsTaskMetadata.json"
+                 Pack="true"
+                 PackagePath="/"
+                 CopyToOutputDirectory="PreserveNewest"/>
+        <AdditionalFiles Include="FrendsTaskMetadata.json"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <Protobuf Include="Protos\pubsub_api.proto">
+            <Generator>MSBuild:Compile</Generator>
+        </Protobuf>
+    </ItemGroup>
+
+    <ItemGroup>
+        <InternalsVisibleTo Include="Frends.Salesforce.PubSubConsume.Tests"/>
     </ItemGroup>
 </Project>

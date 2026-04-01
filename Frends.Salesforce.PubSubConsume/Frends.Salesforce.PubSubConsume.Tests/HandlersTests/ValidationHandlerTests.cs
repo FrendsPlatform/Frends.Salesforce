@@ -1,18 +1,11 @@
 using System.ComponentModel.DataAnnotations;
-using Frends.Salesforce.CreateSObject.Helpers;
+using Frends.Salesforce.PubSubConsume.Helpers;
 using NUnit.Framework;
 
-namespace Frends.Salesforce.CreateSObject.Tests.HandlersTests;
+namespace Frends.Salesforce.PubSubConsume.Tests.HandlersTests;
 
 public class ValidationHandlerTests
 {
-    private class TestClass
-    {
-        [Required(ErrorMessage = "Name is required")]
-        public string Name { get; set; }
-    }
-
-
     [Test]
     public void BasicValidationShouldPass()
     {
@@ -26,8 +19,7 @@ public class ValidationHandlerTests
     [Test]
     public void ValidationShouldFailOnNullObject()
     {
-        TestClass foobar = null;
-        var ex = Assert.Throws<ValidationException>(() => ValidationHandler.Run(foobar));
+        var ex = Assert.Throws<ValidationException>(() => ValidationHandler.Run([null]));
         Assert.That(ex, Is.Not.Null);
         Assert.That(ex.Message, Contains.Substring("Validated object can't be null!"));
     }
@@ -56,5 +48,11 @@ public class ValidationHandlerTests
         Assert.That(ex, Is.Not.Null);
         Assert.That(ex.Message, Contains.Substring("Validated object can't be null!"));
         Assert.That(ex.Message, Contains.Substring("Name is required"));
+    }
+
+    private class TestClass
+    {
+        [Required(ErrorMessage = "Name is required")]
+        public string Name { get; set; }
     }
 }
