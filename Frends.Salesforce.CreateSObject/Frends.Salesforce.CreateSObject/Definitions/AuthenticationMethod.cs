@@ -6,11 +6,15 @@
 public enum AuthenticationMethod
 {
     /// <summary>
-    /// Authenticate with access token.
+    /// Authenticate with an access token.
     /// </summary>
-    AccessToken,
+    AccessToken = 0,
     /// <summary>
-    /// Authenticate by providing required informations to fetch OAuth2 access token.
+    /// Authenticate by providing required information to fetch OAuth2 access token.
     /// </summary>
-    OAuth2WithPassword
+    OAuth2WithPassword = 1,
+    /// <summary>
+    /// Authenticate by providing required information to fetch OAuth2 access token client_credentials.
+    /// </summary>
+    OAuth2WithClientCredentials = 2
 }
