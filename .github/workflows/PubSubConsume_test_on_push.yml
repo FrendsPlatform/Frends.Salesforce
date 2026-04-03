@@ -8,6 +8,7 @@ on:
       - main
     paths:
       - 'Frends.Salesforce.PubSubConsume/**'
+      - '.github/workflows/PubSubConsume*'
   workflow_dispatch:
 
 jobs:
