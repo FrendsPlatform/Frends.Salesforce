@@ -7,11 +7,30 @@ public abstract class TestBase
 {
     protected TestBase()
     {
-        // TODO: Here you can load environment variables used in tests
         DotEnv.Load();
-        SecretKey = Environment.GetEnvironmentVariable("FRENDS_SECRET_KEY");
+        PubSubApiUrl = Environment.GetEnvironmentVariable("SALESFORCE_PUBSUB_API_URL");
+        InstanceUrl = Environment.GetEnvironmentVariable("SALESFORCE_INSTANCE_URL");
+        TenantId = Environment.GetEnvironmentVariable("SALESFORCE_TENANT_ID");
+        ClientId = Environment.GetEnvironmentVariable("SALESFORCE_CLIENT_ID");
+        ClientSecret = Environment.GetEnvironmentVariable("SALESFORCE_CLIENT_SECRET");
+        Username = Environment.GetEnvironmentVariable("SALESFORCE_USERNAME");
+        Password = Environment.GetEnvironmentVariable("SALESFORCE_PASSWORD");
+        SecurityToken = Environment.GetEnvironmentVariable("SALESFORCE_SECURITY_TOKEN");
     }
 
-    // TODO: Replace with your secret key or remove if not needed
-    protected string SecretKey { get; }
+    protected string PubSubApiUrl { get; }
+
+    protected string InstanceUrl { get; }
+
+    protected string TenantId { get; }
+
+    protected string ClientId { get; }
+
+    protected string ClientSecret { get; }
+
+    protected string Username { get; }
+
+    protected string Password { get; }
+
+    protected string SecurityToken { get; }
 }

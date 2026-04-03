@@ -19,7 +19,7 @@ public class Input
     public string TopicName { get; set; }
 
     /// <summary>
-    /// The message payload to send (JSON string).
+    /// The message payload to send in Json format correct with topic schema.
     /// </summary>
     /// <example>{ "field": "value" }</example>
     [DisplayFormat(DataFormatString = "Text")]

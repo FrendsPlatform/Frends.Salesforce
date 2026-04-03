@@ -1,6 +1,8 @@
 ﻿using System;
 using System.ComponentModel;
 using System.Threading;
+using System.Threading.Tasks;
+using Eventbus.V1;
 using Frends.Salesforce.PubSubPublish.Definitions;
 using Frends.Salesforce.PubSubPublish.Helpers;
 
@@ -20,7 +22,7 @@ public static class Salesforce
     /// <param name="options">Additional parameters.</param>
     /// <param name="cancellationToken">A cancellation token provided by Frends Platform.</param>
     /// <returns>object { bool Success, string MessageId, object Error { string Message, Exception AdditionalInfo } }</returns>
-    public static Result PubSubPublish(
+    public static async Task<Result> PubSubPublish(
         [PropertyTab] Input input,
         [PropertyTab] Connection connection,
         [PropertyTab] Options options,
@@ -29,45 +31,63 @@ public static class Salesforce
         try
         {
             ValidationHandler.Run(input, connection);
-            var accessTokenTask = ConnectionHandler.GetAccessToken(connection, cancellationToken);
-            accessTokenTask.Wait(cancellationToken);
-            var accessToken = accessTokenTask.Result;
+            var accessToken = await ConnectionHandler.GetAccessToken(connection, cancellationToken);
             var client = ConnectionHandler.GetPubSubClient(connection);
-            var metadata = ConnectionHandler.GetMetadata(connection, accessToken);
-            var publishTask = GrpcHandler.PublishEventAsync(
+            var headers = ConnectionHandler.GetMetadata(connection, accessToken);
+
+            var topicInfo = await client.GetTopicAsync(
+                new TopicRequest
+                {
+                    TopicName = input.TopicName,
+                },
+                headers: headers,
+                cancellationToken: cancellationToken).ResponseAsync.ConfigureAwait(false);
+
+            var schemaInfo = await client.GetSchemaAsync(
+                new SchemaRequest
+                {
+                    SchemaId = topicInfo.SchemaId,
+                },
+                headers,
+                cancellationToken: cancellationToken).ResponseAsync.ConfigureAwait(false);
+
+            if (!topicInfo.CanSubscribe)
+            {
+                throw new InvalidOperationException(
+                    $"Salesforce topic '{input.TopicName}' is not subscribable for the current credentials.");
+            }
+
+            var publishTaskResult = await GrpcHandler.PublishEventAsync(
                 client,
-                metadata,
+                headers,
                 input.TopicName,
                 input.Payload,
+                schemaInfo,
                 input.Headers,
-                cancellationToken);
-            publishTask.Wait(cancellationToken);
-            var result = publishTask.Result;
+                cancellationToken).ConfigureAwait(false);
 
-            if (result?.Error != null && !string.IsNullOrEmpty(result.Error.Msg))
-            {
-                return new Result
-                {
-                    Success = false,
-                    MessageId = null,
-                    Error = new Error
-                    {
-                        Message = result.Error.Msg,
-                        AdditionalInfo = null,
-                    },
-                };
-            }
+            if (publishTaskResult?.Error != null && !string.IsNullOrEmpty(publishTaskResult.Error.Msg))
+                throw new Exception(publishTaskResult.Error.Msg);
 
             return new Result
             {
                 Success = true,
-                MessageId = result?.ReplayId != null ? Convert.ToBase64String(result.ReplayId.ToByteArray()) : null,
+                MessageId = publishTaskResult?.ReplayId != null
+                    ? Convert.ToBase64String(publishTaskResult.ReplayId.ToByteArray())
+                    : null,
                 Error = null,
             };
         }
         catch (Exception ex)
         {
             return ErrorHandler.Handle(ex, options.ThrowErrorOnFailure, options.ErrorMessageOnFailure);
+        }
+        finally
+        {
+            if (connection.ShutdownChannel)
+            {
+                await ConnectionHandler.ShutdownChannel().ConfigureAwait(false);
+            }
         }
     }
 }

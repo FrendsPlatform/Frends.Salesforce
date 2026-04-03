@@ -8,13 +8,6 @@ namespace Frends.Salesforce.PubSubPublish.Definitions;
 public class Options
 {
     /// <summary>
-    /// Fetch Avro schema JSON for each distinct schema ID encountered in the response.
-    /// </summary>
-    /// <example>true</example>
-    [DefaultValue(true)]
-    public bool ResolveSchemas { get; set; } = true;
-
-    /// <summary>
     /// Whether to throw an error on failure.
     /// </summary>
     /// <example>true</example>
