@@ -243,4 +243,4 @@ ModelManifest.xml
 .fake/
 
 # Dev env files
-.env*
+.env
