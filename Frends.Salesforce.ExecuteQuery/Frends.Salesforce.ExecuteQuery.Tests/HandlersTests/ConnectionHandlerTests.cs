@@ -120,14 +120,14 @@ public class ConnectionHandlerTests
     [TestMethod]
     public void ShouldReturnToken_IsFalse_When_AccessTokenMethod()
     {
-        var result  =  ConnectionHandler.ShouldReturnToken(AuthenticationMethod.AccessToken, true);
+        var result = ConnectionHandler.ShouldReturnToken(AuthenticationMethod.AccessToken, true);
         Assert.IsFalse(result);
     }
 
     [TestMethod]
     public void ShouldReturnToken_IsFalse_When_FlagIsFalse()
     {
-        var result  =  ConnectionHandler.ShouldReturnToken(AuthenticationMethod.OAuth2WithPassword, false);
+        var result = ConnectionHandler.ShouldReturnToken(AuthenticationMethod.OAuth2WithPassword, false);
         Assert.IsFalse(result);
     }
 

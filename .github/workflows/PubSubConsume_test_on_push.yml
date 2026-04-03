@@ -12,7 +12,7 @@ on:
 
 jobs:
   build:
-    uses: FrendsPlatform/FrendsTasks/.github/workflows/linux_build_test.yml@dae3215
+    uses: FrendsPlatform/FrendsTasks/.github/workflows/linux_build_test.yml@testsettings
     with:
       workdir: Frends.Salesforce.PubSubConsume
       dotnet_version: 8.0.x
