@@ -28,13 +28,16 @@ internal static class ConnectionHandler
 
     internal static PubSub.PubSubClient GetPubSubClient(Connection connection)
     {
-        channel ??= GrpcChannel.ForAddress(connection.PubSubApiUrl, new GrpcChannelOptions
+        if (channel == null || channel.State == ConnectivityState.Shutdown)
         {
-            HttpHandler = new SocketsHttpHandler
+            channel = GrpcChannel.ForAddress(connection.PubSubApiUrl, new GrpcChannelOptions
             {
-                EnableMultipleHttp2Connections = true,
-            },
-        });
+                HttpHandler = new SocketsHttpHandler
+                {
+                    EnableMultipleHttp2Connections = true,
+                },
+            });
+        }
 
         return new PubSub.PubSubClient(channel);
     }

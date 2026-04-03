@@ -1,7 +1,6 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using dotenv.net;
 using Frends.Salesforce.PubSubConsume.Definitions;
 using Frends.Salesforce.PubSubConsume.Helpers;
 using NUnit.Framework;

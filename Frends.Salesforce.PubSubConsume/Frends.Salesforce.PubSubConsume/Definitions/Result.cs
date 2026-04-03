@@ -38,12 +38,6 @@ public class Result
     public string LatestReplayIdBase64 { get; set; }
 
     /// <summary>
-    /// Number of events the server still considered pending in the latest response.
-    /// </summary>
-    /// <example>0</example>
-    public int PendingNumRequested { get; set; }
-
-    /// <summary>
     /// Events returned by the subscription.
     /// </summary>
     /// <example>object[] { object { string EventId, string SchemaId, string ReplayIdBase64, string PayloadBase64 } }</example>
