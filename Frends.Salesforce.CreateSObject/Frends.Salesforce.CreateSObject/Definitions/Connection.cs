@@ -24,6 +24,16 @@ public class Connection
     public string InstanceUrl { get; set; } = string.Empty;
 
     /// <summary>
+    /// Url used to authenticate to Salesforce with the OAuth2 password flow.
+    /// </summary>
+    /// <example>https://mydomain.my.salesforce.com</example>
+    [UIHint(nameof(AuthenticationMethod), "", AuthenticationMethod.OAuth2WithPassword)]
+    [RequiredIf(nameof(AuthenticationMethod), AuthenticationMethod.OAuth2WithPassword)]
+    [DefaultValue("https://login.salesforce.com")]
+    [DisplayFormat(DataFormatString = "Text")]
+    public string AuthUrl { get; set; } = "https://login.salesforce.com";
+
+    /// <summary>
     /// Reusable Salesforce access token. Required when using the AccessToken authentication method.
     /// </summary>
     /// <example>00Dxx0000000001!AQ8AQExampleToken</example>
@@ -37,7 +47,8 @@ public class Connection
     /// OAuth connected app client ID.
     /// </summary>
     /// <example>3MVG9d8..ExampleClientId</example>
-    [UIHint(nameof(AuthenticationMethod), "", AuthenticationMethod.OAuth2WithPassword, AuthenticationMethod.OAuth2WithClientCredentials)]
+    [UIHint(nameof(AuthenticationMethod), "", AuthenticationMethod.OAuth2WithPassword,
+        AuthenticationMethod.OAuth2WithClientCredentials)]
     [RequiredIf(
         nameof(AuthenticationMethod),
         AuthenticationMethod.OAuth2WithPassword,
@@ -49,7 +60,8 @@ public class Connection
     /// </summary>
     /// <example>ExampleClientSecret</example>
     [PasswordPropertyText]
-    [UIHint(nameof(AuthenticationMethod), "", AuthenticationMethod.OAuth2WithPassword, AuthenticationMethod.OAuth2WithClientCredentials)]
+    [UIHint(nameof(AuthenticationMethod), "", AuthenticationMethod.OAuth2WithPassword,
+        AuthenticationMethod.OAuth2WithClientCredentials)]
     [RequiredIf(
         nameof(AuthenticationMethod),
         AuthenticationMethod.OAuth2WithPassword,
@@ -93,6 +105,7 @@ public class Connection
     /// </summary>
     /// <example>true</example>
     [DefaultValue(false)]
-    [UIHint(nameof(AuthenticationMethod), "", AuthenticationMethod.OAuth2WithPassword, AuthenticationMethod.OAuth2WithClientCredentials)]
+    [UIHint(nameof(AuthenticationMethod), "", AuthenticationMethod.OAuth2WithPassword,
+        AuthenticationMethod.OAuth2WithClientCredentials)]
     public bool ReturnAccessToken { get; set; }
 }

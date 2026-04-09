@@ -75,7 +75,7 @@ internal static class ConnectionHandler
         switch (connection.AuthenticationMethod)
         {
             case AuthenticationMethod.OAuth2WithPassword:
-                authRequest = new RestRequest("https://login.salesforce.com" + "/services/oauth2/token", Method.Post);
+                authRequest = new RestRequest(connection.AuthUrl + "/services/oauth2/token", Method.Post);
                 authRequest.AddParameter("grant_type", "password");
                 authRequest.AddParameter("client_id", connection.ClientId);
                 authRequest.AddParameter("client_secret", connection.ClientSecret);

@@ -24,6 +24,16 @@ public class Connection
     public string InstanceUrl { get; set; } = string.Empty;
 
     /// <summary>
+    /// Url used to authenticate to Salesforce with the OAuth2 password flow.
+    /// </summary>
+    /// <example>https://mydomain.my.salesforce.com</example>
+    [UIHint(nameof(AuthenticationMethod), "", AuthenticationMethod.OAuth2WithPassword)]
+    [RequiredIf(nameof(AuthenticationMethod), AuthenticationMethod.OAuth2WithPassword)]
+    [DefaultValue("https://login.salesforce.com")]
+    [DisplayFormat(DataFormatString = "Text")]
+    public string AuthUrl { get; set; } = "https://login.salesforce.com";
+
+    /// <summary>
     /// Reusable Salesforce access token. Required when using the AccessToken authentication method.
     /// </summary>
     /// <example>00Dxx0000000001!AQ8AQExampleToken</example>

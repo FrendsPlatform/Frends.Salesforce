@@ -19,11 +19,11 @@ namespace Frends.Salesforce.DeleteSObject;
 public class Salesforce
 {
     /// <summary>
-    /// Deletes a sobject from Salesforce.
+    /// Deletes a SObject from Salesforce.
     /// [Documentation](https://tasks.frends.com/tasks/frends-tasks/Frends.Salesforce.DeleteSObject)
     /// </summary>
     /// <param name="input">Information to delete the sobject.</param>
-    /// <param name="options">Information about the salesforce destination.</param>
+    /// <param name="connection">Information about the Salesforce connection.</param>
     /// <param name="cancellationToken"></param>
     /// <returns>Object { object Body, bool RequestIsSuccessful, Exception ErrorException, string ErrorMessage, string Token }</returns>
     public static async Task<Result> DeleteSObject(
