@@ -1,0 +1,74 @@
+[
+  {
+    "Task": "Frends.Salesforce.UpdateSObject",
+    "Migrations": [
+      {
+        "Version": "3.0.0",
+        "Description": "Move connection and authentication settings to Connection tab.",
+        "Migration": [
+          {
+            "Type": "Copy",
+            "Source": "Input.Domain",
+            "Target": "Connection.InstanceUrl"
+          },
+          {
+            "Type": "Copy",
+            "Source": "Input.ApiVersion",
+            "Target": "Connection.ApiVersion"
+          },
+          {
+            "Type": "Copy",
+            "Source": "Options.AuthenticationMethod",
+            "Target": "Connection.AuthenticationMethod"
+          },
+          {
+            "Type": "Copy",
+            "Source": "Options.AccessToken",
+            "Target": "Connection.AccessToken"
+          },
+          {
+            "Type": "Copy",
+            "Source": "Options.AuthUrl",
+            "Target": "Connection.AuthUrl"
+          },
+          {
+            "Type": "Copy",
+            "Source": "Options.ClientID",
+            "Target": "Connection.ClientId"
+          },
+          {
+            "Type": "Copy",
+            "Source": "Options.ClientSecret",
+            "Target": "Connection.ClientSecret"
+          },
+          {
+            "Type": "Copy",
+            "Source": "Options.Username",
+            "Target": "Connection.Username"
+          },
+          {
+            "Type": "Copy",
+            "Source": "Options.Password",
+            "Target": "Connection.Password"
+          },
+          {
+            "Type": "Copy",
+            "Source": "Options.SecurityToken",
+            "Target": "Connection.SecurityToken"
+          },
+          {
+            "Type": "Copy",
+            "Source": "Options.ReturnAccessToken",
+            "Target": "Connection.ReturnAccessToken"
+          },
+          {
+            "Type": "Copy",
+            "Source": "Options.ThrowAnErrorIfNotFound",
+            "Target": "Connection.ThrowAnErrorIfNotFound"
+          }
+        ]
+      }
+    ]
+  }
+]
+
