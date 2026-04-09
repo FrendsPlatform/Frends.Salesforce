@@ -56,7 +56,7 @@ public static class Salesforce
             var response = await client.ExecuteAsync(request, cancellationToken);
             var content = JsonConvert.DeserializeObject<dynamic>(response.Content);
 
-            if (connection.ThrowAnErrorIfNotFound && response.ErrorException.ToString()
+            if (connection.ThrowAnErrorIfNotFound && response.ErrorException != null && response.ErrorException.ToString()
                     .Equals(new HttpRequestException("Request failed with status code NotFound").ToString()))
                 throw new HttpRequestException("Target couldn't be found with given id or type.");
 

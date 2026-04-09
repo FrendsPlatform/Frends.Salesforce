@@ -1,6 +1,6 @@
 # Frends.Salesforce.PubSubConsume
 
-Task to consume salesforce messages with a Pub/Sub API
+Task to consume Salesforce messages with a Pub/Sub API
 
 [![PubSubConsume_build](https://github.com/FrendsPlatform/Frends.Salesforce/actions/workflows/PubSubConsume_test_on_main.yml/badge.svg)](https://github.com/FrendsPlatform/Frends.Salesforce/actions/workflows/PubSubConsume_test_on_main.yml)
 ![Coverage](https://app-github-custom-badges.azurewebsites.net/Badge?key=FrendsPlatform/Frends.Salesforce/Frends.Salesforce.PubSubConsume|main)

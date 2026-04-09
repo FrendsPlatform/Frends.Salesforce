@@ -39,7 +39,7 @@ public class UnitTests
         clientSecret = Environment.GetEnvironmentVariable("SALESFORCE_CLIENT_SECRET");
         password = Environment.GetEnvironmentVariable("SALESFORCE_PASSWORD");
         securityToken = Environment.GetEnvironmentVariable("SALESFORCE_SECURITY_TOKEN");
-        clientId = Environment.GetEnvironmentVariable("SALESFORCE_ClientId");
+        clientId = Environment.GetEnvironmentVariable("SALESFORCE_CLIENTID");
         username = Environment.GetEnvironmentVariable("SALESFORCE_USERNAME");
         domain = Environment.GetEnvironmentVariable("SALESFORCE_DOMAIN_URL");
 

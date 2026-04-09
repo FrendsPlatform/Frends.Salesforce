@@ -86,6 +86,7 @@ public class Connection
     /// </summary>
     /// <example>ExampleSecurityToken</example>
     [PasswordPropertyText]
+    [UIHint(nameof(AuthenticationMethod), "", AuthenticationMethod.OAuth2WithPassword)]
     public string SecurityToken { get; set; } = string.Empty;
 
     /// <summary>

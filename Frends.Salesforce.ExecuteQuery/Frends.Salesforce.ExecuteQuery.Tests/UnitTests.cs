@@ -27,7 +27,7 @@ public class UnitTests
         clientSecret = Environment.GetEnvironmentVariable("SALESFORCE_CLIENT_SECRET");
         password = Environment.GetEnvironmentVariable("SALESFORCE_PASSWORD");
         securityToken = Environment.GetEnvironmentVariable("SALESFORCE_SECURITY_TOKEN");
-        clientId = Environment.GetEnvironmentVariable("SALESFORCE_ClientId");
+        clientId = Environment.GetEnvironmentVariable("SALESFORCE_CLIENTID");
         username = Environment.GetEnvironmentVariable("SALESFORCE_USERNAME");
         domain = Environment.GetEnvironmentVariable("SALESFORCE_DOMAIN_URL");
 
@@ -104,6 +104,7 @@ public class UnitTests
         Assert.IsNotEmpty(result.Token);
     }
 
+    [TestMethod]
     public async Task ExecuteQuery_QueryWithoutSpecifiedApi()
     {
         var input = new Input
@@ -226,7 +227,7 @@ public class UnitTests
     }
 
     [TestMethod]
-    public async Task DeleteSObject_WithClientCredentials()
+    public async Task ExecuteQuery_WithClientCredentials()
     {
         var input = new Input
         {
@@ -247,7 +248,7 @@ public class UnitTests
     }
 
     [TestMethod]
-    public async Task DeleteSObject_WithClientCredentials_ReturnToken()
+    public async Task ExecuteQuery_WithClientCredentials_ReturnToken()
     {
         var input = new Input
         {

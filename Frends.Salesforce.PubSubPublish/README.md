@@ -1,6 +1,6 @@
 # Frends.Salesforce.PubSubPublish
 
-Task to publish salesforce messages with a Pub/Sub API
+Task to publish Salesforce messages with a Pub/Sub API
 
 [![PubSubPublish_build](https://github.com/FrendsPlatform/Frends.Salesforce/actions/workflows/PubSubPublish_test_on_main.yml/badge.svg)](https://github.com/FrendsPlatform/Frends.Salesforce/actions/workflows/PubSubPublish_test_on_main.yml)
 ![Coverage](https://app-github-custom-badges.azurewebsites.net/Badge?key=FrendsPlatform/Frends.Salesforce/Frends.Salesforce.PubSubPublish|main)

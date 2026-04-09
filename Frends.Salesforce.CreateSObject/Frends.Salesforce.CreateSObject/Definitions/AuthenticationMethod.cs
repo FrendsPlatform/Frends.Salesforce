@@ -14,7 +14,7 @@ public enum AuthenticationMethod
     /// </summary>
     OAuth2WithPassword = 1,
     /// <summary>
-    /// Authenticate by providing required information to fetch OAuth2 access token client_credentials.
+    /// Authenticate using OAuth2 client credentials grant flow.
     /// </summary>
     OAuth2WithClientCredentials = 2
 }

@@ -79,7 +79,6 @@ public class Connection
     /// <example>ExampleSecurityToken</example>
     [PasswordPropertyText]
     [UIHint(nameof(AuthenticationMethod), "", AuthenticationMethod.OAuth2WithPassword)]
-    [RequiredIf(nameof(AuthenticationMethod), AuthenticationMethod.OAuth2WithPassword)]
     public string SecurityToken { get; set; } = string.Empty;
 
     /// <summary>
@@ -96,12 +95,4 @@ public class Connection
     [DefaultValue(false)]
     [UIHint(nameof(AuthenticationMethod), "", AuthenticationMethod.OAuth2WithPassword, AuthenticationMethod.OAuth2WithClientCredentials)]
     public bool ReturnAccessToken { get; set; }
-
-    /// <summary>
-    /// Set whether process will throw an error if targeted id can not be found from Salesforce.
-    /// </summary>
-    /// <example>true</example>
-    [DefaultValue(false)]
-    [UIHint(nameof(AuthenticationMethod), "", AuthenticationMethod.OAuth2WithPassword, AuthenticationMethod.OAuth2WithClientCredentials)]
-    public bool ThrowAnErrorIfNotFound { get; set; }
 }
