@@ -115,7 +115,6 @@ public class UnitTests
         var con = new Connection
         {
             InstanceUrl = domain,
-            ApiVersion = "",
             AuthenticationMethod = AuthenticationMethod.AccessToken,
             AccessToken = token,
         };
