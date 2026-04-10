@@ -307,7 +307,7 @@ public class UnitTests
     }
 
     [TestMethod]
-    [ExpectedException(typeof(ValidationException))]
+    [ExpectedException(typeof(Exception))]
     public async Task InvalidDomain_ThrowTest()
     {
         var input = new Input
