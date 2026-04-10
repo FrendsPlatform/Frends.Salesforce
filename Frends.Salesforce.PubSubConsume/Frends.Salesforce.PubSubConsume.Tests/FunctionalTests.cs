@@ -118,8 +118,12 @@ public class FunctionalTests : TestBase
     [Test]
     public async Task ConsumedMessageCanBeCorrectlyParsed()
     {
+        input.WaitTimeoutSeconds = 10;
         var result = await Salesforce.PubSubConsume(input, connection, options, CancellationToken.None);
         var messages = new List<string>();
+
+        if (result.Events.Count == 0)
+            Assert.Fail("No events were consumed, cannot test message parsing.");
 
         foreach (var ev in result.Events)
         {
