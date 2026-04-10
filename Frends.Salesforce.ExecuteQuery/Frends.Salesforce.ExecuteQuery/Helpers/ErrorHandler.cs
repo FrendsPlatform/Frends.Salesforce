@@ -1,4 +1,5 @@
 ﻿using System;
+using Frends.Salesforce.ExecuteQuery.Definitions;
 
 namespace Frends.Salesforce.ExecuteQuery.Helpers;
 

@@ -1,34 +1,37 @@
 ﻿using System;
-using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using Frends.Salesforce.ExecuteQuery.Definitions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using dotenv.net;
-using NUnit.Framework.Internal;
 
 namespace Frends.Salesforce.ExecuteQuery.Tests;
+
 [TestClass]
 public class UnitTests
 {
-    private readonly string _clientSecret = Environment.GetEnvironmentVariable("Salesforce_Client_Secret");
-    private readonly string _password = Environment.GetEnvironmentVariable("Salesforce_Password");
-    private readonly string _securityToken = Environment.GetEnvironmentVariable("Salesforce_Security_Token");
-    private readonly string _clientID = Environment.GetEnvironmentVariable("Salesforce_ClientID");
-    private readonly string _username = Environment.GetEnvironmentVariable("Salesforce_Username");
-    private readonly string _domain = Environment.GetEnvironmentVariable("Salesforce_Domain_Url");
-    private readonly string _authurl = Environment.GetEnvironmentVariable("Salesforce_Auth_Url");
-    private readonly CancellationToken _cancellationToken = new();
+    private static string clientSecret;
+    private static string password;
+    private static string securityToken;
+    private static string clientId;
+    private static string username;
+    private static string domain;
+    private static string token;
+
+    private readonly CancellationToken cancellationToken = CancellationToken.None;
 
     [ClassInitialize]
-    public static void TestInitialize(TestContext testContext)
+    public static async Task TestInitialize(TestContext testContext)
     {
-        // load envs
-        var root = Directory.GetCurrentDirectory();
-        var projDir = Directory.GetParent(root)?.Parent?.Parent?.FullName;
-        DotEnv.Load(
-            options: new DotEnvOptions(
-                envFilePaths: new[] { $"{projDir}{Path.DirectorySeparatorChar}.env.local" }));
+        DotEnv.Load();
+        clientSecret = Environment.GetEnvironmentVariable("SALESFORCE_CLIENT_SECRET");
+        password = Environment.GetEnvironmentVariable("SALESFORCE_PASSWORD");
+        securityToken = Environment.GetEnvironmentVariable("SALESFORCE_SECURITY_TOKEN");
+        clientId = Environment.GetEnvironmentVariable("SALESFORCE_CLIENTID");
+        username = Environment.GetEnvironmentVariable("SALESFORCE_USERNAME");
+        domain = Environment.GetEnvironmentVariable("SALESFORCE_DOMAIN_URL");
+
+        token = await TestHelper.GetAccessToken(domain, clientId, clientSecret);
     }
 
     [TestMethod]
@@ -36,18 +39,18 @@ public class UnitTests
     {
         var input = new Input
         {
-            Domain = _domain,
             Query = "SELECT Name from Customer",
-            ApiVersion = "v61.0"
         };
 
-        var options = new Options
+        var con = new Connection
         {
+            InstanceUrl = domain,
+            ApiVersion = "v61.0",
             AuthenticationMethod = AuthenticationMethod.AccessToken,
-            AccessToken = await Salesforce.GetAccessToken(_authurl, _clientID, _clientSecret, _username, _password + _securityToken, _cancellationToken)
+            AccessToken = token,
         };
 
-        var result = await Salesforce.ExecuteQuery(input, options, _cancellationToken);
+        var result = await Salesforce.ExecuteQuery(input, con, cancellationToken);
         Assert.IsTrue(result.RequestIsSuccessful);
     }
 
@@ -56,23 +59,22 @@ public class UnitTests
     {
         var input = new Input
         {
-            Domain = _domain,
             Query = "SELECT Name from Customer",
-            ApiVersion = "v61.0"
         };
 
-        var options = new Options
+        var con = new Connection
         {
+            InstanceUrl = domain,
+            ApiVersion = "v61.0",
             AuthenticationMethod = AuthenticationMethod.OAuth2WithPassword,
-            AuthUrl = _authurl,
-            ClientID = _clientID,
-            ClientSecret = _clientSecret,
-            Username = _username,
-            Password = _password,
-            SecurityToken = _securityToken
+            ClientId = clientId,
+            ClientSecret = clientSecret,
+            Username = username,
+            Password = password,
+            SecurityToken = securityToken,
         };
 
-        var result = await Salesforce.ExecuteQuery(input, options, _cancellationToken);
+        var result = await Salesforce.ExecuteQuery(input, con, cancellationToken);
         Assert.IsTrue(result.RequestIsSuccessful);
     }
 
@@ -81,45 +83,43 @@ public class UnitTests
     {
         var input = new Input
         {
-            Domain = _domain,
             Query = "SELECT Name from Customer",
-            ApiVersion = "v61.0"
         };
 
-        var options = new Options
+        var con = new Connection
         {
+            InstanceUrl = domain,
+            ApiVersion = "v61.0",
             AuthenticationMethod = AuthenticationMethod.OAuth2WithPassword,
-            AuthUrl = _authurl,
-            ClientID = _clientID,
-            ClientSecret = _clientSecret,
-            Username = _username,
-            Password = _password,
-            SecurityToken = _securityToken,
-            ReturnAccessToken = true
+            ClientId = clientId,
+            ClientSecret = clientSecret,
+            Username = username,
+            Password = password,
+            SecurityToken = securityToken,
+            ReturnAccessToken = true,
         };
 
-        var result = await Salesforce.ExecuteQuery(input, options, _cancellationToken);
-        var accessToken = await Salesforce.GetAccessToken(_authurl, _clientID, _clientSecret, _username, _password + _securityToken, _cancellationToken);
+        var result = await Salesforce.ExecuteQuery(input, con, cancellationToken);
         Assert.IsTrue(result.RequestIsSuccessful);
-        Assert.AreEqual(result.Token, accessToken);
+        Assert.IsNotEmpty(result.Token);
     }
 
+    [TestMethod]
     public async Task ExecuteQuery_QueryWithoutSpecifiedApi()
     {
         var input = new Input
         {
-            Domain = _domain,
             Query = "SELECT Name from Customer",
-            ApiVersion = ""
         };
 
-        var options = new Options
+        var con = new Connection
         {
+            InstanceUrl = domain,
             AuthenticationMethod = AuthenticationMethod.AccessToken,
-            AccessToken = await Salesforce.GetAccessToken(_authurl, _clientID, _clientSecret, _username, _password + _securityToken, _cancellationToken)
+            AccessToken = token,
         };
 
-        var result = await Salesforce.ExecuteQuery(input, options, _cancellationToken);
+        var result = await Salesforce.ExecuteQuery(input, con, cancellationToken);
         Assert.IsTrue(result.RequestIsSuccessful);
     }
 
@@ -130,18 +130,18 @@ public class UnitTests
     {
         var input = new Input
         {
-            Domain = _domain,
             Query = null,
-            ApiVersion = "v61.0"
         };
 
-        var options = new Options
+        var con = new Connection
         {
+            InstanceUrl = domain,
+            ApiVersion = "v61.0",
             AuthenticationMethod = AuthenticationMethod.AccessToken,
-            AccessToken = await Salesforce.GetAccessToken(_authurl, _clientID, _clientSecret, _username, _password + _securityToken, _cancellationToken)
+            AccessToken = token,
         };
 
-        await Salesforce.ExecuteQuery(input, options, _cancellationToken);
+        await Salesforce.ExecuteQuery(input, con, cancellationToken);
     }
 
     [TestMethod]
@@ -150,18 +150,18 @@ public class UnitTests
     {
         var input = new Input
         {
-            Domain = _domain,
             Query = "SELECT Name from Customer",
-            ApiVersion = "v61.0"
         };
 
-        var options = new Options
+        var con = new Connection
         {
+            InstanceUrl = domain,
+            ApiVersion = "v61.0",
             AuthenticationMethod = AuthenticationMethod.AccessToken,
-            AccessToken = " "
+            AccessToken = " ",
         };
 
-        await Salesforce.ExecuteQuery(input, options, _cancellationToken);
+        await Salesforce.ExecuteQuery(input, con, cancellationToken);
     }
 
     [TestMethod]
@@ -170,18 +170,18 @@ public class UnitTests
     {
         var input = new Input
         {
-            Domain = null,
             Query = "SELECT Name from Customer",
-            ApiVersion = "v61.0"
         };
 
-        var options = new Options
+        var con = new Connection
         {
+            InstanceUrl = null,
+            ApiVersion = "v61.0",
             AuthenticationMethod = AuthenticationMethod.AccessToken,
-            AccessToken = await Salesforce.GetAccessToken(_authurl, _clientID, _clientSecret, _username, _password + _securityToken, _cancellationToken)
+            AccessToken = token,
         };
 
-        await Salesforce.ExecuteQuery(input, options, _cancellationToken);
+        await Salesforce.ExecuteQuery(input, con, cancellationToken);
     }
 
     [TestMethod]
@@ -190,18 +190,18 @@ public class UnitTests
     {
         var input = new Input
         {
-            Domain = "https://mycompany.my.salesforce.com",
             Query = "SELECT Name from Customer",
-            ApiVersion = "v61.0"
         };
 
-        var options = new Options
+        var con = new Connection
         {
+            InstanceUrl = "https://invalid-mycompany.my.salesforce.com",
+            ApiVersion = "v61.0",
             AuthenticationMethod = AuthenticationMethod.AccessToken,
-            AccessToken = await Salesforce.GetAccessToken(_authurl, _clientID, _clientSecret, _username, _password + _securityToken, _cancellationToken)
+            AccessToken = token,
         };
 
-        await Salesforce.ExecuteQuery(input, options, _cancellationToken);
+        await Salesforce.ExecuteQuery(input, con, cancellationToken);
     }
 
     [TestMethod]
@@ -209,19 +209,63 @@ public class UnitTests
     {
         var input = new Input
         {
-            Domain = _domain,
             Query = "SELECT NAME from Invalid",
-            ApiVersion = "v61.0"
         };
 
-        var options = new Options
+        var con = new Connection
         {
+            InstanceUrl = domain,
+            ApiVersion = "v61.0",
             AuthenticationMethod = AuthenticationMethod.AccessToken,
-            AccessToken = await Salesforce.GetAccessToken(_authurl, _clientID, _clientSecret, _username, _password + _securityToken, _cancellationToken)
+            AccessToken = token,
         };
 
-        var result = await Salesforce.ExecuteQuery(input, options, _cancellationToken);
+        var result = await Salesforce.ExecuteQuery(input, con, cancellationToken);
         Assert.IsNotNull(result.ErrorMessage);
         StringAssert.Contains(result.ErrorMessage, "sObject type 'Invalid' is not supported.");
+    }
+
+    [TestMethod]
+    public async Task ExecuteQuery_WithClientCredentials()
+    {
+        var input = new Input
+        {
+            Query = "SELECT Name from Customer",
+        };
+
+        var con = new Connection
+        {
+            InstanceUrl = domain,
+            ApiVersion = "v61.0",
+            AuthenticationMethod = AuthenticationMethod.OAuth2WithClientCredentials,
+            ClientId = clientId,
+            ClientSecret = clientSecret,
+        };
+
+        var result = await Salesforce.ExecuteQuery(input, con, cancellationToken);
+        Assert.IsTrue(result.RequestIsSuccessful);
+    }
+
+    [TestMethod]
+    public async Task ExecuteQuery_WithClientCredentials_ReturnToken()
+    {
+        var input = new Input
+        {
+            Query = "SELECT Name from Customer",
+        };
+
+        var con = new Connection
+        {
+            InstanceUrl = domain,
+            ApiVersion = "v61.0",
+            AuthenticationMethod = AuthenticationMethod.OAuth2WithClientCredentials,
+            ClientId = clientId,
+            ClientSecret = clientSecret,
+            ReturnAccessToken = true,
+        };
+
+        var result = await Salesforce.ExecuteQuery(input, con, cancellationToken);
+        Assert.IsTrue(result.RequestIsSuccessful);
+        Assert.IsNotEmpty(result.Token);
     }
 }

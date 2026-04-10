@@ -6,6 +6,7 @@
 *.user
 *.userosscache
 *.sln.docstates
+.idea/
 
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs
@@ -242,4 +243,4 @@ ModelManifest.xml
 .fake/
 
 # Dev env files
-.env*
+.env

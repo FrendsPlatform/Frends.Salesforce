@@ -1,7 +1,6 @@
-﻿using Newtonsoft.Json.Linq;
-using System;
+﻿using System;
 
-namespace Frends.Salesforce.ExecuteQuery;
+namespace Frends.Salesforce.ExecuteQuery.Definitions;
 
 /// <summary>
 /// Result-class for ExecuteQuery-task.
