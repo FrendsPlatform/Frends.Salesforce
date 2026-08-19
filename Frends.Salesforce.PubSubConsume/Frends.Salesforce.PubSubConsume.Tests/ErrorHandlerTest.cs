@@ -14,8 +14,8 @@ public class ErrorHandlerTest
     [Test]
     public void Should_Throw_Error_When_ThrowErrorOnFailure_Is_True()
     {
-        var ex = Assert.ThrowsAsync<Exception>(() =>
-            Salesforce.PubSubConsume(new Input(), new Connection(), new Options(), CancellationToken.None));
+        var ex = Assert.ThrowsAsync<Exception>((Func<Task>)(() =>
+            Salesforce.PubSubConsume(new Input(), new Connection(), new Options(), CancellationToken.None)));
         Assert.That(ex, Is.Not.Null);
     }
 
@@ -38,8 +38,8 @@ public class ErrorHandlerTest
         {
             ErrorMessageOnFailure = CustomErrorMessage,
         };
-        var ex = Assert.ThrowsAsync<Exception>(() =>
-            Salesforce.PubSubConsume(new Input(), new Connection(), options, CancellationToken.None));
+        var ex = Assert.ThrowsAsync<Exception>((Func<Task>)(() =>
+            Salesforce.PubSubConsume(new Input(), new Connection(), options, CancellationToken.None)));
         Assert.That(ex, Is.Not.Null);
         Assert.That(ex.Message, Contains.Substring(CustomErrorMessage));
     }
