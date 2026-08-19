@@ -33,7 +33,7 @@ public class Connection
     /// <summary>
     /// Url used to authenticate to Salesforce with the OAuth2 password flow.
     /// </summary>
-    /// <example>https://mydomain.my.salesforce.com</example>
+    /// <example>https://mydomain.your.salesforce.com</example>
     [UIHint(nameof(AuthenticationMethod), "", AuthenticationMethod.OAuth2WithPassword)]
     [RequiredIf(nameof(AuthenticationMethod), AuthenticationMethod.OAuth2WithPassword)]
     [DefaultValue("https://login.salesforce.com")]
