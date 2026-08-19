@@ -9,7 +9,7 @@ namespace Frends.Salesforce.PubSubConsume.Tests;
 [TestFixture]
 public class ErrorHandlerTest
 {
-    private const string CustomErrorMessage = "CustomErrorMessage";
+    private const string CustomErrorMessage = "CustomErrorMessage.";
 
     [Test]
     public void Should_Throw_Error_When_ThrowErrorOnFailure_Is_True()
