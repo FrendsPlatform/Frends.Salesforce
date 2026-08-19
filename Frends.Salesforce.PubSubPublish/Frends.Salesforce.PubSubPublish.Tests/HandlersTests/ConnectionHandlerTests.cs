@@ -41,8 +41,8 @@ public class ConnectionHandlerTests : TestBase
     {
         connection.AuthenticationMethod = AuthenticationMethod.OAuth2WithPassword;
         connection.Password = "invalid";
-        var ex = Assert.ThrowsAsync<Exception>(async () =>
-            await ConnectionHandler.GetAccessToken(connection, CancellationToken.None));
+        var ex = Assert.ThrowsAsync<Exception>(new AsyncTestDelegate(() =>
+            ConnectionHandler.GetAccessToken(connection, CancellationToken.None)));
 
         Assert.That(ex, Is.Not.Null);
         Assert.That(ex.Message.Contains("Failed to obtain access token"), Is.True);
@@ -53,8 +53,8 @@ public class ConnectionHandlerTests : TestBase
     {
         connection.AuthenticationMethod = AuthenticationMethod.OAuth2WithPassword;
         connection.Username = "invalid";
-        var ex = Assert.ThrowsAsync<Exception>(async () =>
-            await ConnectionHandler.GetAccessToken(connection, CancellationToken.None));
+        var ex = Assert.ThrowsAsync<Exception>(new AsyncTestDelegate(() =>
+            ConnectionHandler.GetAccessToken(connection, CancellationToken.None)));
 
         Assert.That(ex, Is.Not.Null);
         Assert.That(ex.Message.Contains("Failed to obtain access token"), Is.True);
@@ -74,8 +74,8 @@ public class ConnectionHandlerTests : TestBase
     {
         connection.AuthenticationMethod = AuthenticationMethod.OAuth2WithPassword;
         connection.ClientId = "invalid";
-        var ex = Assert.ThrowsAsync<Exception>(async () =>
-            await ConnectionHandler.GetAccessToken(connection, CancellationToken.None));
+        var ex = Assert.ThrowsAsync<Exception>(new AsyncTestDelegate(() =>
+            ConnectionHandler.GetAccessToken(connection, CancellationToken.None)));
 
         Assert.That(ex, Is.Not.Null);
         Assert.That(ex.Message.Contains("Failed to obtain access token"), Is.True);
@@ -87,8 +87,8 @@ public class ConnectionHandlerTests : TestBase
         connection.AuthenticationMethod = AuthenticationMethod.OAuth2WithPassword;
         connection.ClientSecret = "invalid";
 
-        var ex = Assert.ThrowsAsync<Exception>(async () =>
-            await ConnectionHandler.GetAccessToken(connection, CancellationToken.None));
+        var ex = Assert.ThrowsAsync<Exception>(new AsyncTestDelegate(() =>
+            ConnectionHandler.GetAccessToken(connection, CancellationToken.None)));
 
         Assert.That(ex, Is.Not.Null);
         Assert.That(ex.Message.Contains("Failed to obtain access token"), Is.True);
@@ -99,8 +99,8 @@ public class ConnectionHandlerTests : TestBase
     {
         connection.AuthenticationMethod = AuthenticationMethod.OAuth2WithPassword;
         connection.SecurityToken = "invalid";
-        var ex = Assert.ThrowsAsync<Exception>(async () =>
-            await ConnectionHandler.GetAccessToken(connection, CancellationToken.None));
+        var ex = Assert.ThrowsAsync<Exception>(new AsyncTestDelegate(() =>
+            ConnectionHandler.GetAccessToken(connection, CancellationToken.None)));
 
         Assert.That(ex, Is.Not.Null);
         Assert.That(ex.Message.Contains("Failed to obtain access token"), Is.True);
