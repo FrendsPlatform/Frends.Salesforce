@@ -13,13 +13,15 @@ public class ValidationHandlerTests
         {
             Name = "foobar",
         };
-        Assert.DoesNotThrow(() => ValidationHandler.Run(foobar));
+        TestDelegate action = () => ValidationHandler.Run(foobar);
+        Assert.DoesNotThrow(action);
     }
 
     [Test]
     public void ValidationShouldFailOnNullObject()
     {
-        var ex = Assert.Throws<ValidationException>(() => ValidationHandler.Run([null]));
+        TestDelegate action = () => ValidationHandler.Run([null]);
+        var ex = Assert.Throws<ValidationException>(action);
         Assert.That(ex, Is.Not.Null);
         Assert.That(ex.Message, Contains.Substring("Validated object can't be null!"));
     }
@@ -27,7 +29,8 @@ public class ValidationHandlerTests
     [Test]
     public void ValidationShouldFailWhenNoObjectsProvided()
     {
-        var ex = Assert.Throws<ValidationException>(() => ValidationHandler.Run());
+        TestDelegate action = () => ValidationHandler.Run();
+        var ex = Assert.Throws<ValidationException>(action);
         Assert.That(ex, Is.Not.Null);
         Assert.That(ex.Message, Contains.Substring("You must provide objects to validate"));
     }
@@ -35,7 +38,8 @@ public class ValidationHandlerTests
     [Test]
     public void ValidationShouldFailWhenObjectArrayIsNull()
     {
-        var ex = Assert.Throws<ValidationException>(() => ValidationHandler.Run(null));
+        TestDelegate action = () => ValidationHandler.Run(null);
+        var ex = Assert.Throws<ValidationException>(action);
         Assert.That(ex, Is.Not.Null);
         Assert.That(ex.Message, Contains.Substring("You must provide objects to validate"));
     }
@@ -44,7 +48,8 @@ public class ValidationHandlerTests
     public void MultipleValidationMessagesAreReturned()
     {
         TestClass foobar = new();
-        var ex = Assert.Throws<ValidationException>(() => ValidationHandler.Run(foobar, null));
+        TestDelegate action = () => ValidationHandler.Run(foobar, null);
+        var ex = Assert.Throws<ValidationException>(action);
         Assert.That(ex, Is.Not.Null);
         Assert.That(ex.Message, Contains.Substring("Validated object can't be null!"));
         Assert.That(ex.Message, Contains.Substring("Name is required"));
