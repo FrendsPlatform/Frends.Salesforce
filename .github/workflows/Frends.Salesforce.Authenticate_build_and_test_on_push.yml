@@ -1,0 +1,26 @@
+name: Frends.Salesforce.Authenticate_build_test
+
+on:
+  push:
+    branches-ignore:    
+      - main
+    paths:
+      - 'Frends.Salesforce.Authenticate/**'
+  workflow_dispatch:
+
+jobs:
+  build:
+    uses: FrendsPlatform/FrendsTasks/.github/workflows/build_test.yml@main
+    with:
+      workdir: Frends.Salesforce.Authenticate
+      env_var_name_1: Salesforce_Client_Secret
+      env_var_name_2: Salesforce_Password
+      env_var_name_3: Salesforce_Security_Token
+      env_var_name_4: Salesforce_ClientID
+    secrets:
+      badge_service_api_key: ${{ secrets.BADGE_SERVICE_API_KEY }}
+      test_feed_api_key: ${{ secrets.TASKS_TEST_FEED_API_KEY }}
+      env_var_value_1: ${{ secrets.SALESFORCE_CLIENT_SECRET }}
+      env_var_value_2: ${{ secrets.SALESFORCE_PASSWORD }}
+      env_var_value_3: ${{ secrets.SALESFORCE_SECURITY_TOKEN }}
+      env_var_value_4: ${{ secrets.SALESFORCE_CLIENTID }}
