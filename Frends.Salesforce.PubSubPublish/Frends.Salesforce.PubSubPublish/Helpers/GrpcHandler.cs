@@ -58,11 +58,13 @@ internal static class GrpcHandler
         return response.Results.FirstOrDefault();
     }
 
-    private static byte[] SerializeJsonToAvro(string jsonPayload, string schemaJson)
+    internal static byte[] SerializeJsonToAvro(string jsonPayload, string schemaJson)
     {
         var schema = (RecordSchema)Schema.Parse(schemaJson);
         var record = new GenericRecord(schema);
         var jsonObject = JObject.Parse(jsonPayload);
+
+        var missingFields = new List<string>();
 
         foreach (var field in schema.Fields)
         {
@@ -70,10 +72,26 @@ internal static class GrpcHandler
             {
                 record.Add(field.Name, value.ToObject<object>());
             }
+            else if (field.DefaultValue != null)
+            {
+                record.Add(field.Name, field.DefaultValue.ToObject<object>());
+            }
+            else if (field.Schema.Tag == Schema.Type.Null
+                     || (field.Schema is UnionSchema union && union.Schemas.Any(s => s.Tag == Schema.Type.Null)))
+            {
+                record.Add(field.Name, null);
+            }
             else
             {
-                throw new Exception($"Missing field '{field.Name}' in JSON payload.");
+                missingFields.Add(field.Name);
             }
+        }
+
+        if (missingFields.Count > 0)
+        {
+            var fieldList = string.Join(Environment.NewLine, missingFields.Select(name => $" - {name}"));
+            throw new Exception(
+                $"JSON payload is missing required fields that have no default value and do not allow null:{Environment.NewLine}{fieldList}{Environment.NewLine}Schema used for validation:{Environment.NewLine}{schemaJson}");
         }
 
         using var ms = new MemoryStream();
