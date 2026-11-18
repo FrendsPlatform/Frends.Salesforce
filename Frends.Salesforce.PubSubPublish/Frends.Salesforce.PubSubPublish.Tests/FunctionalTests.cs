@@ -82,6 +82,6 @@ public class FunctionalTests : TestBase
         var result = await Salesforce.PubSubPublish(input, connection, options, CancellationToken.None);
 
         Assert.That(result.Success, Is.False);
-        Assert.That(result.Error.Message, Does.Contain("Missing field 'CreatedDate' in JSON payload."));
+        Assert.That(result.Error.Message, Does.Contain("- CreatedDate"));
     }
 }
