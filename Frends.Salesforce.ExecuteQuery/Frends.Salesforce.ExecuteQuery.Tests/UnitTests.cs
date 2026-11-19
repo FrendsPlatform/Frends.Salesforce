@@ -50,8 +50,8 @@ public class UnitTests
             AccessToken = token,
         };
 
-        var result = await Salesforce.ExecuteQuery(input, con, cancellationToken);
-        Assert.IsTrue(result.RequestIsSuccessful);
+        var result = await Salesforce.ExecuteQuery(input, con, new Options(), cancellationToken);
+        Assert.IsTrue(result.Success);
     }
 
     [TestMethod]
@@ -74,8 +74,8 @@ public class UnitTests
             SecurityToken = securityToken,
         };
 
-        var result = await Salesforce.ExecuteQuery(input, con, cancellationToken);
-        Assert.IsTrue(result.RequestIsSuccessful);
+        var result = await Salesforce.ExecuteQuery(input, con, new Options(), cancellationToken);
+        Assert.IsTrue(result.Success);
     }
 
     [TestMethod]
@@ -99,8 +99,8 @@ public class UnitTests
             ReturnAccessToken = true,
         };
 
-        var result = await Salesforce.ExecuteQuery(input, con, cancellationToken);
-        Assert.IsTrue(result.RequestIsSuccessful);
+        var result = await Salesforce.ExecuteQuery(input, con, new Options(), cancellationToken);
+        Assert.IsTrue(result.Success);
         Assert.IsNotEmpty(result.Token);
     }
 
@@ -119,8 +119,8 @@ public class UnitTests
             AccessToken = token,
         };
 
-        var result = await Salesforce.ExecuteQuery(input, con, cancellationToken);
-        Assert.IsTrue(result.RequestIsSuccessful);
+        var result = await Salesforce.ExecuteQuery(input, con, new Options(), cancellationToken);
+        Assert.IsTrue(result.Success);
     }
 
 
@@ -141,7 +141,7 @@ public class UnitTests
             AccessToken = token,
         };
 
-        await Salesforce.ExecuteQuery(input, con, cancellationToken);
+        await Salesforce.ExecuteQuery(input, con, new Options(), cancellationToken);
     }
 
     [TestMethod]
@@ -161,7 +161,7 @@ public class UnitTests
             AccessToken = " ",
         };
 
-        await Salesforce.ExecuteQuery(input, con, cancellationToken);
+        await Salesforce.ExecuteQuery(input, con, new Options(), cancellationToken);
     }
 
     [TestMethod]
@@ -181,7 +181,7 @@ public class UnitTests
             AccessToken = token,
         };
 
-        await Salesforce.ExecuteQuery(input, con, cancellationToken);
+        await Salesforce.ExecuteQuery(input, con, new Options(), cancellationToken);
     }
 
     [TestMethod]
@@ -201,7 +201,7 @@ public class UnitTests
             AccessToken = token,
         };
 
-        await Salesforce.ExecuteQuery(input, con, cancellationToken);
+        await Salesforce.ExecuteQuery(input, con, new Options(), cancellationToken);
     }
 
     [TestMethod]
@@ -220,9 +220,10 @@ public class UnitTests
             AccessToken = token,
         };
 
-        var result = await Salesforce.ExecuteQuery(input, con, cancellationToken);
-        Assert.IsNotNull(result.ErrorMessage);
-        StringAssert.Contains(result.ErrorMessage, "sObject type 'Invalid' is not supported.");
+        var result = await Salesforce.ExecuteQuery(input, con, new Options { ThrowErrorOnFailure = false }, cancellationToken);
+        Assert.IsFalse(result.Success);
+        Assert.IsNotNull(result.Error);
+        StringAssert.Contains(result.Error.Message, "sObject type 'Invalid' is not supported.");
     }
 
     [TestMethod]
@@ -242,8 +243,8 @@ public class UnitTests
             ClientSecret = clientSecret,
         };
 
-        var result = await Salesforce.ExecuteQuery(input, con, cancellationToken);
-        Assert.IsTrue(result.RequestIsSuccessful);
+        var result = await Salesforce.ExecuteQuery(input, con, new Options(), cancellationToken);
+        Assert.IsTrue(result.Success);
     }
 
     [TestMethod]
@@ -264,8 +265,8 @@ public class UnitTests
             ReturnAccessToken = true,
         };
 
-        var result = await Salesforce.ExecuteQuery(input, con, cancellationToken);
-        Assert.IsTrue(result.RequestIsSuccessful);
+        var result = await Salesforce.ExecuteQuery(input, con, new Options(), cancellationToken);
+        Assert.IsTrue(result.Success);
         Assert.IsNotEmpty(result.Token);
     }
 }
