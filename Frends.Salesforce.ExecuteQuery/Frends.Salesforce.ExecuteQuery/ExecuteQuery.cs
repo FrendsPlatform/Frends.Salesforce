@@ -24,11 +24,13 @@ public static class Salesforce
     /// </summary>
     /// <param name="input">Information to update the sobject.</param>
     /// <param name="connection">Information about the salesforce destination.</param>
-    /// <param name="cancellationToken"></param>
-    /// <returns>Object { dynamic Body, bool RequestIsSuccessful, Exception ErrorException, string ErrorMessage, string Token }</returns>
+    /// <param name="options">Additional parameters.</param>
+    /// <param name="cancellationToken">A cancellation token provided by Frends Platform.</param>
+    /// <returns>object { bool Success, dynamic Body, string Token, object Error { string Message, Exception AdditionalInfo } }</returns>
     public static async Task<Result> ExecuteQuery(
         [PropertyTab] Input input,
         [PropertyTab] Connection connection,
+        [PropertyTab] Options options,
         CancellationToken cancellationToken
     )
     {
@@ -36,7 +38,7 @@ public static class Salesforce
 
         try
         {
-            ValidationHandler.Run(input, connection);
+            ValidationHandler.Run(input, connection, options);
 
             var query = WebUtility.UrlEncode(input.Query);
             var client =
@@ -51,12 +53,20 @@ public static class Salesforce
             var response = await client.ExecuteAsync(request, cancellationToken);
             dynamic content = JsonConvert.DeserializeObject(response.Content);
 
-            return new Result(content, response.IsSuccessful, response.ErrorException,
-                response.IsSuccessful ? string.Empty : content[0].Value<string>("message"), accessToken);
+            if (!response.IsSuccessful)
+                throw new Exception(content[0].Value<string>("message"), response.ErrorException);
+
+            return new Result
+            {
+                Success = true,
+                Body = content,
+                Token = accessToken,
+                Error = null,
+            };
         }
         catch (Exception e)
         {
-            return ErrorHandler.Handle(e, accessToken);
+            return e.Handle(options);
         }
     }
 }

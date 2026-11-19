@@ -1,5 +1,13 @@
 # Changelog
 
+## [4.0.0] - 2026-11-19
+
+### Changed
+
+- **[Breaking Change]** Added the Options parameter with `ThrowErrorOnFailure` and `ErrorMessageOnFailure`. When `ThrowErrorOnFailure` is false, errors are returned in the result instead of thrown.
+- **[Breaking Change]** Result now contains `Success`, `Body`, `Token` and `Error`. The `RequestIsSuccessful`, `ErrorException` and `ErrorMessage` properties were removed; failed queries are now reported through `Error` or thrown according to the Options.
+- Updated the target framework to .NET 8.
+
 ## [3.0.0] - 2026-04-01
 
 ### Changed
