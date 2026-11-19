@@ -1,5 +1,14 @@
 # Changelog
 
+## [4.0.0] - 2026-11-19
+
+### Changed
+
+- **[Breaking Change]** Added the new `Options` parameter with `ThrowErrorOnFailure` and `ErrorMessageOnFailure` for controlling error handling.
+- **[Breaking Change]** The result now contains `Success`, `Body`, `Token` and `Error` properties. The `RequestIsSuccessful`, `ErrorException` and `ErrorMessage` properties were removed; failed requests now throw an error by default, or return `Success` as false with details in `Error` when `ThrowErrorOnFailure` is disabled.
+- Updated the task to target .NET 8.
+- Added missing documentation examples.
+
 ## [3.0.0] - 2026-04-01
 
 ### Changed

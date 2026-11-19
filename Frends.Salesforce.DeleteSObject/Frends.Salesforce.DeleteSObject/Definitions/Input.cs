@@ -1,8 +1,9 @@
-﻿using System.ComponentModel;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using Frends.Salesforce.DeleteSObject.Attributes;
 
 namespace Frends.Salesforce.DeleteSObject.Definitions;
+
 /// <summary>
 /// Input-class for DeleteSObject-task.
 /// </summary>

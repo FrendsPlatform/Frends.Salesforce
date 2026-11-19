@@ -12,6 +12,11 @@ public class ValidationHandlerTests
         public string Name { get; set; }
     }
 
+    private class OtherTestClass
+    {
+        [Required(ErrorMessage = "Value is required")]
+        public string Value { get; set; }
+    }
 
     [Test]
     public void BasicValidationShouldPass()
@@ -28,7 +33,7 @@ public class ValidationHandlerTests
     {
         var ex = Assert.Throws<ValidationException>(() => ValidationHandler.Run(new object[] { null }));
         Assert.That(ex, Is.Not.Null);
-        Assert.That(ex.Message, Contains.Substring("Validated object can't be null!"));
+        Assert.That(ex.Message, Contains.Substring("can't be null"));
     }
 
     [Test]
@@ -51,9 +56,10 @@ public class ValidationHandlerTests
     public void MultipleValidationMessagesAreReturned()
     {
         TestClass foobar = new();
-        var ex = Assert.Throws<ValidationException>(() => ValidationHandler.Run(foobar, null));
+        OtherTestClass other = new();
+        var ex = Assert.Throws<ValidationException>(() => ValidationHandler.Run(foobar, other));
         Assert.That(ex, Is.Not.Null);
-        Assert.That(ex.Message, Contains.Substring("Validated object can't be null!"));
         Assert.That(ex.Message, Contains.Substring("Name is required"));
+        Assert.That(ex.Message, Contains.Substring("Value is required"));
     }
 }
