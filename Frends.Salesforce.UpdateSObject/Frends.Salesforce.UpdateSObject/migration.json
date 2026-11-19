@@ -67,8 +67,12 @@
             "Target": "Connection.ThrowAnErrorIfNotFound"
           }
         ]
+      },
+      {
+        "Version": "4.0.0",
+        "Description": "Result properties were changed: RequestIsSuccessful is now Success, ErrorException and ErrorMessage are replaced by Error.",
+        "Migration": []
       }
     ]
   }
 ]
-

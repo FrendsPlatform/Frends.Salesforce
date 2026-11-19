@@ -1,17 +1,15 @@
-﻿using Frends.Salesforce.UpdateSObject.Definitions;
-using Microsoft.CSharp.RuntimeBinder;
-using Newtonsoft.Json;
-using RestSharp;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Net;
 using System.Net.Http;
-using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
+using Frends.Salesforce.UpdateSObject.Definitions;
 using Frends.Salesforce.UpdateSObject.Helpers;
-
-[assembly: InternalsVisibleTo("Frends.Salesforce.UpdateSObject.Tests")]
+using Microsoft.CSharp.RuntimeBinder;
+using Newtonsoft.Json;
+using RestSharp;
 
 namespace Frends.Salesforce.UpdateSObject;
 
@@ -26,13 +24,14 @@ public static class Salesforce
     /// </summary>
     /// <param name="input">Information to update the sobject.</param>
     /// <param name="connection">Information about the salesforce destination.</param>
-    /// <param name="cancellationToken"></param>
-    /// <returns>Object { JObject Body, bool RequestIsSuccessful, Exception ErrorException, string ErrorMessage, string Token }</returns>
+    /// <param name="options">Additional parameters.</param>
+    /// <param name="cancellationToken">A cancellation token provided by Frends Platform.</param>
+    /// <returns>object { bool Success, JObject Body, string Token, object Error { string Message, Exception AdditionalInfo } }</returns>
     public static async Task<Result> UpdateSObject(
         [PropertyTab] Input input,
         [PropertyTab] Connection connection,
-        CancellationToken cancellationToken
-    )
+        [PropertyTab] Options options,
+        CancellationToken cancellationToken)
     {
         try
         {
@@ -46,8 +45,9 @@ public static class Salesforce
             request.AddHeader("Authorization", "Bearer " + accessToken);
 
             if (!ConnectionHandler.ShouldReturnToken(connection.AuthenticationMethod, connection.ReturnAccessToken))
+            {
                 accessToken = string.Empty;
-
+            }
 
             var json = JsonConvert.DeserializeObject<Dictionary<string, string>>(input.SObjectAsJson);
             request.RequestFormat = DataFormat.Json;
@@ -56,28 +56,35 @@ public static class Salesforce
             var response = await client.ExecuteAsync(request, cancellationToken);
             var content = JsonConvert.DeserializeObject<dynamic>(response.Content);
 
-            if (connection.ThrowAnErrorIfNotFound && response.ErrorException != null && response.ErrorException.ToString()
-                    .Equals(new HttpRequestException("Request failed with status code NotFound").ToString()))
-                throw new HttpRequestException("Target couldn't be found with given id or type.");
+            if (!response.IsSuccessful)
+            {
+                if (connection.ThrowAnErrorIfNotFound && response.StatusCode == HttpStatusCode.NotFound)
+                {
+                    throw new HttpRequestException("Target couldn't be found with given id or type.");
+                }
 
-            return new Result(content, response.IsSuccessful, response.ErrorException, response.ErrorMessage,
-                accessToken);
+                throw response.ErrorException ?? new HttpRequestException(response.ErrorMessage);
+            }
+
+            return new Result
+            {
+                Success = true,
+                Body = content,
+                Token = accessToken,
+                Error = null,
+            };
         }
         catch (JsonReaderException e)
         {
-            const string message = "Given input couldn't be parsed to json.";
-
-            return ErrorHandler.Handle(e, message);
+            return new Exception("Given input couldn't be parsed to json.", e).Handle(options);
         }
         catch (RuntimeBinderException e)
         {
-            const string message = "Given Salesforce information is invalid.";
-
-            return ErrorHandler.Handle(e, message);
+            return new Exception("Given Salesforce information is invalid.", e).Handle(options);
         }
         catch (Exception e)
         {
-            return ErrorHandler.Handle(e);
+            return e.Handle(options);
         }
     }
 }
