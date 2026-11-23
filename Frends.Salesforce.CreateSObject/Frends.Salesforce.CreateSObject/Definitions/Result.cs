@@ -15,16 +15,28 @@ public class Result
     public object Body { get; private set; }
 
     /// <summary>
+    /// Indicates whether the request completed successfully.
+    /// </summary>
+    /// <example>true</example>
+    public bool Success { get; private set; }
+
+    /// <summary>
+    /// Error details, or null if the request succeeded.
+    /// </summary>
+    /// <example>null</example>
+    public Error Error { get; private set; }
+
+    /// <summary>
     /// Was the request successful?
     /// </summary>
     /// <example>true</example>
-    public bool RequestIsSuccessful { get; private set; }
+    public bool RequestIsSuccessful => Success;
 
     /// <summary>
     /// Exception that was thrown by the server.
     /// </summary>
-    /// <example>System.Net.Http.HttpRequestException</example>
-    public Exception ErrorException { get; private set; }
+    /// <example>System.Net.Http.HttpRequestException: Request failed with status code Unauthorized</example>
+    public string ErrorException { get; private set; }
 
     /// <summary>
     /// Error message from the server.
@@ -38,12 +50,15 @@ public class Result
     /// <example>abcdefghjklmn123456789</example>
     public string Token { get; private set; }
 
-    internal Result(object body, bool succesful, Exception error, string errormessage, string token)
+    internal Result(object body, bool successful, string errorException, string errorMessage, string token)
     {
         Body = body;
-        RequestIsSuccessful = succesful;
-        ErrorException = error;
-        ErrorMessage = errormessage;
+        Success = successful;
+        ErrorException = errorException;
+        ErrorMessage = errorMessage;
         Token = token;
+        Error = successful
+            ? null
+            : new Error { Message = errorMessage, AdditionalInfo = errorException };
     }
 }

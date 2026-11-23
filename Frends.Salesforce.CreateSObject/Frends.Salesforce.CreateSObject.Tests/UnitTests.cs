@@ -98,7 +98,7 @@ public class UnitTests
             SObjectType = "Account",
         };
 
-        var result = await Salesforce.CreateSObject(input, _connection, _cancellationToken);
+        var result = await Salesforce.CreateSObject(input, _connection, new Options(), _cancellationToken);
         Assert.IsTrue(result.RequestIsSuccessful);
 
         var body = JsonConvert.SerializeObject(result.Body);
@@ -119,7 +119,7 @@ public class UnitTests
             SObjectType = "Account"
         };
 
-        var result = await Salesforce.CreateSObject(input, _connection, _cancellationToken);
+        var result = await Salesforce.CreateSObject(input, _connection, new Options(), _cancellationToken);
         Assert.IsTrue(result.RequestIsSuccessful, result.ErrorMessage);
 
         var body = JsonConvert.SerializeObject(result.Body);
@@ -147,7 +147,7 @@ public class UnitTests
             SObjectType = "Contact",
         };
 
-        var result = await Salesforce.CreateSObject(input, _connection, _cancellationToken);
+        var result = await Salesforce.CreateSObject(input, _connection, new Options(), _cancellationToken);
         Assert.IsTrue(result.RequestIsSuccessful);
 
         var body = JsonConvert.SerializeObject(result.Body);
@@ -169,7 +169,7 @@ public class UnitTests
             SObjectType = "Account"
         };
 
-        var accountResult = await Salesforce.CreateSObject(accountInput, _connection, _cancellationToken);
+        var accountResult = await Salesforce.CreateSObject(accountInput, _connection, new Options(), _cancellationToken);
 
         var body = JsonConvert.SerializeObject(accountResult.Body);
         var accObj = JsonConvert.DeserializeObject<dynamic>(body);
@@ -194,7 +194,7 @@ public class UnitTests
             SObjectType = "Case"
         };
 
-        var caseResult = await Salesforce.CreateSObject(caseInput, _connection, _cancellationToken);
+        var caseResult = await Salesforce.CreateSObject(caseInput, _connection, new Options(), _cancellationToken);
         Assert.IsTrue(caseResult.RequestIsSuccessful);
 
         var caseBody = JsonConvert.SerializeObject(caseResult.Body);
@@ -226,7 +226,7 @@ public class UnitTests
             SecurityToken = _securityToken,
             ReturnAccessToken = true
         };
-        var result = await Salesforce.CreateSObject(input, connection, _cancellationToken);
+        var result = await Salesforce.CreateSObject(input, connection, new Options(), _cancellationToken);
         Assert.IsNotNull(result.Token);
     }
 
@@ -246,7 +246,7 @@ public class UnitTests
             AccessToken = " "
         };
 
-        await Salesforce.CreateSObject(input, connection, _cancellationToken);
+        await Salesforce.CreateSObject(input, connection, new Options(), _cancellationToken);
     }
 
     [TestMethod]
@@ -265,7 +265,7 @@ public class UnitTests
             AccessToken = await TestHelper.GetAccessToken(_domain, _clientID, _clientSecret)
         };
 
-        await Salesforce.CreateSObject(input, connection, _cancellationToken);
+        await Salesforce.CreateSObject(input, connection, new Options(), _cancellationToken);
     }
 
     [TestMethod]
@@ -284,7 +284,7 @@ public class UnitTests
             AccessToken = await TestHelper.GetAccessToken(_domain, _clientID, _clientSecret)
         };
 
-        await Salesforce.CreateSObject(input, connection, _cancellationToken);
+        await Salesforce.CreateSObject(input, connection, new Options(), _cancellationToken);
     }
 
     [TestMethod]
@@ -303,7 +303,7 @@ public class UnitTests
             AccessToken = await TestHelper.GetAccessToken(_domain, _clientID, _clientSecret)
         };
 
-        await Salesforce.CreateSObject(input, connection, _cancellationToken);
+        await Salesforce.CreateSObject(input, connection, new Options(), _cancellationToken);
     }
 
     [TestMethod]
@@ -326,7 +326,7 @@ public class UnitTests
             Password = _password + _securityToken,
         };
 
-        await Salesforce.CreateSObject(input, options, _cancellationToken);
+        await Salesforce.CreateSObject(input, options, new Options(), _cancellationToken);
     }
 
     [TestMethod]
@@ -349,7 +349,11 @@ public class UnitTests
             SecurityToken = _securityToken
         };
 
-        var result = await Salesforce.CreateSObject(input, connection, _cancellationToken);
+        var result = await Salesforce.CreateSObject(
+            input,
+            connection,
+            new Options { ThrowErrorOnFailure = false },
+            _cancellationToken);
         Assert.AreEqual(new HttpRequestException("Request failed with status code NotFound").ToString(),
             result.ErrorException.ToString());
     }
@@ -372,7 +376,7 @@ public class UnitTests
         };
 
         var ex = await Assert.ThrowsExactlyAsync<Exception>(async () =>
-            await Salesforce.CreateSObject(input, connection, _cancellationToken));
+            await Salesforce.CreateSObject(input, connection, new Options(), _cancellationToken));
 
         Assert.IsTrue(ex.Message.Contains("Failed to obtain access token"));
     }
@@ -394,7 +398,7 @@ public class UnitTests
             AccessToken = await TestHelper.GetAccessToken(_domain, _clientID, _clientSecret)
         };
 
-        await Salesforce.CreateSObject(input, connection, _cancellationToken);
+        await Salesforce.CreateSObject(input, connection, new Options(), _cancellationToken);
     }
 
     [TestMethod]
@@ -415,7 +419,7 @@ public class UnitTests
             ClientSecret = _clientSecret
         };
 
-        var result = await Salesforce.CreateSObject(input, connection, _cancellationToken);
+        var result = await Salesforce.CreateSObject(input, connection, new Options(), _cancellationToken);
         Assert.IsTrue(result.RequestIsSuccessful);
     }
 
@@ -438,7 +442,7 @@ public class UnitTests
             ReturnAccessToken = true
         };
 
-        var result = await Salesforce.CreateSObject(input, connection, _cancellationToken);
+        var result = await Salesforce.CreateSObject(input, connection, new Options(), _cancellationToken);
         Assert.IsTrue(result.RequestIsSuccessful);
         Assert.IsNotEmpty(result.Token);
     }

@@ -1,5 +1,12 @@
 # Changelog
 
+## [4.0.0] - 2026-11-23
+
+### Changed
+
+- **[Breaking Change]** Added task options for controlling failure handling and updated the result to expose standard success and error properties.
+- **[Breaking Change]** Changed `ErrorException` to a string to avoid exposing exception types in the task result.
+
 ## [3.1.0] - 2026-11-20
 
 ### Changed

@@ -97,6 +97,7 @@ public class Connection
     /// The API version to use when making requests to Salesforce.
     /// If left empty, the default value is v61.0.
     /// </summary>
+    /// <example>v61.0</example>
     [DefaultValue("v61.0")]
     public string ApiVersion { get; set; }
 

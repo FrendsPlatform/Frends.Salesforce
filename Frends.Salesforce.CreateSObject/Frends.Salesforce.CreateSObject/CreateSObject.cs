@@ -21,28 +21,30 @@ public static class Salesforce
     /// </summary>
     /// <param name="input">Information to create the sobject.</param>
     /// <param name="connection">Information about the salesforce connection.</param>
-    /// <param name="cancellationToken"></param>
-    /// <returns>Object { object Body, bool RequestIsSuccessful, Exception ErrorException, string ErrorMessage, string Token }</returns>
+    /// <param name="options">Additional parameters.</param>
+    /// <param name="cancellationToken">A cancellation token provided by Frends Platform.</param>
+    /// <returns>object { object Body, bool Success, object Error, string ErrorMessage, string Token }</returns>
     public static async Task<Result> CreateSObject(
         [PropertyTab] Input input,
         [PropertyTab] Connection connection,
+        [PropertyTab] Options options,
         CancellationToken cancellationToken
     )
     {
-        ValidationHandler.Run(input, connection);
-
-        string accessToken = await ConnectionHandler.GetAccessToken(connection, cancellationToken);
-        using var client =
-            new RestClient(
-                $"{connection.InstanceUrl}/services/data/{connection.ApiVersion}/sobjects/{input.SObjectType}");
-        var request = new RestRequest("/", Method.Post);
-        request.AddHeader("Authorization", "Bearer " + accessToken);
-
-        if (!ConnectionHandler.ShouldReturnToken(connection.AuthenticationMethod, connection.ReturnAccessToken))
-            accessToken = string.Empty;
-
         try
         {
+            ValidationHandler.Run(input, connection);
+
+            string accessToken = await ConnectionHandler.GetAccessToken(connection, cancellationToken);
+            using var client =
+                new RestClient(
+                    $"{connection.InstanceUrl}/services/data/{connection.ApiVersion}/sobjects/{input.SObjectType}");
+            var request = new RestRequest("/", Method.Post);
+            request.AddHeader("Authorization", "Bearer " + accessToken);
+
+            if (!ConnectionHandler.ShouldReturnToken(connection.AuthenticationMethod, connection.ReturnAccessToken))
+                accessToken = string.Empty;
+
             var json = JsonConvert.DeserializeObject<Dictionary<string, string>>(input.SObjectAsJson);
             request.RequestFormat = DataFormat.Json;
             request.AddJsonBody(json);
@@ -51,16 +53,38 @@ public static class Salesforce
 
             var content = JsonConvert.DeserializeObject<dynamic>(response.Content);
 
-            return new Result(content, response.IsSuccessful, response.ErrorException, response.ErrorMessage,
+            var result = new Result(
+                content,
+                response.IsSuccessful,
+                response.ErrorException?.ToString(),
+                response.ErrorMessage,
                 accessToken);
+
+            if (!response.IsSuccessful && options.ThrowErrorOnFailure)
+            {
+                var responseException = response.ErrorException ?? new Exception(response.ErrorMessage);
+                return responseException.Handle(options);
+            }
+
+            if (!response.IsSuccessful && !string.IsNullOrEmpty(options.ErrorMessageOnFailure))
+            {
+                result = new Result(
+                    content,
+                    false,
+                    response.ErrorException?.ToString(),
+                    $"{options.ErrorMessageOnFailure}: {response.ErrorMessage}",
+                    accessToken);
+            }
+
+            return result;
         }
         catch (JsonException e)
         {
-            return ErrorHandler.Handle(e, "Given input couldn't be parsed to json.");
+            return e.Handle(options);
         }
         catch (Exception e)
         {
-            return ErrorHandler.Handle(e);
+            return e.Handle(options);
         }
     }
 }

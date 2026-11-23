@@ -5,11 +5,19 @@ using Definitions;
 
 internal static class ErrorHandler
 {
-    internal static Result Handle(Exception exception, string additionalMessage = "")
+    internal static Result Handle(this Exception exception, Definitions.Options options)
     {
-        if (string.IsNullOrEmpty(additionalMessage))
-            throw new Exception(exception.Message, exception);
+        if (options.ThrowErrorOnFailure)
+        {
+            if (string.IsNullOrEmpty(options.ErrorMessageOnFailure))
+                throw new Exception(exception.Message, exception);
 
-        throw new Exception(additionalMessage, exception);
+            throw new Exception(options.ErrorMessageOnFailure, exception);
+        }
+
+        var errorMessage = !string.IsNullOrEmpty(options.ErrorMessageOnFailure)
+            ? $"{options.ErrorMessageOnFailure}: {exception.Message}"
+            : exception.Message;
+        return new Result(null, false, exception.ToString(), errorMessage, null);
     }
 }
