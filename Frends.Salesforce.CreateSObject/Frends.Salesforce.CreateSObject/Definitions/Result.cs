@@ -1,13 +1,27 @@
-﻿using System;
+using System;
 using System.Runtime.CompilerServices;
 
 [assembly: InternalsVisibleTo("Frends.Salesforce.CreateSObject.Tests")]
+
 namespace Frends.Salesforce.CreateSObject.Definitions;
+
 /// <summary>
 /// Result-class for CreateSObject-task.
 /// </summary>
 public class Result
 {
+    internal Result(object body, bool successful, string errorException, string errorMessage, string token)
+    {
+        Body = body;
+        Success = successful;
+        ErrorException = errorException;
+        ErrorMessage = errorMessage;
+        Token = token;
+        Error = successful
+            ? null
+            : new Error { Message = errorMessage, AdditionalInfo = errorException };
+    }
+
     /// <summary>
     /// Body of the response.
     /// </summary>
@@ -33,7 +47,7 @@ public class Result
     public bool RequestIsSuccessful => Success;
 
     /// <summary>
-    /// Exception that was thrown by the server.
+    /// String representation of the exception returned by the HTTP client.
     /// </summary>
     /// <example>System.Net.Http.HttpRequestException: Request failed with status code Unauthorized</example>
     public string ErrorException { get; private set; }
@@ -49,16 +63,4 @@ public class Result
     /// </summary>
     /// <example>abcdefghjklmn123456789</example>
     public string Token { get; private set; }
-
-    internal Result(object body, bool successful, string errorException, string errorMessage, string token)
-    {
-        Body = body;
-        Success = successful;
-        ErrorException = errorException;
-        ErrorMessage = errorMessage;
-        Token = token;
-        Error = successful
-            ? null
-            : new Error { Message = errorMessage, AdditionalInfo = errorException };
-    }
 }

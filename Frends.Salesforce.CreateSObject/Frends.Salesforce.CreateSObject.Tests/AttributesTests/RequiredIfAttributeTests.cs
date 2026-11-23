@@ -6,20 +6,6 @@ namespace Frends.Salesforce.CreateSObject.Tests.AttributesTests;
 
 public class RequiredIfAttributeTests : AttributeTestBase
 {
-    private class TestClass
-    {
-        public bool Flag { get; set; }
-
-        [RequiredIf(nameof(Flag), true)]
-        public string Name { get; set; }
-    }
-
-    private class InvalidTestClass
-    {
-        [RequiredIf("NonExistentProperty", true)]
-        public string Name { get; set; }
-    }
-
     [Test]
     public void ShouldValidateWithSuccessWhenConditionMet()
     {
@@ -61,4 +47,17 @@ public class RequiredIfAttributeTests : AttributeTestBase
         Assert.That(res.First().ErrorMessage, Contains.Substring("Unknown property: NonExistentProperty"));
     }
 
+    private class TestClass
+    {
+        public bool Flag { get; set; }
+
+        [RequiredIf(nameof(Flag), true)]
+        public string Name { get; set; }
+    }
+
+    private class InvalidTestClass
+    {
+        [RequiredIf("NonExistentProperty", true)]
+        public string Name { get; set; }
+    }
 }

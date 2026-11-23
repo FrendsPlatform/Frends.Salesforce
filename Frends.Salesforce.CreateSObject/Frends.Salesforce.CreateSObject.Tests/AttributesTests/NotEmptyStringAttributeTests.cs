@@ -6,12 +6,6 @@ namespace Frends.Salesforce.CreateSObject.Tests.AttributesTests;
 
 public class NotEmptyStringAttributeTests : AttributeTestBase
 {
-    private class TestClass
-    {
-        [NotEmptyString]
-        public string Name { get; set; }
-    }
-
     [Test]
     public void ValidationShouldPass()
     {
@@ -51,5 +45,11 @@ public class NotEmptyStringAttributeTests : AttributeTestBase
         var test = new TestClass();
         var res = Validate(test);
         Assert.That(res.First().ErrorMessage, Contains.Substring("Name is required and cannot be empty."));
+    }
+
+    private class TestClass
+    {
+        [NotEmptyString]
+        public string Name { get; set; }
     }
 }

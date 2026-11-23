@@ -1,12 +1,12 @@
-﻿using Frends.Salesforce.CreateSObject.Definitions;
-using Newtonsoft.Json;
-using RestSharp;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Threading;
 using System.Threading.Tasks;
+using Frends.Salesforce.CreateSObject.Definitions;
 using Frends.Salesforce.CreateSObject.Helpers;
+using Newtonsoft.Json;
+using RestSharp;
 
 namespace Frends.Salesforce.CreateSObject;
 
@@ -28,8 +28,7 @@ public static class Salesforce
         [PropertyTab] Input input,
         [PropertyTab] Connection connection,
         [PropertyTab] Options options,
-        CancellationToken cancellationToken
-    )
+        CancellationToken cancellationToken)
     {
         try
         {
@@ -60,27 +59,25 @@ public static class Salesforce
                 response.ErrorMessage,
                 accessToken);
 
-            if (!response.IsSuccessful && options.ThrowErrorOnFailure)
+            if (!response.IsSuccessful)
             {
-                var responseException = response.ErrorException ?? new Exception(response.ErrorMessage);
-                return responseException.Handle(options);
-            }
+                var responseMessage = response.ErrorMessage ??
+                    $"Salesforce request failed with status code {(int)response.StatusCode}.";
+                var responseException = response.ErrorException ?? new Exception(responseMessage);
 
-            if (!response.IsSuccessful && !string.IsNullOrEmpty(options.ErrorMessageOnFailure))
-            {
-                result = new Result(
-                    content,
-                    false,
-                    response.ErrorException?.ToString(),
-                    $"{options.ErrorMessageOnFailure}: {response.ErrorMessage}",
-                    accessToken);
+                if (options.ThrowErrorOnFailure)
+                {
+                    throw responseException;
+                }
+
+                return responseException.Handle(options, result, responseMessage);
             }
 
             return result;
         }
         catch (JsonException e)
         {
-            return e.Handle(options);
+            return e.Handle(options, additionalMessage: "Given input couldn't be parsed to json.");
         }
         catch (Exception e)
         {
