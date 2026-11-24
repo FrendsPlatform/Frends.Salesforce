@@ -60,8 +60,10 @@ internal static class ConnectionHandler
 
         if (!authResponse.IsSuccessful)
         {
+            var details = string.IsNullOrWhiteSpace(authResponse.Content) ? string.Empty : $" {authResponse.Content}";
+
             throw new Exception(
-                $"Failed to obtain access token. HTTP {(int)authResponse.StatusCode} ({authResponse.StatusCode}).");
+                $"Failed to obtain access token. HTTP {(int)authResponse.StatusCode} ({authResponse.StatusCode}).{details}");
         }
 
         dynamic responseContent = JsonConvert.DeserializeObject<dynamic>(authResponse.Content);

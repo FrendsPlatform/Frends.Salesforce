@@ -7,6 +7,7 @@
 - **[Breaking Change]** Added the new `Options` parameter with `ThrowErrorOnFailure` and `ErrorMessageOnFailure` for controlling error handling.
 - **[Breaking Change]** The result now contains `Success`, `Body`, `Token` and `Error` properties. The `RequestIsSuccessful`, `ErrorException` and `ErrorMessage` properties were removed. When `ThrowErrorOnFailure` is disabled, errors are returned with `Success` set to `false` and the details in `Error`.
 - **[Breaking Change]** Errors are no longer wrapped in a generic `Exception`; the original exception is thrown unless `ErrorMessageOnFailure` is set.
+- **[Breaking Change]** Error messages now include the response body returned by Salesforce.
 - Updated the task to target .NET 8.
 
 ### Added

@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
+using dotenv.net;
 using Frends.Salesforce.DeleteSObject.Definitions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Newtonsoft.Json;
-using dotenv.net;
 using RestSharp;
 using JsonSerializer = System.Text.Json.JsonSerializer;
 
@@ -24,10 +24,11 @@ public class UnitTests
     private static string token;
 
     private readonly CancellationToken cancellationToken = CancellationToken.None;
+
+    private readonly string name = "Test" + DateTime.Now.Year + string.Empty + DateTime.Now.Month + string.Empty + DateTime.Now.Day + string.Empty + DateTime.Now.Hour + string.Empty + DateTime.Now.Minute + string.Empty + DateTime.Now.Millisecond;
+
     private Connection connection;
     private string userJson;
-
-    private readonly string name = "Test" + DateTime.Now.Year + "" + DateTime.Now.Month + "" + DateTime.Now.Day + "" + DateTime.Now.Hour + "" + DateTime.Now.Minute + "" + DateTime.Now.Millisecond;
 
     [ClassInitialize]
     public static async Task ClassInitialize(TestContext testContext)
@@ -137,6 +138,12 @@ public class UnitTests
             Password = password,
             ReturnAccessToken = true,
         };
+
+        Options options = new Options
+        {
+            ThrowErrorOnFailure = false,
+        };
+
         var result = await Salesforce.DeleteSObject(new Input { SObjectId = id, SObjectType = "Account" }, con, new Options(), cancellationToken);
 
         Assert.IsNotNull(result.Token);
@@ -205,9 +212,8 @@ public class UnitTests
     {
         var input = new Input
         {
-
             SObjectId = "123456789",
-            SObjectType = "",
+            SObjectType = string.Empty,
         };
 
         var con = new Connection
@@ -248,7 +254,6 @@ public class UnitTests
     {
         var input = new Input
         {
-
             SObjectId = "123456789",
             SObjectType = "InvalidType",
         };
@@ -266,7 +271,7 @@ public class UnitTests
 
         var result = await Salesforce.DeleteSObject(input, con, new Options { ThrowErrorOnFailure = false }, cancellationToken);
         Assert.IsFalse(result.Success);
-        Assert.AreEqual(new HttpRequestException("Request failed with status code NotFound").ToString(), result.Error.AdditionalInfo.ToString());
+        Assert.IsTrue(result.Error.Message.Contains("Request failed with status code NotFound"));
     }
 
     [TestMethod]
@@ -274,7 +279,6 @@ public class UnitTests
     {
         var input = new Input
         {
-
             SObjectId = "123456789",
             SObjectType = "Account",
         };
@@ -290,7 +294,7 @@ public class UnitTests
             Password = password,
         };
 
-        var ex = await Assert.ThrowsExactlyAsync<Exception>(async () =>
+        var ex = await Assert.ThrowsExactlyAsync<HttpRequestException>(async () =>
             await Salesforce.DeleteSObject(input, con, new Options(), cancellationToken));
 
         Assert.IsTrue(ex.Message.Contains("Failed to obtain access token"));
@@ -301,7 +305,6 @@ public class UnitTests
     {
         var input = new Input
         {
-
             SObjectId = "Not valid id",
             SObjectType = "Account",
         };
@@ -315,7 +318,7 @@ public class UnitTests
 
         var result = await Salesforce.DeleteSObject(input, con, new Options { ThrowErrorOnFailure = false }, cancellationToken);
         Assert.IsFalse(result.Success);
-        Assert.AreEqual(new HttpRequestException("Request failed with status code NotFound").ToString(), result.Error.AdditionalInfo.ToString());
+        Assert.IsTrue(result.Error.Message.Contains("Request failed with status code NotFound"));
     }
 
     [TestMethod]
@@ -324,7 +327,6 @@ public class UnitTests
     {
         var input = new Input
         {
-
             SObjectId = "123456789",
             SObjectType = "Account",
         };
@@ -392,4 +394,3 @@ public class UnitTests
         return content.id.ToString();
     }
 }
-

@@ -50,7 +50,10 @@ public static class Salesforce
 
             if (!response.IsSuccessful)
             {
-                var ex = response.ErrorException ?? new HttpRequestException(response.ErrorMessage ?? response.Content);
+                var details = string.IsNullOrWhiteSpace(response.Content) ? string.Empty : $": {response.Content}";
+                var ex = new HttpRequestException(
+                    $"{response.ErrorException?.Message ?? response.ErrorMessage}{details}",
+                    response.ErrorException);
                 var result = ex.Handle(options);
                 result.Body = TryDeserialize(response.Content);
                 result.Token = accessToken;
@@ -74,7 +77,13 @@ public static class Salesforce
     private static object TryDeserialize(string content)
     {
         if (string.IsNullOrWhiteSpace(content)) return null;
-        try { return JsonConvert.DeserializeObject<dynamic>(content); }
-        catch (JsonException) { return content; }
+        try
+        {
+            return JsonConvert.DeserializeObject<dynamic>(content);
+        }
+        catch (JsonException)
+        {
+            return content;
+        }
     }
 }
