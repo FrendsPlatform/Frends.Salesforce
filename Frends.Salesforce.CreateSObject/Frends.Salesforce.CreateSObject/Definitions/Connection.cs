@@ -47,7 +47,10 @@ public class Connection
     /// OAuth connected app client ID.
     /// </summary>
     /// <example>3MVG9d8..ExampleClientId</example>
-    [UIHint(nameof(AuthenticationMethod), "", AuthenticationMethod.OAuth2WithPassword,
+    [UIHint(
+        nameof(AuthenticationMethod),
+        "",
+        AuthenticationMethod.OAuth2WithPassword,
         AuthenticationMethod.OAuth2WithClientCredentials)]
     [RequiredIf(
         nameof(AuthenticationMethod),
@@ -60,7 +63,10 @@ public class Connection
     /// </summary>
     /// <example>ExampleClientSecret</example>
     [PasswordPropertyText]
-    [UIHint(nameof(AuthenticationMethod), "", AuthenticationMethod.OAuth2WithPassword,
+    [UIHint(
+        nameof(AuthenticationMethod),
+        "",
+        AuthenticationMethod.OAuth2WithPassword,
         AuthenticationMethod.OAuth2WithClientCredentials)]
     [RequiredIf(
         nameof(AuthenticationMethod),
@@ -97,6 +103,7 @@ public class Connection
     /// The API version to use when making requests to Salesforce.
     /// If left empty, the default value is v61.0.
     /// </summary>
+    /// <example>v61.0</example>
     [DefaultValue("v61.0")]
     public string ApiVersion { get; set; }
 
@@ -105,7 +112,10 @@ public class Connection
     /// </summary>
     /// <example>true</example>
     [DefaultValue(false)]
-    [UIHint(nameof(AuthenticationMethod), "", AuthenticationMethod.OAuth2WithPassword,
+    [UIHint(
+        nameof(AuthenticationMethod),
+        "",
+        AuthenticationMethod.OAuth2WithPassword,
         AuthenticationMethod.OAuth2WithClientCredentials)]
     public bool ReturnAccessToken { get; set; }
 }
