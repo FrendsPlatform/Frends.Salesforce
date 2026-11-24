@@ -294,7 +294,7 @@ public class UnitTests
             Password = password,
         };
 
-        var ex = await Assert.ThrowsExactlyAsync<HttpRequestException>(async () =>
+        var ex = await Assert.ThrowsExactlyAsync<Exception>(async () =>
             await Salesforce.DeleteSObject(input, con, new Options(), cancellationToken));
 
         Assert.IsTrue(ex.Message.Contains("Failed to obtain access token"));
