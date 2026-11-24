@@ -1,4 +1,4 @@
-﻿namespace Frends.Salesforce.ExecuteQuery.Definitions;
+namespace Frends.Salesforce.ExecuteQuery.Definitions;
 
 /// <summary>
 /// Authentication options to authenticate to Salesforce.

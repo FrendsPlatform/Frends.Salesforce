@@ -1,13 +1,10 @@
-﻿using Frends.Salesforce.ExecuteQuery.Definitions;
-using Newtonsoft.Json;
-using RestSharp;
-using System;
 using System.ComponentModel;
 using System.Net;
 using System.Runtime.CompilerServices;
-using System.Threading;
-using System.Threading.Tasks;
+using Frends.Salesforce.ExecuteQuery.Definitions;
 using Frends.Salesforce.ExecuteQuery.Helpers;
+using Newtonsoft.Json;
+using RestSharp;
 
 [assembly: InternalsVisibleTo("Frends.Salesforce.ExecuteQuery.Tests")]
 
@@ -24,19 +21,21 @@ public static class Salesforce
     /// </summary>
     /// <param name="input">Information to update the sobject.</param>
     /// <param name="connection">Information about the salesforce destination.</param>
-    /// <param name="cancellationToken"></param>
-    /// <returns>Object { dynamic Body, bool RequestIsSuccessful, Exception ErrorException, string ErrorMessage, string Token }</returns>
+    /// <param name="options">Additional parameters.</param>
+    /// <param name="cancellationToken">A cancellation token provided by Frends Platform.</param>
+    /// <returns>object { bool Success, dynamic Body, string Token, object Error { string Message, Exception AdditionalInfo } }</returns>
     public static async Task<Result> ExecuteQuery(
         [PropertyTab] Input input,
         [PropertyTab] Connection connection,
-        CancellationToken cancellationToken
-    )
+        [PropertyTab] Options options,
+        CancellationToken cancellationToken)
     {
         var accessToken = string.Empty;
+        RestResponse response = null;
 
         try
         {
-            ValidationHandler.Run(input, connection);
+            ValidationHandler.Run(input, connection, options);
 
             var query = WebUtility.UrlEncode(input.Query);
             var client =
@@ -48,15 +47,47 @@ public static class Salesforce
             if (!ConnectionHandler.ShouldReturnToken(connection.AuthenticationMethod, connection.ReturnAccessToken))
                 accessToken = string.Empty;
 
-            var response = await client.ExecuteAsync(request, cancellationToken);
-            dynamic content = JsonConvert.DeserializeObject(response.Content);
+            response = await client.ExecuteAsync(request, cancellationToken);
+            var content = TryDeserialize(response.Content);
 
-            return new Result(content, response.IsSuccessful, response.ErrorException,
-                response.IsSuccessful ? string.Empty : content[0].Value<string>("message"), accessToken);
+            if (!response.IsSuccessful)
+            {
+                if (cancellationToken.IsCancellationRequested && response.ErrorException is OperationCanceledException canceled)
+                    throw canceled;
+
+                var details = string.IsNullOrWhiteSpace(response.Content) ? string.Empty : $": {response.Content}";
+                throw new HttpRequestException(
+                    $"{response.ErrorException?.Message ?? response.ErrorMessage}{details}",
+                    response.ErrorException);
+            }
+
+            return new Result
+            {
+                Success = true,
+                Body = content,
+                Token = accessToken,
+                Error = null,
+            };
         }
         catch (Exception e)
         {
-            return ErrorHandler.Handle(e, accessToken);
+            var result = e.Handle(options);
+            result.Body = TryDeserialize(response?.Content);
+            result.Token = accessToken;
+            return result;
+        }
+    }
+
+    private static object TryDeserialize(string content)
+    {
+        if (string.IsNullOrWhiteSpace(content)) return null;
+        try
+        {
+            return JsonConvert.DeserializeObject<dynamic>(content);
+        }
+        catch (JsonException)
+        {
+            return content;
         }
     }
 }

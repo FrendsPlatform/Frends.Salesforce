@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 using Frends.Salesforce.ExecuteQuery.Attributes;
 
 namespace Frends.Salesforce.ExecuteQuery.Definitions;
