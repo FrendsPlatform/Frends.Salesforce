@@ -11,7 +11,7 @@ jobs:
     uses: FrendsPlatform/FrendsTasks/.github/workflows/official_task_pipeline.yml@main
     with:
       workflow_mode: release
-      os: all
+      os: win
       workdir: Frends.Salesforce.DeleteSObject
       env_var_name_1: Salesforce_Client_Secret
       env_var_name_2: Salesforce_Password

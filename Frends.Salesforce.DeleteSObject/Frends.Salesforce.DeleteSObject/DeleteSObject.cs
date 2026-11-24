@@ -50,10 +50,17 @@ public static class Salesforce
 
             if (!response.IsSuccessful)
             {
+                if (cancellationToken.IsCancellationRequested && response.ErrorException is OperationCanceledException canceled)
+                    throw canceled;
+
                 var details = string.IsNullOrWhiteSpace(response.Content) ? string.Empty : $": {response.Content}";
                 var ex = new HttpRequestException(
                     $"{response.ErrorException?.Message ?? response.ErrorMessage}{details}",
                     response.ErrorException);
+
+                if (options.ThrowErrorOnFailure)
+                    throw ex;
+
                 var result = ex.Handle(options);
                 result.Body = TryDeserialize(response.Content);
                 result.Token = accessToken;
