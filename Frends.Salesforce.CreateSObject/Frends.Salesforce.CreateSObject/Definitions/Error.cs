@@ -1,3 +1,5 @@
+using System;
+
 namespace Frends.Salesforce.CreateSObject.Definitions;
 
 /// <summary>
@@ -15,5 +17,5 @@ public class Error
     /// Additional error details.
     /// </summary>
     /// <example>Request failed with status code Unauthorized.</example>
-    public string AdditionalInfo { get; set; }
+    public Exception AdditionalInfo { get; set; }
 }

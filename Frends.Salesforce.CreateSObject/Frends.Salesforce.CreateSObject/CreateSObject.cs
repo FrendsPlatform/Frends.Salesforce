@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using Frends.Salesforce.CreateSObject.Definitions;
@@ -23,18 +24,21 @@ public static class Salesforce
     /// <param name="connection">Information about the salesforce connection.</param>
     /// <param name="options">Additional parameters.</param>
     /// <param name="cancellationToken">A cancellation token provided by Frends Platform.</param>
-    /// <returns>object { object Body, bool Success, object Error, string ErrorMessage, string Token }</returns>
+    /// <returns>object { bool Success, object Body, string Token, object Error { string Message, Exception AdditionalInfo } }</returns>
     public static async Task<Result> CreateSObject(
         [PropertyTab] Input input,
         [PropertyTab] Connection connection,
         [PropertyTab] Options options,
         CancellationToken cancellationToken)
     {
+        string accessToken = null;
+        RestResponse response = null;
+
         try
         {
             ValidationHandler.Run(input, connection);
 
-            string accessToken = await ConnectionHandler.GetAccessToken(connection, cancellationToken);
+            accessToken = await ConnectionHandler.GetAccessToken(connection, cancellationToken);
             using var client =
                 new RestClient(
                     $"{connection.InstanceUrl}/services/data/{connection.ApiVersion}/sobjects/{input.SObjectType}");
@@ -48,40 +52,48 @@ public static class Salesforce
             request.RequestFormat = DataFormat.Json;
             request.AddJsonBody(json);
 
-            var response = await client.ExecuteAsync(request, cancellationToken);
+            response = await client.ExecuteAsync(request, cancellationToken);
 
-            var content = JsonConvert.DeserializeObject<dynamic>(response.Content);
-
-            var result = new Result(
-                content,
-                response.IsSuccessful,
-                response.ErrorException?.ToString(),
-                response.ErrorMessage,
-                accessToken);
+            var content = TryDeserialize(response.Content);
 
             if (!response.IsSuccessful)
             {
-                var responseMessage = response.ErrorMessage ??
-                    $"Salesforce request failed with status code {(int)response.StatusCode}.";
-                var responseException = response.ErrorException ?? new Exception(responseMessage);
+                if (cancellationToken.IsCancellationRequested && response.ErrorException is OperationCanceledException canceled)
+                    throw canceled;
 
-                if (options.ThrowErrorOnFailure)
-                {
-                    throw responseException;
-                }
-
-                return responseException.Handle(options, result, responseMessage);
+                var details = string.IsNullOrWhiteSpace(response.Content) ? string.Empty : $": {response.Content}";
+                throw new HttpRequestException(
+                    $"{response.ErrorException?.Message ?? response.ErrorMessage}{details}",
+                    response.ErrorException);
             }
 
+            return new Result
+            {
+                Success = true,
+                Body = content,
+                Token = accessToken,
+                Error = null,
+            };
+        }
+        catch (Exception ex)
+        {
+            var result = ex.Handle(options);
+            result.Body = TryDeserialize(response?.Content);
+            result.Token = accessToken;
             return result;
         }
-        catch (JsonException e)
+    }
+
+    private static object TryDeserialize(string content)
+    {
+        if (string.IsNullOrWhiteSpace(content)) return null;
+        try
         {
-            return e.Handle(options, additionalMessage: "Given input couldn't be parsed to json.");
+            return JsonConvert.DeserializeObject<dynamic>(content);
         }
-        catch (Exception e)
+        catch (JsonException)
         {
-            return e.Handle(options);
+            return content;
         }
     }
 }

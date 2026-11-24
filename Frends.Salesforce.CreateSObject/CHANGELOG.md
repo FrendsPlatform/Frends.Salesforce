@@ -4,14 +4,11 @@
 
 ### Changed
 
-- **[Breaking Change]** Added task options for controlling failure handling and updated the result to expose standard success and error properties.
-- **[Breaking Change]** Changed `ErrorException` to a string to avoid exposing exception types in the task result.
-
-## [3.1.0] - 2026-11-20
-
-### Changed
-
-- Upgraded target framework from .NET 6 to .NET 8.
+- **[Breaking Change]** Added the new `Options` parameter with `ThrowErrorOnFailure` and `ErrorMessageOnFailure` for controlling error handling.
+- **[Breaking Change]** The result now contains `Success`, `Body`, `Token` and `Error` properties. The `RequestIsSuccessful`, `ErrorException` and `ErrorMessage` properties were removed. When `ThrowErrorOnFailure` is disabled, errors are returned with `Success` set to `false` and the details in `Error`.
+- **[Breaking Change]** Errors are no longer wrapped in a generic `Exception`; the original exception is thrown unless `ErrorMessageOnFailure` is set.
+- **[Breaking Change]** Error messages now include the response body returned by Salesforce.
+- Updated the task to target .NET 8.
 
 ## [3.0.0] - 2026-04-01
 

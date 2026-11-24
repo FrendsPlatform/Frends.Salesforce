@@ -99,7 +99,7 @@ public class UnitTests
         };
 
         var result = await Salesforce.CreateSObject(input, connection, new Options(), cancellationToken);
-        Assert.IsTrue(result.RequestIsSuccessful);
+        Assert.IsTrue(result.Success);
 
         var body = JsonConvert.SerializeObject(result.Body);
         var obj = JsonConvert.DeserializeObject<dynamic>(body);
@@ -120,7 +120,7 @@ public class UnitTests
         };
 
         var result = await Salesforce.CreateSObject(input, connection, new Options(), cancellationToken);
-        Assert.IsTrue(result.RequestIsSuccessful, result.ErrorMessage);
+        Assert.IsTrue(result.Success, result.Error?.Message);
 
         var body = JsonConvert.SerializeObject(result.Body);
         var obj = JsonConvert.DeserializeObject<dynamic>(body);
@@ -148,7 +148,7 @@ public class UnitTests
         };
 
         var result = await Salesforce.CreateSObject(input, connection, new Options(), cancellationToken);
-        Assert.IsTrue(result.RequestIsSuccessful);
+        Assert.IsTrue(result.Success);
 
         var body = JsonConvert.SerializeObject(result.Body);
         var obj = JsonConvert.DeserializeObject<dynamic>(body);
@@ -195,7 +195,7 @@ public class UnitTests
         };
 
         var caseResult = await Salesforce.CreateSObject(caseInput, connection, new Options(), cancellationToken);
-        Assert.IsTrue(caseResult.RequestIsSuccessful);
+        Assert.IsTrue(caseResult.Success);
 
         var caseBody = JsonConvert.SerializeObject(caseResult.Body);
         var caseObj = JsonConvert.DeserializeObject<dynamic>(caseBody);
@@ -226,7 +226,7 @@ public class UnitTests
             SecurityToken = securityToken,
             ReturnAccessToken = true,
         };
-        var result = await Salesforce.CreateSObject(input, connection, new Options(), cancellationToken);
+        var result = await Salesforce.CreateSObject(input, connection, new Options() { ThrowErrorOnFailure = false }, cancellationToken);
         Assert.IsNotNull(result.Token);
     }
 
@@ -307,7 +307,7 @@ public class UnitTests
     }
 
     [TestMethod]
-    [ExpectedException(typeof(Exception))]
+    [ExpectedException(typeof(HttpRequestException))]
     public async Task InvalidDomain_ThrowTest()
     {
         var input = new Input
@@ -349,14 +349,14 @@ public class UnitTests
             SecurityToken = securityToken,
         };
 
-        var result = await Salesforce.CreateSObject(
+        var ex = await Assert.ThrowsExactlyAsync<HttpRequestException>(async () =>
+            await Salesforce.CreateSObject(
             input,
             connection,
-            new Options { ThrowErrorOnFailure = false },
-            cancellationToken);
-        Assert.AreEqual(
-            new HttpRequestException("Request failed with status code NotFound").ToString(),
-            result.ErrorException.ToString());
+            new Options(),
+            cancellationToken));
+
+        Assert.IsTrue(ex.Message.Contains("Request failed with status code NotFound"));
     }
 
     [TestMethod]
@@ -383,7 +383,7 @@ public class UnitTests
     }
 
     [TestMethod]
-    [ExpectedException(typeof(Exception))]
+    [ExpectedException(typeof(JsonReaderException))]
     public async Task InvalidJson_ThrowTest()
     {
         var input = new Input
@@ -421,7 +421,7 @@ public class UnitTests
         };
 
         var result = await Salesforce.CreateSObject(input, connection, new Options(), cancellationToken);
-        Assert.IsTrue(result.RequestIsSuccessful);
+        Assert.IsTrue(result.Success);
     }
 
     [TestMethod]
@@ -444,7 +444,7 @@ public class UnitTests
         };
 
         var result = await Salesforce.CreateSObject(input, connection, new Options(), cancellationToken);
-        Assert.IsTrue(result.RequestIsSuccessful);
+        Assert.IsTrue(result.Success);
         Assert.IsNotEmpty(result.Token);
     }
 }
