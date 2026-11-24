@@ -49,12 +49,18 @@ public static class Salesforce
                 throw new HttpRequestException("Target couldn't be found with given id.");
 
             if (!response.IsSuccessful)
-                throw response.ErrorException ?? new HttpRequestException(response.ErrorMessage ?? response.Content);
+            {
+                var ex = response.ErrorException ?? new HttpRequestException(response.ErrorMessage ?? response.Content);
+                var result = ex.Handle(options);
+                result.Body = TryDeserialize(response.Content);
+                result.Token = accessToken;
+                return result;
+            }
 
             return new Result
             {
                 Success = true,
-                Body = JsonConvert.DeserializeObject<dynamic>(response.Content),
+                Body = TryDeserialize(response.Content),
                 Token = accessToken,
                 Error = null,
             };
@@ -63,5 +69,12 @@ public static class Salesforce
         {
             return ex.Handle(options);
         }
+    }
+
+    private static object TryDeserialize(string content)
+    {
+        if (string.IsNullOrWhiteSpace(content)) return null;
+        try { return JsonConvert.DeserializeObject<dynamic>(content); }
+        catch (JsonException) { return content; }
     }
 }
