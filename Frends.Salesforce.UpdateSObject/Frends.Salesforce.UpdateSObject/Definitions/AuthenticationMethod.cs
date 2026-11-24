@@ -1,4 +1,4 @@
-﻿namespace Frends.Salesforce.UpdateSObject.Definitions;
+namespace Frends.Salesforce.UpdateSObject.Definitions;
 
 /// <summary>
 /// Authentication options to authenticate to Salesforce.
