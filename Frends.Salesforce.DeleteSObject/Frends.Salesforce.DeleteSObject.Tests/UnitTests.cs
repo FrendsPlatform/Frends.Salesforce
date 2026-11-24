@@ -1,12 +1,12 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
+using dotenv.net;
 using Frends.Salesforce.DeleteSObject.Definitions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Newtonsoft.Json;
-using dotenv.net;
 using RestSharp;
 using JsonSerializer = System.Text.Json.JsonSerializer;
 
@@ -24,10 +24,11 @@ public class UnitTests
     private static string token;
 
     private readonly CancellationToken cancellationToken = CancellationToken.None;
+
+    private readonly string name = "Test" + DateTime.Now.Year + string.Empty + DateTime.Now.Month + string.Empty + DateTime.Now.Day + string.Empty + DateTime.Now.Hour + string.Empty + DateTime.Now.Minute + string.Empty + DateTime.Now.Millisecond;
+
     private Connection connection;
     private string userJson;
-
-    private readonly string name = "Test" + DateTime.Now.Year + "" + DateTime.Now.Month + "" + DateTime.Now.Day + "" + DateTime.Now.Hour + "" + DateTime.Now.Minute + "" + DateTime.Now.Millisecond;
 
     [ClassInitialize]
     public static async Task ClassInitialize(TestContext testContext)
@@ -61,9 +62,9 @@ public class UnitTests
     public async Task DeleteAccountTest()
     {
         var id = await CreateSObject("Account", userJson);
-        var result = await Salesforce.DeleteSObject(new Input { SObjectId = id, SObjectType = "Account" }, connection, cancellationToken);
+        var result = await Salesforce.DeleteSObject(new Input { SObjectId = id, SObjectType = "Account" }, connection, new Options(), cancellationToken);
 
-        Assert.IsTrue(result.RequestIsSuccessful);
+        Assert.IsTrue(result.Success);
     }
 
     [TestMethod]
@@ -76,9 +77,9 @@ public class UnitTests
             AuthenticationMethod = AuthenticationMethod.AccessToken,
             AccessToken = token,
         };
-        var result = await Salesforce.DeleteSObject(new Input { SObjectId = id, SObjectType = "Account" }, con, cancellationToken);
+        var result = await Salesforce.DeleteSObject(new Input { SObjectId = id, SObjectType = "Account" }, con, new Options(), cancellationToken);
 
-        Assert.IsTrue(result.RequestIsSuccessful);
+        Assert.IsTrue(result.Success);
     }
 
     [TestMethod]
@@ -92,9 +93,9 @@ public class UnitTests
             });
 
         var id = await CreateSObject("Contact", json);
-        var result = await Salesforce.DeleteSObject(new Input { SObjectId = id, SObjectType = "Contact" }, connection, cancellationToken);
+        var result = await Salesforce.DeleteSObject(new Input { SObjectId = id, SObjectType = "Contact" }, connection, new Options(), cancellationToken);
 
-        Assert.IsTrue(result.RequestIsSuccessful);
+        Assert.IsTrue(result.Success);
     }
 
     [TestMethod]
@@ -114,11 +115,11 @@ public class UnitTests
 
         var caseId = await CreateSObject("Case", json);
 
-        var caseResult = await Salesforce.DeleteSObject(new Input { SObjectId = caseId, SObjectType = "Case" }, connection, cancellationToken);
-        Assert.IsTrue(caseResult.RequestIsSuccessful);
+        var caseResult = await Salesforce.DeleteSObject(new Input { SObjectId = caseId, SObjectType = "Case" }, connection, new Options(), cancellationToken);
+        Assert.IsTrue(caseResult.Success);
 
-        var accountResult = await Salesforce.DeleteSObject(new Input { SObjectId = accountId, SObjectType = "Account" }, connection, cancellationToken);
-        Assert.IsTrue(accountResult.RequestIsSuccessful);
+        var accountResult = await Salesforce.DeleteSObject(new Input { SObjectId = accountId, SObjectType = "Account" }, connection, new Options(), cancellationToken);
+        Assert.IsTrue(accountResult.Success);
     }
 
     [TestMethod]
@@ -137,13 +138,19 @@ public class UnitTests
             Password = password,
             ReturnAccessToken = true,
         };
-        var result = await Salesforce.DeleteSObject(new Input { SObjectId = id, SObjectType = "Account" }, con, cancellationToken);
+
+        Options options = new Options
+        {
+            ThrowErrorOnFailure = false,
+        };
+
+        var result = await Salesforce.DeleteSObject(new Input { SObjectId = id, SObjectType = "Account" }, con, new Options(), cancellationToken);
 
         Assert.IsNotNull(result.Token);
     }
 
     [TestMethod]
-    [ExpectedException(typeof(Exception))]
+    [ExpectedException(typeof(Exception), AllowDerivedTypes = true)]
     public async Task EmptyAccessToken_ThrowTest()
     {
         var input = new Input
@@ -158,11 +165,11 @@ public class UnitTests
             AccessToken = " ",
         };
 
-        await Salesforce.DeleteSObject(input, con, cancellationToken);
+        await Salesforce.DeleteSObject(input, con, new Options(), cancellationToken);
     }
 
     [TestMethod]
-    [ExpectedException(typeof(Exception))]
+    [ExpectedException(typeof(Exception), AllowDerivedTypes = true)]
     public async Task EmptyDomain_ThrowTest()
     {
         var input = new Input
@@ -177,11 +184,11 @@ public class UnitTests
             AccessToken = token,
         };
 
-        await Salesforce.DeleteSObject(input, con, cancellationToken);
+        await Salesforce.DeleteSObject(input, con, new Options(), cancellationToken);
     }
 
     [TestMethod]
-    [ExpectedException(typeof(Exception))]
+    [ExpectedException(typeof(Exception), AllowDerivedTypes = true)]
     public async Task EmptyId_ThrowTest()
     {
         var input = new Input
@@ -196,18 +203,17 @@ public class UnitTests
             AccessToken = token,
         };
 
-        await Salesforce.DeleteSObject(input, con, cancellationToken);
+        await Salesforce.DeleteSObject(input, con, new Options(), cancellationToken);
     }
 
     [TestMethod]
-    [ExpectedException(typeof(Exception))]
+    [ExpectedException(typeof(Exception), AllowDerivedTypes = true)]
     public async Task EmptyType_ThrowTest()
     {
         var input = new Input
         {
-
             SObjectId = "123456789",
-            SObjectType = "",
+            SObjectType = string.Empty,
         };
 
         var con = new Connection
@@ -216,11 +222,11 @@ public class UnitTests
             AccessToken = token,
         };
 
-        await Salesforce.DeleteSObject(input, con, cancellationToken);
+        await Salesforce.DeleteSObject(input, con, new Options(), cancellationToken);
     }
 
     [TestMethod]
-    [ExpectedException(typeof(Exception))]
+    [ExpectedException(typeof(Exception), AllowDerivedTypes = true)]
     public async Task InvalidDomain_ThrowTest()
     {
         var input = new Input
@@ -240,7 +246,7 @@ public class UnitTests
             Password = password + securityToken,
         };
 
-        await Salesforce.DeleteSObject(input, con, cancellationToken);
+        await Salesforce.DeleteSObject(input, con, new Options(), cancellationToken);
     }
 
     [TestMethod]
@@ -248,7 +254,6 @@ public class UnitTests
     {
         var input = new Input
         {
-
             SObjectId = "123456789",
             SObjectType = "InvalidType",
         };
@@ -264,8 +269,9 @@ public class UnitTests
             Password = password,
         };
 
-        var result = await Salesforce.DeleteSObject(input, con, cancellationToken);
-        Assert.AreEqual(new HttpRequestException("Request failed with status code NotFound").ToString(), result.ErrorException.ToString());
+        var result = await Salesforce.DeleteSObject(input, con, new Options { ThrowErrorOnFailure = false }, cancellationToken);
+        Assert.IsFalse(result.Success);
+        Assert.IsTrue(result.Error.Message.Contains("Request failed with status code NotFound"));
     }
 
     [TestMethod]
@@ -273,7 +279,6 @@ public class UnitTests
     {
         var input = new Input
         {
-
             SObjectId = "123456789",
             SObjectType = "Account",
         };
@@ -290,7 +295,7 @@ public class UnitTests
         };
 
         var ex = await Assert.ThrowsExactlyAsync<Exception>(async () =>
-            await Salesforce.DeleteSObject(input, con, cancellationToken));
+            await Salesforce.DeleteSObject(input, con, new Options(), cancellationToken));
 
         Assert.IsTrue(ex.Message.Contains("Failed to obtain access token"));
     }
@@ -300,7 +305,6 @@ public class UnitTests
     {
         var input = new Input
         {
-
             SObjectId = "Not valid id",
             SObjectType = "Account",
         };
@@ -312,17 +316,17 @@ public class UnitTests
             AccessToken = token,
         };
 
-        var result = await Salesforce.DeleteSObject(input, con, cancellationToken);
-        Assert.AreEqual(new HttpRequestException("Request failed with status code NotFound").ToString(), result.ErrorException.ToString());
+        var result = await Salesforce.DeleteSObject(input, con, new Options { ThrowErrorOnFailure = false }, cancellationToken);
+        Assert.IsFalse(result.Success);
+        Assert.IsTrue(result.Error.Message.Contains("Request failed with status code NotFound"));
     }
 
     [TestMethod]
-    [ExpectedException(typeof(Exception))]
+    [ExpectedException(typeof(Exception), AllowDerivedTypes = true)]
     public async Task NotFoundId_ThrowTest()
     {
         var input = new Input
         {
-
             SObjectId = "123456789",
             SObjectType = "Account",
         };
@@ -334,7 +338,7 @@ public class UnitTests
             ThrowAnErrorIfNotFound = true,
         };
 
-        await Salesforce.DeleteSObject(input, con, cancellationToken);
+        await Salesforce.DeleteSObject(input, con, new Options(), cancellationToken);
     }
 
     [TestMethod]
@@ -349,8 +353,8 @@ public class UnitTests
             ClientId = clientId,
             ClientSecret = clientSecret,
         };
-        var result = await Salesforce.DeleteSObject(new Input { SObjectId = id, SObjectType = "Account" }, con, cancellationToken);
-        Assert.IsTrue(result.RequestIsSuccessful);
+        var result = await Salesforce.DeleteSObject(new Input { SObjectId = id, SObjectType = "Account" }, con, new Options(), cancellationToken);
+        Assert.IsTrue(result.Success);
     }
 
     [TestMethod]
@@ -366,8 +370,8 @@ public class UnitTests
             ClientSecret = clientSecret,
             ReturnAccessToken = true,
         };
-        var result = await Salesforce.DeleteSObject(new Input { SObjectId = id, SObjectType = "Account" }, con, cancellationToken);
-        Assert.IsTrue(result.RequestIsSuccessful);
+        var result = await Salesforce.DeleteSObject(new Input { SObjectId = id, SObjectType = "Account" }, con, new Options(), cancellationToken);
+        Assert.IsTrue(result.Success);
         Assert.IsNotEmpty(result.Token);
     }
 
@@ -390,4 +394,3 @@ public class UnitTests
         return content.id.ToString();
     }
 }
-

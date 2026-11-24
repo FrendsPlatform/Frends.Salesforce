@@ -1,13 +1,9 @@
-﻿using Frends.Salesforce.DeleteSObject.Definitions;
+using System.ComponentModel;
+using System.Runtime.CompilerServices;
+using Frends.Salesforce.DeleteSObject.Definitions;
+using Frends.Salesforce.DeleteSObject.Helpers;
 using Newtonsoft.Json;
 using RestSharp;
-using System;
-using System.ComponentModel;
-using System.Net.Http;
-using System.Runtime.CompilerServices;
-using System.Threading;
-using System.Threading.Tasks;
-using Frends.Salesforce.DeleteSObject.Helpers;
 
 [assembly: InternalsVisibleTo("Frends.Salesforce.DeleteSObject.Tests")]
 
@@ -16,7 +12,7 @@ namespace Frends.Salesforce.DeleteSObject;
 /// <summary>
 /// Tasks class.
 /// </summary>
-public class Salesforce
+public static class Salesforce
 {
     /// <summary>
     /// Deletes a SObject from Salesforce.
@@ -24,41 +20,75 @@ public class Salesforce
     /// </summary>
     /// <param name="input">Information to delete the sobject.</param>
     /// <param name="connection">Information about the Salesforce connection.</param>
-    /// <param name="cancellationToken"></param>
-    /// <returns>Object { object Body, bool RequestIsSuccessful, Exception ErrorException, string ErrorMessage, string Token }</returns>
+    /// <param name="options">Additional parameters.</param>
+    /// <param name="cancellationToken">A cancellation token provided by Frends Platform.</param>
+    /// <returns>object { bool Success, object Body, string Token, object Error { string Message, Exception AdditionalInfo } }</returns>
     public static async Task<Result> DeleteSObject(
         [PropertyTab] Input input,
         [PropertyTab] Connection connection,
-        CancellationToken cancellationToken
-    )
+        [PropertyTab] Options options,
+        CancellationToken cancellationToken)
     {
+        string accessToken = null;
+        RestResponse response = null;
 
         try
         {
-            ValidationHandler.Run(input, connection);
+            ValidationHandler.Run(input, connection, options);
             var client =
                 new RestClient(
                     $"{connection.InstanceUrl}/services/data/{connection.ApiVersion}/sobjects/{input.SObjectType}/{input.SObjectId}");
             var request = new RestRequest("/", Method.Delete);
-            var accessToken = await ConnectionHandler.GetAccessToken(connection, cancellationToken);
+            accessToken = await ConnectionHandler.GetAccessToken(connection, cancellationToken);
             request.AddHeader("Authorization", "Bearer " + accessToken);
 
             if (!ConnectionHandler.ShouldReturnToken(connection.AuthenticationMethod, connection.ReturnAccessToken))
                 accessToken = string.Empty;
 
-            var response = await client.ExecuteAsync(request, cancellationToken);
-            var content = JsonConvert.DeserializeObject<dynamic>(response.Content);
+            response = await client.ExecuteAsync(request, cancellationToken);
 
             if (connection.ThrowAnErrorIfNotFound && response.ErrorException != null && response.ErrorException.ToString()
-                    .Equals(new HttpRequestException("Request failed with status code NotFound").ToString()))
+                .Equals(new HttpRequestException("Request failed with status code NotFound").ToString()))
                 throw new HttpRequestException("Target couldn't be found with given id.");
 
-            return new Result(content, response.IsSuccessful, response.ErrorException, response.ErrorMessage,
-                accessToken);
+            if (!response.IsSuccessful)
+            {
+                if (cancellationToken.IsCancellationRequested && response.ErrorException is OperationCanceledException canceled)
+                    throw canceled;
+
+                var details = string.IsNullOrWhiteSpace(response.Content) ? string.Empty : $": {response.Content}";
+                throw new HttpRequestException(
+                    $"{response.ErrorException?.Message ?? response.ErrorMessage}{details}",
+                    response.ErrorException);
+            }
+
+            return new Result
+            {
+                Success = true,
+                Body = TryDeserialize(response.Content),
+                Token = accessToken,
+                Error = null,
+            };
         }
-        catch (Exception e)
+        catch (Exception ex)
         {
-            return Helpers.ErrorHandler.Handle(e);
+            var result = ex.Handle(options);
+            result.Body = TryDeserialize(response?.Content);
+            result.Token = accessToken;
+            return result;
+        }
+    }
+
+    private static object TryDeserialize(string content)
+    {
+        if (string.IsNullOrWhiteSpace(content)) return null;
+        try
+        {
+            return JsonConvert.DeserializeObject<dynamic>(content);
+        }
+        catch (JsonException)
+        {
+            return content;
         }
     }
 }

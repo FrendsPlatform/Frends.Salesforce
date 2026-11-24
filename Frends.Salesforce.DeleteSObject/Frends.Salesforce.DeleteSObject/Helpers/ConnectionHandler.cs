@@ -1,6 +1,3 @@
-using System;
-using System.Threading;
-using System.Threading.Tasks;
 using Frends.Salesforce.DeleteSObject.Definitions;
 using Newtonsoft.Json;
 using RestSharp;
@@ -9,7 +6,6 @@ namespace Frends.Salesforce.DeleteSObject.Helpers;
 
 internal static class ConnectionHandler
 {
-
     internal static async Task<string> GetAccessToken(Connection connection, CancellationToken cancellationToken)
     {
         return connection.AuthenticationMethod switch
@@ -27,7 +23,8 @@ internal static class ConnectionHandler
                allowanceFlag;
     }
 
-    private static async Task<string> GetOAuthResponse(Connection connection,
+    private static async Task<string> GetOAuthResponse(
+        Connection connection,
         CancellationToken cancellationToken)
     {
         using var authClient = new RestClient();
@@ -52,7 +49,8 @@ internal static class ConnectionHandler
 
                 break;
             default:
-                throw new ArgumentOutOfRangeException(nameof(connection),
+                throw new ArgumentOutOfRangeException(
+                    nameof(connection),
                     "This method supports only OAuth2WithPassword and OAuth2WithClientCredentials");
         }
 
@@ -61,8 +59,13 @@ internal static class ConnectionHandler
         var authResponse = await authClient.ExecuteAsync(authRequest, cancellationToken);
 
         if (!authResponse.IsSuccessful)
+        {
+            var details = string.IsNullOrWhiteSpace(authResponse.Content) ? string.Empty : $" {authResponse.Content}";
+
             throw new Exception(
-                $"Failed to obtain access token. HTTP {(int)authResponse.StatusCode} ({authResponse.StatusCode}).");
+                $"Failed to obtain access token. HTTP {(int)authResponse.StatusCode} ({authResponse.StatusCode}).{details}");
+        }
+
         dynamic responseContent = JsonConvert.DeserializeObject<dynamic>(authResponse.Content);
         string accessToken = responseContent?.access_token ?? throw new Exception("Access token not found in response");
 
