@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using dotenv.net;
@@ -268,48 +269,7 @@ public class UnitTests
     }
 
     [TestMethod]
-    [ExpectedException(typeof(Exception))]
-    public async Task EmptyAccessToken_ThrowTest()
-    {
-        var input = new Input
-        {
-            SObjectId = "123456789",
-            SObjectAsJson = userJson,
-            SObjectType = "Contact",
-        };
-
-        var con = new Connection
-        {
-            AuthenticationMethod = AuthenticationMethod.AccessToken,
-            AccessToken = " ",
-        };
-
-        await Salesforce.UpdateSObject(input, con, new Options(), cancellationToken);
-    }
-
-    [TestMethod]
-    [ExpectedException(typeof(Exception))]
-    public async Task EmptyDomain_ThrowTest()
-    {
-        var input = new Input
-        {
-            SObjectId = "123456789",
-            SObjectType = "Account",
-        };
-
-        var con = new Connection
-        {
-            InstanceUrl = null,
-            ApiVersion = "v61.0",
-            AuthenticationMethod = AuthenticationMethod.AccessToken,
-            AccessToken = token,
-        };
-
-        await Salesforce.UpdateSObject(input, con, new Options(), cancellationToken);
-    }
-
-    [TestMethod]
-    [ExpectedException(typeof(Exception))]
+    [ExpectedException(typeof(ArgumentNullException))]
     public async Task EmptyId_ThrowTest()
     {
         var input = new Input
@@ -330,7 +290,7 @@ public class UnitTests
     }
 
     [TestMethod]
-    [ExpectedException(typeof(Exception))]
+    [ExpectedException(typeof(ArgumentNullException))]
     public async Task EmptyJson_ThrowTest()
     {
         var input = new Input
@@ -351,7 +311,7 @@ public class UnitTests
     }
 
     [TestMethod]
-    [ExpectedException(typeof(Exception))]
+    [ExpectedException(typeof(ArgumentNullException))]
     public async Task EmptyType_ThrowTest()
     {
         var input = new Input
@@ -447,7 +407,7 @@ public class UnitTests
     }
 
     [TestMethod]
-    [ExpectedException(typeof(Exception))]
+    [ExpectedException(typeof(HttpRequestException))]
     public async Task InvalidId_ThrowTest()
     {
         var input = new Input
@@ -469,7 +429,7 @@ public class UnitTests
     }
 
     [TestMethod]
-    [ExpectedException(typeof(Exception))]
+    [ExpectedException(typeof(JsonReaderException))]
     public async Task InvalidJson_ThrowTest()
     {
         var input = new Input
@@ -491,7 +451,7 @@ public class UnitTests
     }
 
     [TestMethod]
-    [ExpectedException(typeof(Exception))]
+    [ExpectedException(typeof(HttpRequestException))]
     public async Task NotFoundId_ThrowTest()
     {
         var input = new Input

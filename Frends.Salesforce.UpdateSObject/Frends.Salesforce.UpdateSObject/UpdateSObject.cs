@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Net;
@@ -7,8 +7,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using Frends.Salesforce.UpdateSObject.Definitions;
 using Frends.Salesforce.UpdateSObject.Helpers;
-using Microsoft.CSharp.RuntimeBinder;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using RestSharp;
 
 namespace Frends.Salesforce.UpdateSObject;
@@ -33,6 +33,9 @@ public static class Salesforce
         [PropertyTab] Options options,
         CancellationToken cancellationToken)
     {
+        string accessToken = null;
+        RestResponse response = null;
+
         try
         {
             ValidationHandler.Run(input, connection);
@@ -41,7 +44,7 @@ public static class Salesforce
                 new RestClient(
                     $"{connection.InstanceUrl}/services/data/{connection.ApiVersion}/sobjects/{input.SObjectType}/{input.SObjectId}");
             var request = new RestRequest("/", Method.Patch);
-            var accessToken = await ConnectionHandler.GetAccessToken(connection, cancellationToken);
+            accessToken = await ConnectionHandler.GetAccessToken(connection, cancellationToken);
             request.AddHeader("Authorization", "Bearer " + accessToken);
 
             if (!ConnectionHandler.ShouldReturnToken(connection.AuthenticationMethod, connection.ReturnAccessToken))
@@ -53,17 +56,25 @@ public static class Salesforce
             request.RequestFormat = DataFormat.Json;
             request.AddJsonBody(json);
 
-            var response = await client.ExecuteAsync(request, cancellationToken);
-            var content = JsonConvert.DeserializeObject<dynamic>(response.Content);
+            response = await client.ExecuteAsync(request, cancellationToken);
+            var content = TryDeserialize(response.Content);
 
             if (!response.IsSuccessful)
             {
+                if (cancellationToken.IsCancellationRequested && response.ErrorException is OperationCanceledException canceled)
+                {
+                    throw canceled;
+                }
+
                 if (connection.ThrowAnErrorIfNotFound && response.StatusCode == HttpStatusCode.NotFound)
                 {
                     throw new HttpRequestException("Target couldn't be found with given id or type.");
                 }
 
-                throw response.ErrorException ?? new HttpRequestException(response.ErrorMessage);
+                var details = string.IsNullOrWhiteSpace(response.Content) ? string.Empty : $": {response.Content}";
+                throw new HttpRequestException(
+                    $"{response.ErrorException?.Message ?? response.ErrorMessage}{details}",
+                    response.ErrorException);
             }
 
             return new Result
@@ -74,17 +85,28 @@ public static class Salesforce
                 Error = null,
             };
         }
-        catch (JsonReaderException e)
-        {
-            return new Exception("Given input couldn't be parsed to json.", e).Handle(options);
-        }
-        catch (RuntimeBinderException e)
-        {
-            return new Exception("Given Salesforce information is invalid.", e).Handle(options);
-        }
         catch (Exception e)
         {
-            return e.Handle(options);
+            var result = e.Handle(options);
+            result.Body = TryDeserialize(response?.Content);
+            result.Token = accessToken;
+            return result;
         }
     }
+
+    private static JObject TryDeserialize(string content)
+    {
+        if (string.IsNullOrWhiteSpace(content))
+        {
+            return null;
+        }
+
+        try
+        {
+            return JsonConvert.DeserializeObject<JObject>(content);
+        }
+        catch (JsonException)
+        {
+            return null;
+        }    }
 }
