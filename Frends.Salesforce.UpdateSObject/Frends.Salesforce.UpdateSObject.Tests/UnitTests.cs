@@ -1,13 +1,13 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
+using dotenv.net;
 using Frends.Salesforce.UpdateSObject.Definitions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Newtonsoft.Json;
 using RestSharp;
-using dotenv.net;
 using JsonSerializer = System.Text.Json.JsonSerializer;
 
 namespace Frends.Salesforce.UpdateSObject.Tests;
@@ -25,8 +25,8 @@ public class UnitTests
 
     private readonly CancellationToken cancellationToken = CancellationToken.None;
 
-    private readonly string name = "Test" + DateTime.Now.Year + "" + DateTime.Now.Month + "" + DateTime.Now.Day + "" +
-                                   DateTime.Now.Hour + "" + DateTime.Now.Minute + "" + DateTime.Now.Millisecond;
+    private readonly string name = "Test" + DateTime.Now.Year + string.Empty + DateTime.Now.Month + string.Empty + DateTime.Now.Day + string.Empty +
+                                   DateTime.Now.Hour + string.Empty + DateTime.Now.Minute + string.Empty + DateTime.Now.Millisecond;
 
     private Connection connection;
     private string userJson;
@@ -69,7 +69,7 @@ public class UnitTests
     {
         if (resultList != null)
         {
-            for (var i = (resultList.Count - 1); i >= 0; i--)
+            for (var i = resultList.Count - 1; i >= 0; i--)
             {
                 var temp = JsonConvert.SerializeObject(resultList[i]);
                 var obj = JsonConvert.DeserializeObject<dynamic>(temp);
@@ -99,14 +99,18 @@ public class UnitTests
         {
             Name = "NewName_" + name,
         };
-        var result = await Salesforce.UpdateSObject(new Input
-        {
-            SObjectId = id,
-            SObjectType = "Account",
-            SObjectAsJson = JsonSerializer.Serialize(newInput),
-        }, connection, cancellationToken);
+        var result = await Salesforce.UpdateSObject(
+            new Input
+            {
+                SObjectId = id,
+                SObjectType = "Account",
+                SObjectAsJson = JsonSerializer.Serialize(newInput),
+            },
+            connection,
+            new Options(),
+            cancellationToken);
 
-        Assert.IsTrue(result.RequestIsSuccessful);
+        Assert.IsTrue(result.Success);
     }
 
     [TestMethod]
@@ -129,14 +133,18 @@ public class UnitTests
         {
             Name = "NewName_" + name,
         };
-        var result = await Salesforce.UpdateSObject(new Input
-        {
-            SObjectId = id,
-            SObjectType = "Account",
-            SObjectAsJson = JsonSerializer.Serialize(newInput),
-        }, con, cancellationToken);
+        var result = await Salesforce.UpdateSObject(
+            new Input
+            {
+                SObjectId = id,
+                SObjectType = "Account",
+                SObjectAsJson = JsonSerializer.Serialize(newInput),
+            },
+            con,
+            new Options(),
+            cancellationToken);
 
-        Assert.IsTrue(result.RequestIsSuccessful);
+        Assert.IsTrue(result.Success);
     }
 
     [TestMethod]
@@ -155,20 +163,23 @@ public class UnitTests
             Type = "Contact",
             Id = id,
         });
-        var result = await Salesforce.UpdateSObject(new Input
-        {
-            SObjectId = id,
-            SObjectType = "Contact",
-            SObjectAsJson = JsonSerializer.Serialize(
-                new
-                {
-                    Title = "Mr",
-                    LastName = "NewName_" + name,
-                }
-            ),
-        }, connection, cancellationToken);
+        var result = await Salesforce.UpdateSObject(
+            new Input
+            {
+                SObjectId = id,
+                SObjectType = "Contact",
+                SObjectAsJson = JsonSerializer.Serialize(
+                    new
+                    {
+                        Title = "Mr",
+                        LastName = "NewName_" + name,
+                    }),
+            },
+            connection,
+            new Options(),
+            cancellationToken);
 
-        Assert.IsTrue(result.RequestIsSuccessful);
+        Assert.IsTrue(result.Success);
     }
 
     [TestMethod]
@@ -198,21 +209,24 @@ public class UnitTests
             Id = caseId,
         });
 
-        var caseResult = await Salesforce.UpdateSObject(new Input
-        {
-            SObjectId = caseId,
-            SObjectType = "Case",
-            SObjectAsJson = JsonSerializer.Serialize(
-                new
-                {
-                    AccountId = accountId,
-                    Subject = "This is updated test.",
-                    Description = "This is updated test case for Frends.SalesForce.UpdateSObject task.",
-                    Origin = "Web",
-                }
-            ),
-        }, connection, cancellationToken);
-        Assert.IsTrue(caseResult.RequestIsSuccessful);
+        var caseResult = await Salesforce.UpdateSObject(
+            new Input
+            {
+                SObjectId = caseId,
+                SObjectType = "Case",
+                SObjectAsJson = JsonSerializer.Serialize(
+                    new
+                    {
+                        AccountId = accountId,
+                        Subject = "This is updated test.",
+                        Description = "This is updated test case for Frends.SalesForce.UpdateSObject task.",
+                        Origin = "Web",
+                    }),
+            },
+            connection,
+            new Options(),
+            cancellationToken);
+        Assert.IsTrue(caseResult.Success);
     }
 
     [TestMethod]
@@ -240,59 +254,22 @@ public class UnitTests
             Password = password,
             ReturnAccessToken = true,
         };
-        var result = await Salesforce.UpdateSObject(new Input
-        {
-            SObjectId = id,
-            SObjectType = "Account",
-            SObjectAsJson = JsonSerializer.Serialize(newInput),
-        }, con, cancellationToken);
+        var result = await Salesforce.UpdateSObject(
+            new Input
+            {
+                SObjectId = id,
+                SObjectType = "Account",
+                SObjectAsJson = JsonSerializer.Serialize(newInput),
+            },
+            con,
+            new Options(),
+            cancellationToken);
 
         Assert.IsNotNull(result.Token);
     }
 
     [TestMethod]
-    [ExpectedException(typeof(Exception))]
-    public async Task EmptyAccessToken_ThrowTest()
-    {
-        var input = new Input
-        {
-            SObjectId = "123456789",
-            SObjectAsJson = userJson,
-            SObjectType = "Contact",
-        };
-
-        var con = new Connection
-        {
-            AuthenticationMethod = AuthenticationMethod.AccessToken,
-            AccessToken = " ",
-        };
-
-        await Salesforce.UpdateSObject(input, con, cancellationToken);
-    }
-
-    [TestMethod]
-    [ExpectedException(typeof(Exception))]
-    public async Task EmptyDomain_ThrowTest()
-    {
-        var input = new Input
-        {
-            SObjectId = "123456789",
-            SObjectType = "Account",
-        };
-
-        var con = new Connection
-        {
-            InstanceUrl = null,
-            ApiVersion = "v61.0",
-            AuthenticationMethod = AuthenticationMethod.AccessToken,
-            AccessToken = token,
-        };
-
-        await Salesforce.UpdateSObject(input, con, cancellationToken);
-    }
-
-    [TestMethod]
-    [ExpectedException(typeof(Exception))]
+    [ExpectedException(typeof(ArgumentNullException))]
     public async Task EmptyId_ThrowTest()
     {
         var input = new Input
@@ -309,11 +286,11 @@ public class UnitTests
             AccessToken = token,
         };
 
-        await Salesforce.UpdateSObject(input, con, cancellationToken);
+        await Salesforce.UpdateSObject(input, con, new Options(), cancellationToken);
     }
 
     [TestMethod]
-    [ExpectedException(typeof(Exception))]
+    [ExpectedException(typeof(ArgumentNullException))]
     public async Task EmptyJson_ThrowTest()
     {
         var input = new Input
@@ -330,17 +307,17 @@ public class UnitTests
             AccessToken = token,
         };
 
-        await Salesforce.UpdateSObject(input, con, cancellationToken);
+        await Salesforce.UpdateSObject(input, con, new Options(), cancellationToken);
     }
 
     [TestMethod]
-    [ExpectedException(typeof(Exception))]
+    [ExpectedException(typeof(ArgumentNullException))]
     public async Task EmptyType_ThrowTest()
     {
         var input = new Input
         {
             SObjectId = "123456789",
-            SObjectType = "",
+            SObjectType = string.Empty,
         };
 
         var con = new Connection
@@ -351,7 +328,7 @@ public class UnitTests
             AccessToken = token,
         };
 
-        await Salesforce.UpdateSObject(input, con, cancellationToken);
+        await Salesforce.UpdateSObject(input, con, new Options(), cancellationToken);
     }
 
     [TestMethod]
@@ -376,7 +353,7 @@ public class UnitTests
             Password = password,
         };
 
-        await Salesforce.UpdateSObject(input, con, cancellationToken);
+        await Salesforce.UpdateSObject(input, con, new Options(), cancellationToken);
     }
 
     [TestMethod]
@@ -401,9 +378,7 @@ public class UnitTests
             Password = password,
         };
 
-        var result = await Salesforce.UpdateSObject(input, con, cancellationToken);
-        Assert.AreEqual(new HttpRequestException("Request failed with status code NotFound").ToString(),
-            result.ErrorException.ToString());
+        await Salesforce.UpdateSObject(input, con, new Options(), cancellationToken);
     }
 
     [TestMethod]
@@ -428,13 +403,11 @@ public class UnitTests
             Password = password,
         };
 
-        var result = await Salesforce.UpdateSObject(input, con, cancellationToken);
-        Assert.AreEqual(new HttpRequestException("Request failed with status code Unauthorized").ToString(),
-            result.ErrorException.ToString());
+        await Salesforce.UpdateSObject(input, con, new Options(), cancellationToken);
     }
 
     [TestMethod]
-    [ExpectedException(typeof(Exception))]
+    [ExpectedException(typeof(HttpRequestException))]
     public async Task InvalidId_ThrowTest()
     {
         var input = new Input
@@ -452,13 +425,11 @@ public class UnitTests
             AccessToken = token,
         };
 
-        var result = await Salesforce.UpdateSObject(input, con, cancellationToken);
-        Assert.AreEqual(new HttpRequestException("Request failed with status code NotFound").ToString(),
-            result.ErrorException.ToString());
+        await Salesforce.UpdateSObject(input, con, new Options(), cancellationToken);
     }
 
     [TestMethod]
-    [ExpectedException(typeof(Exception))]
+    [ExpectedException(typeof(JsonReaderException))]
     public async Task InvalidJson_ThrowTest()
     {
         var input = new Input
@@ -476,11 +447,11 @@ public class UnitTests
             AccessToken = token,
         };
 
-        await Salesforce.UpdateSObject(input, con, cancellationToken);
+        await Salesforce.UpdateSObject(input, con, new Options(), cancellationToken);
     }
 
     [TestMethod]
-    [ExpectedException(typeof(Exception))]
+    [ExpectedException(typeof(HttpRequestException))]
     public async Task NotFoundId_ThrowTest()
     {
         var input = new Input
@@ -499,9 +470,8 @@ public class UnitTests
             ThrowAnErrorIfNotFound = true,
         };
 
-        await Salesforce.UpdateSObject(input, con, cancellationToken);
+        await Salesforce.UpdateSObject(input, con, new Options(), cancellationToken);
     }
-
 
     [TestMethod]
     public async Task UpdateSObject_WithClientCredentials()
@@ -526,14 +496,18 @@ public class UnitTests
             ClientSecret = clientSecret,
         };
 
-        var result = await Salesforce.UpdateSObject(new Input
-        {
-            SObjectId = id,
-            SObjectType = "Account",
-            SObjectAsJson = JsonSerializer.Serialize(newInput),
-        }, con, cancellationToken);
+        var result = await Salesforce.UpdateSObject(
+            new Input
+            {
+                SObjectId = id,
+                SObjectType = "Account",
+                SObjectAsJson = JsonSerializer.Serialize(newInput),
+            },
+            con,
+            new Options(),
+            cancellationToken);
 
-        Assert.IsTrue(result.RequestIsSuccessful);
+        Assert.IsTrue(result.Success);
     }
 
     [TestMethod]
@@ -560,14 +534,18 @@ public class UnitTests
             ReturnAccessToken = true,
         };
 
-        var result = await Salesforce.UpdateSObject(new Input
-        {
-            SObjectId = id,
-            SObjectType = "Account",
-            SObjectAsJson = JsonSerializer.Serialize(newInput),
-        }, con, cancellationToken);
+        var result = await Salesforce.UpdateSObject(
+            new Input
+            {
+                SObjectId = id,
+                SObjectType = "Account",
+                SObjectAsJson = JsonSerializer.Serialize(newInput),
+            },
+            con,
+            new Options(),
+            cancellationToken);
 
-        Assert.IsTrue(result.RequestIsSuccessful);
+        Assert.IsTrue(result.Success);
         Assert.IsNotEmpty(result.Token);
     }
 

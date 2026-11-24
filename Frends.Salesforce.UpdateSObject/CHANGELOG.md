@@ -1,5 +1,16 @@
 # Changelog
 
+## [4.0.0] - 2026-11-19
+
+### Changed
+
+- Task now targets .NET 8.
+- **[Breaking Change]** Added new `Options` parameter with `ThrowErrorOnFailure` and `ErrorMessageOnFailure`. When `ThrowErrorOnFailure` is false, errors are returned in the result instead of being thrown.
+- **[Breaking Change]** Replaced result properties `RequestIsSuccessful`, `ErrorException` and `ErrorMessage` with `Success` and `Error` (`Message`, `AdditionalInfo`).
+- **[Breaking Change]** An unsuccessful response from Salesforce is treated as a failure and handled according to the `Options` settings.
+- **[Breaking Change]** Errors are no longer wrapped in a generic `Exception`; the original exception is thrown unless `ErrorMessageOnFailure` is set.
+- **[Breaking Change]** Error messages now include the response body returned by Salesforce.
+
 ## [3.0.0] - 2026-04-01
 
 ### Changed

@@ -1,50 +1,33 @@
-﻿using Newtonsoft.Json.Linq;
-using System;
-using System.Runtime.CompilerServices;
+using Newtonsoft.Json.Linq;
 
-[assembly: InternalsVisibleTo("Frends.Salesforce.CreateSObject.Tests")]
 namespace Frends.Salesforce.UpdateSObject.Definitions;
+
 /// <summary>
-/// Result-class for CreateSObject-task.
+/// Result of the task.
 /// </summary>
 public class Result
 {
     /// <summary>
+    /// Indicates if the task completed successfully.
+    /// </summary>
+    /// <example>true</example>
+    public bool Success { get; set; }
+
+    /// <summary>
     /// Body of the response.
     /// </summary>
     /// <example>{"id": "abcdefghijkl123456789",  "success": true,  "errors": []}</example>
-    public JObject Body { get; private set; }
-
-    /// <summary>
-    /// Was the request successful?
-    /// </summary>
-    /// <example>true</example>
-    public bool RequestIsSuccessful { get; private set; }
-
-    /// <summary>
-    /// Exception that was thrown by the server.
-    /// </summary>
-    /// <example>System.Net.Http.HttpRequestException</example>
-    public Exception ErrorException { get; private set; }
-
-    /// <summary>
-    /// Error message from the server.
-    /// </summary>
-    /// <example>System.Net.Http.HttpRequestException: Request failed with status code Unauthorized</example>
-    public string ErrorMessage { get; private set; }
+    public JObject Body { get; set; }
 
     /// <summary>
     /// OAuth2 access token.
     /// </summary>
     /// <example>abcdefghjklmn123456789</example>
-    public string Token { get; private set; }
+    public string Token { get; set; }
 
-    internal Result(JObject body, bool succesful, Exception error, string errormessage, string token)
-    {
-        Body = body;
-        RequestIsSuccessful = succesful;
-        ErrorException = error;
-        ErrorMessage = errormessage;
-        Token = token;
-    }
+    /// <summary>
+    /// Error that occurred during task execution.
+    /// </summary>
+    /// <example>object { string Message, Exception AdditionalInfo }</example>
+    public Error Error { get; set; }
 }

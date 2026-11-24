@@ -1,7 +1,8 @@
-﻿using System.ComponentModel;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 
 namespace Frends.Salesforce.UpdateSObject.Definitions;
+
 /// <summary>
 /// Input-class for CreateSObject-task.
 /// </summary>

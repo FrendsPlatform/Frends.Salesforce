@@ -19,7 +19,6 @@ public class ConnectionHandlerTests
     private static string domain;
     private static Connection connection;
 
-
     [ClassInitialize]
     public static void ClassInitialize(TestContext testContext)
     {
@@ -130,6 +129,4 @@ public class ConnectionHandlerTests
         var result = ConnectionHandler.ShouldReturnToken(AuthenticationMethod.OAuth2WithPassword, false);
         Assert.IsFalse(result);
     }
-
-
 }
