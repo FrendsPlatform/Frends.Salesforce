@@ -1,13 +1,10 @@
-﻿using Frends.Salesforce.ExecuteQuery.Definitions;
-using Newtonsoft.Json;
-using RestSharp;
-using System;
 using System.ComponentModel;
 using System.Net;
 using System.Runtime.CompilerServices;
-using System.Threading;
-using System.Threading.Tasks;
+using Frends.Salesforce.ExecuteQuery.Definitions;
 using Frends.Salesforce.ExecuteQuery.Helpers;
+using Newtonsoft.Json;
+using RestSharp;
 
 [assembly: InternalsVisibleTo("Frends.Salesforce.ExecuteQuery.Tests")]
 
@@ -31,10 +28,10 @@ public static class Salesforce
         [PropertyTab] Input input,
         [PropertyTab] Connection connection,
         [PropertyTab] Options options,
-        CancellationToken cancellationToken
-    )
+        CancellationToken cancellationToken)
     {
         var accessToken = string.Empty;
+        RestResponse response = null;
 
         try
         {
@@ -50,11 +47,19 @@ public static class Salesforce
             if (!ConnectionHandler.ShouldReturnToken(connection.AuthenticationMethod, connection.ReturnAccessToken))
                 accessToken = string.Empty;
 
-            var response = await client.ExecuteAsync(request, cancellationToken);
-            dynamic content = JsonConvert.DeserializeObject(response.Content);
+            response = await client.ExecuteAsync(request, cancellationToken);
+            var content = TryDeserialize(response.Content);
 
             if (!response.IsSuccessful)
-                throw new Exception(content[0].Value<string>("message"), response.ErrorException);
+            {
+                if (cancellationToken.IsCancellationRequested && response.ErrorException is OperationCanceledException canceled)
+                    throw canceled;
+
+                var details = string.IsNullOrWhiteSpace(response.Content) ? string.Empty : $": {response.Content}";
+                throw new HttpRequestException(
+                    $"{response.ErrorException?.Message ?? response.ErrorMessage}{details}",
+                    response.ErrorException);
+            }
 
             return new Result
             {
@@ -66,7 +71,23 @@ public static class Salesforce
         }
         catch (Exception e)
         {
-            return e.Handle(options);
+            var result = e.Handle(options);
+            result.Body = TryDeserialize(response?.Content);
+            result.Token = accessToken;
+            return result;
+        }
+    }
+
+    private static object TryDeserialize(string content)
+    {
+        if (string.IsNullOrWhiteSpace(content)) return null;
+        try
+        {
+            return JsonConvert.DeserializeObject<dynamic>(content);
+        }
+        catch (JsonException)
+        {
+            return content;
         }
     }
 }

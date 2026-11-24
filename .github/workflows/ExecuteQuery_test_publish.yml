@@ -1,17 +1,22 @@
-name: ExecuteQuery_build_main
+name: ExecuteQuery test publish
+permissions:
+  contents: read
 
 on:
   push:
-    branches:    
+    branches-ignore:
       - main
     paths:
       - 'Frends.Salesforce.ExecuteQuery/**'
+      - '.github/workflows/ExecuteQuery*.yml'
   workflow_dispatch:
 
 jobs:
-  build:
-    uses: FrendsPlatform/FrendsTasks/.github/workflows/build_main.yml@main
+  work_push:
+    uses: FrendsPlatform/FrendsTasks/.github/workflows/official_task_pipeline.yml@main
     with:
+      workflow_mode: work
+      os: win
       workdir: Frends.Salesforce.ExecuteQuery
       env_var_name_1: Salesforce_Client_Secret
       env_var_name_2: Salesforce_Password
@@ -22,6 +27,7 @@ jobs:
       env_var_name_7: Salesforce_Auth_Url
     secrets:
       badge_service_api_key: ${{ secrets.BADGE_SERVICE_API_KEY }}
+      target_feed_api_key: ${{ secrets.TASKS_TEST_FEED_API_KEY }}
       env_var_value_1: ${{ secrets.SALESFORCE_CLIENT_SECRET }}
       env_var_value_2: ${{ secrets.SALESFORCE_PASSWORD }}
       env_var_value_3: ${{ secrets.SALESFORCE_SECURITY_TOKEN }}

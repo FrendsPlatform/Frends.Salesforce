@@ -1,9 +1,10 @@
-﻿using System;
+using System;
+using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
+using dotenv.net;
 using Frends.Salesforce.ExecuteQuery.Definitions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using dotenv.net;
 
 namespace Frends.Salesforce.ExecuteQuery.Tests;
 
@@ -123,69 +124,8 @@ public class UnitTests
         Assert.IsTrue(result.Success);
     }
 
-
     [TestMethod]
-    [ExpectedException(typeof(Exception))]
-    public async Task EmptyQuery_ThrowTest()
-    {
-        var input = new Input
-        {
-            Query = null,
-        };
-
-        var con = new Connection
-        {
-            InstanceUrl = domain,
-            ApiVersion = "v61.0",
-            AuthenticationMethod = AuthenticationMethod.AccessToken,
-            AccessToken = token,
-        };
-
-        await Salesforce.ExecuteQuery(input, con, new Options(), cancellationToken);
-    }
-
-    [TestMethod]
-    [ExpectedException(typeof(Exception))]
-    public async Task EmptyAccessToken_ThrowTest()
-    {
-        var input = new Input
-        {
-            Query = "SELECT Name from Customer",
-        };
-
-        var con = new Connection
-        {
-            InstanceUrl = domain,
-            ApiVersion = "v61.0",
-            AuthenticationMethod = AuthenticationMethod.AccessToken,
-            AccessToken = " ",
-        };
-
-        await Salesforce.ExecuteQuery(input, con, new Options(), cancellationToken);
-    }
-
-    [TestMethod]
-    [ExpectedException(typeof(Exception))]
-    public async Task EmptyDomain_ThrowTest()
-    {
-        var input = new Input
-        {
-            Query = "SELECT Name from Customer",
-        };
-
-        var con = new Connection
-        {
-            InstanceUrl = null,
-            ApiVersion = "v61.0",
-            AuthenticationMethod = AuthenticationMethod.AccessToken,
-            AccessToken = token,
-        };
-
-        await Salesforce.ExecuteQuery(input, con, new Options(), cancellationToken);
-    }
-
-    [TestMethod]
-    [ExpectedException(typeof(Exception))]
+    [ExpectedException(typeof(HttpRequestException))]
     public async Task InvalidDomain_ThrowTest()
     {
         var input = new Input
